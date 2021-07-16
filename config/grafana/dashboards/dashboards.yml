@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+- name: 'Lido basset dashboards'
+  orgId: 1
+  folder: 'lido'
+  type: file
+  disableDeletion: true
+  editable: true
+  options:
+    path: /etc/grafana/provisioning/dashboards/lido_basset
