@@ -17,14 +17,11 @@ func main() {
 	flag.Parse()
 	logger := logging.NewDefaultLogger()
 	c := collector.NewLCDCollector(
-		"https://lcd.terra.dev",
 		"terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
 		logger,
 	)
 
 	c.BlunaContractAddress = "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp"
-
-	// mc := collector.MockCollector{}
 
 	p := extractor.NewPromExtractor(&c, logger)
 	app := app.NewAppHTTP(p)

@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
+	"github.com/go-openapi/runtime"
+	"github.com/lidofinance/terra-monitors/client"
+	"github.com/lidofinance/terra-monitors/client/wasm"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,14 +22,16 @@ var (
 	GlobalIndex       Metrics = "global_index"
 )
 
-func parseRequestBody(resp *http.Response, ret interface{}) error {
+// type
+
+func ParseRequestBody(body io.ReadCloser, ret interface{}) error {
 	m := struct {
 		Result interface{} `json:"result"`
 		Error  string      `json:"error"`
 	}{
 		Result: ret,
 	}
-	decoder := json.NewDecoder(resp.Body)
+	decoder := json.NewDecoder(body)
 	err := decoder.Decode(&m)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal response body: %w", err)
@@ -45,12 +51,11 @@ type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func NewLCDCollector(endpoint string, RewardContractAddress string, logger *logrus.Logger) LCDCollector {
+func NewLCDCollector(RewardContractAddress string, logger *logrus.Logger) LCDCollector {
 	return LCDCollector{
 		logger:                logger,
-		LCDEndpoint:           endpoint,
-		RewardContractAddress: RewardContractAddress,
-		HttpClient:            http.DefaultClient,
+		rewardContractAddress: RewardContractAddress,
+		apiClient:             client.NewHTTPClient(nil),
 	}
 }
 
@@ -58,10 +63,14 @@ type LCDCollector struct {
 	logger                *logrus.Logger
 	LCDEndpoint           string
 	HubAddress            string
-	RewardContractAddress string
+	rewardContractAddress string
 	BlunaContractAddress  string
 	CollectedData         CollectedData
-	HttpClient            HttpClient
+	apiClient             *client.TerraLiteForTerra
+}
+
+func (c *LCDCollector) SetTransport(transport runtime.ClientTransport) {
+	c.apiClient.SetTransport(transport)
 }
 
 func (c LCDCollector) Get(metric Metrics) (float64, error) {
@@ -76,75 +85,50 @@ func (c LCDCollector) Get(metric Metrics) (float64, error) {
 	return 0, fmt.Errorf("metric \"%s\" not found", metric)
 }
 
-func (c LCDCollector) buildRequest(ctx context.Context, contractAddress string, query interface{}) (*http.Request, error) {
-	url := fmt.Sprintf("%s/wasm/contracts/%s/store", c.LCDEndpoint, contractAddress)
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to prapare request for %+v query: %w", query, err)
-	}
-	q := req.URL.Query()
-	queryRaw, err := json.Marshal(query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal %+v query: %w", query, err)
-	}
-	q.Add("query_msg", string(queryRaw))
-	req.URL.RawQuery = q.Encode()
-	return req, nil
-}
-
-func (c LCDCollector) processRequest(req *http.Request, ret interface{}) error {
-	resp, err := c.HttpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to get request: %w", err)
-	}
-
-	err = parseRequestBody(resp, ret)
-	if err != nil {
-		return fmt.Errorf("failed to process response body: %w", err)
-	}
-	return nil
-}
-
-func (c LCDCollector) buildAndProcessRequest(
-	ctx context.Context,
-	contractAddress string,
-	query interface{},
-	ret interface{},
-) error {
-	req, err := c.buildRequest(ctx, contractAddress, query)
-	if err != nil {
-		return fmt.Errorf(
-			"failed to build request %+v for %s contract: %w",
-			query,
-			contractAddress,
-			err,
-		)
-	}
-	err = c.processRequest(req, ret)
-	if err != nil {
-		return fmt.Errorf("failed to process %+v request for %s contract: %w", query, contractAddress, err)
-	}
-	return nil
-}
-
 func (c *LCDCollector) getRewardState(ctx context.Context) (*RewardStateResponse, error) {
-	req, resp := GetRewardResponseStatePair()
-	err := c.buildAndProcessRequest(ctx, c.RewardContractAddress, req, &resp)
+	stateReq, stateResp := GetRewardResponseStatePair()
+	reqRaw, err := json.Marshal(&stateReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal token request: %w", err)
+	}
+	p := wasm.GetWasmContractsContractAddressStoreParams{}
+	p.SetContext(ctx)
+	p.SetContractAddress(c.rewardContractAddress)
+	p.SetQueryMsg(string(reqRaw))
+	_, err = c.apiClient.Wasm.GetWasmContractsContractAddressStore(&p,
+		//custom reader unmarshals json data to Go struct
+		func(op *runtime.ClientOperation) {
+			op.Reader = &PayloadExtractor{PayloadResult: &stateResp}
+		},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to process RewardState request: %w", err)
 	}
 	c.logger.Infoln("updated reward state info")
-	return &resp, nil
+	return &stateResp, nil
 }
 
 func (c *LCDCollector) getBlunaTokenInfo(ctx context.Context) (*TokenInfoResponse, error) {
-	req, resp := GetCommonTokenInfoPair()
-	err := c.buildAndProcessRequest(ctx, c.BlunaContractAddress, req, &resp)
+	tokreq, tokresp := GetCommonTokenInfoPair()
+	reqRaw, err := json.Marshal(&tokreq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal token request: %w", err)
+	}
+	p := wasm.GetWasmContractsContractAddressStoreParams{}
+	p.SetContext(ctx)
+	p.SetContractAddress(c.BlunaContractAddress)
+	p.SetQueryMsg(string(reqRaw))
+	_, err = c.apiClient.Wasm.GetWasmContractsContractAddressStore(&p,
+		//custom reader unmarshals json data to Go struct
+		func(op *runtime.ClientOperation) {
+			op.Reader = &PayloadExtractor{PayloadResult: &tokresp}
+		},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to process BlunaTokenInfo request: %w", err)
 	}
 	c.logger.Infoln("updated bluna token info")
-	return &resp, nil
+	return &tokresp, nil
 }
 
 func (c *LCDCollector) UpdateData(ctx context.Context) error {
