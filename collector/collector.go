@@ -44,11 +44,10 @@ func NewLCDCollector(logger *logrus.Logger) LCDCollector {
 }
 
 type LCDCollector struct {
-	Metrics       map[Metrics]Monitor
-	Monitors      []Monitor
-	logger        *logrus.Logger
-	CollectedData CollectedData
-	apiClient     *client.TerraLiteForTerra
+	Metrics   map[Metrics]Monitor
+	Monitors  []Monitor
+	logger    *logrus.Logger
+	apiClient *client.TerraLiteForTerra
 }
 
 func (c *LCDCollector) SetTransport(transport runtime.ClientTransport) {
