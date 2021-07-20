@@ -73,7 +73,7 @@ func (h HubStateMonitor) Get(metric Metrics) (float64, error) {
 	case BlunaExchangeRate:
 		return strconv.ParseFloat(h.State.ExchangeRate, 64)
 	}
-	return 0, &MetricDoesNotExistsError{metricName: metric}
+	return 0, &MetricDoesNotExistError{metricName: metric}
 }
 
 func (h *HubStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {

@@ -64,10 +64,10 @@ func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
 	return CommonStateRequest{}, HubStateResponse{}
 }
 
-type MetricDoesNotExistsError struct {
+type MetricDoesNotExistError struct {
 	metricName Metrics
 }
 
-func (m *MetricDoesNotExistsError) Error() string {
+func (m *MetricDoesNotExistError) Error() string {
 	return fmt.Sprintf("metric \"%s\" does not exists on monitor", m.metricName)
 }

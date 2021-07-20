@@ -69,7 +69,7 @@ func (h BlunaTokenInfoMonitor) Get(metric Metrics) (float64, error) {
 	case BlunaTotalSupply:
 		return strconv.ParseFloat(h.State.TotalSupply, 64)
 	}
-	return 0, &MetricDoesNotExistsError{metricName: metric}
+	return 0, &MetricDoesNotExistError{metricName: metric}
 }
 
 func (h *BlunaTokenInfoMonitor) SetApiClient(client *client.TerraLiteForTerra) {

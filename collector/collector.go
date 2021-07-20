@@ -79,7 +79,7 @@ func (c *LCDCollector) RegisterMonitor(m Monitor) {
 		}
 		c.Metrics[metric] = m
 		_, err := m.Get(metric)
-		var doesNotExistsError *MetricDoesNotExistsError
+		var doesNotExistsError *MetricDoesNotExistError
 		if err != nil && errors.As(err, &doesNotExistsError) {
 			panic(fmt.Sprintf("register monitor %s failed. Metric validation error. %+v", m.Name(), err))
 		}
@@ -93,9 +93,10 @@ type Monitor interface {
 	Name() string
 	SetApiClient(*client.TerraLiteForTerra)
 	SetLogger(*logrus.Logger)
-	//Handler fetches the data to inner storage
+	// Handler fetches the data to inner storage
 	Handler(ctx context.Context) error
 	ProvidedMetrics() []Metrics
-	//Provides metric fetched by Handler method
+	// Get - provides metric fetched by Handler method
+	// In case metric does not exist on the monitor, you MUST return MetricDoesNotExistError type error
 	Get(m Metrics) (float64, error)
 }

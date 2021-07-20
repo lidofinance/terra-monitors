@@ -69,7 +69,7 @@ func (h RewardStateMonitor) Get(metric Metrics) (float64, error) {
 	case GlobalIndex:
 		return strconv.ParseFloat(h.State.GlobalIndex, 64)
 	}
-	return 0, &MetricDoesNotExistsError{metricName: metric}
+	return 0, &MetricDoesNotExistError{metricName: metric}
 }
 
 func (h *RewardStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {
