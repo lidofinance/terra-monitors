@@ -94,7 +94,9 @@ type Monitor interface {
 	Name() string
 	SetApiClient(*client.TerraLiteForTerra)
 	SetLogger(*logrus.Logger)
+	//Handler fetches the data to inner storage
 	Handler(ctx context.Context) error
 	ProvidedMetrics() []Metrics
+	//Provides metric fetched by Handler method
 	Get(m Metrics) (float64, error)
 }

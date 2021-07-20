@@ -11,6 +11,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	HubContract            = "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts"
+	RewardContract         = "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0"
+	BlunaTokenInfoContract = "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp"
+)
+
 var addr = flag.String("listen-address", ":8080",
 	"The address to listen on for HTTP requests.")
 
@@ -18,13 +24,13 @@ func createCollector(logger *logrus.Logger) collector.LCDCollector {
 	c := collector.NewLCDCollector(
 		logger,
 	)
-	hubStateMonitor := collector.NewHubStateMintor("terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts")
+	hubStateMonitor := collector.NewHubStateMintor(HubContract)
 	c.RegisterMonitor(&hubStateMonitor)
 
-	rewardStateMonitor := collector.NewRewardStateMintor("terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0")
+	rewardStateMonitor := collector.NewRewardStateMintor(RewardContract)
 	c.RegisterMonitor(&rewardStateMonitor)
 
-	blunaTokenInfoMonitor := collector.NewBlunaTokenInfoMintor("terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp")
+	blunaTokenInfoMonitor := collector.NewBlunaTokenInfoMintor(BlunaTokenInfoContract)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
 	return c
 }
