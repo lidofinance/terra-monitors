@@ -5,7 +5,7 @@ import (
 	"github.com/lidofinance/terra-monitors/client/wasm"
 )
 
-func GetRewardResponseStatePair() (CommonStateRequest, RewardStateResponse) {
+func GetRewardStatePair() (CommonStateRequest, RewardStateResponse) {
 	return CommonStateRequest{}, RewardStateResponse{}
 }
 
@@ -50,6 +50,7 @@ type TokenInfoResponse struct {
 //     pub last_processed_batch: u64,
 // }
 
+//shoud be corrtced after contract migration according new response schema
 type HubStateResponse struct {
 	ExchangeRate          string `json:"exchange_rate"`     //decimal
 	TotalBondAmount       string `json:"total_bond_amount"` //uint128
@@ -58,6 +59,10 @@ type HubStateResponse struct {
 	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` //uint128
 	LastUnbondedTime      uint64 `json:"last_unbonded_time"`
 	LastProcessedBatch    uint64 `json:"last_processed_batch"`
+}
+
+func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
+	return CommonStateRequest{}, HubStateResponse{}
 }
 
 type CollectedData struct {

@@ -17,6 +17,7 @@ func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtracto
 	p.log = logger
 	p.addGauge(collector.BlunaTotalSupply)
 	p.addGauge(collector.GlobalIndex)
+	p.addGauge(collector.BlunaExchangeRate)
 	return p
 }
 

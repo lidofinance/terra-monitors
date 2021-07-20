@@ -71,5 +71,10 @@ paths:
                 type: string
               result:
                 type: object
+        500:
+          description: Error
+          schema:
+            type: object
+            properties:
               error:
                 type: string
