@@ -17,7 +17,7 @@ func (suite *CollectorTestSuite) SetupTest() {
 	logger := logging.NewDefaultLogger()
 	out := bytes.NewBuffer(nil)
 	logger.Out = out
-	suite.Collector = NewLCDCollector("terra421h3krehwjkfls", logger)
+	suite.Collector = NewLCDCollector(logger)
 	httpClient := NewMockClient()
 	tr := NewMockTransport(httpClient)
 	suite.Collector.SetTransport(tr)

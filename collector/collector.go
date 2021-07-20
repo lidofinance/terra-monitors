@@ -34,7 +34,7 @@ type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func NewLCDCollector(RewardContractAddress string, logger *logrus.Logger) LCDCollector {
+func NewLCDCollector(logger *logrus.Logger) LCDCollector {
 	return LCDCollector{
 		Metrics:   make(map[Metrics]Monitor),
 		logger:    logger,
