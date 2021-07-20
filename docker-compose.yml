@@ -6,9 +6,21 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+    environment:
+      - GF_RENDERING_SERVER_URL=http://renderer:8081/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - TELEGRAM_BOTTOKEN=${TELEGRAM_BOTTOKEN}
     volumes:
       - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
       - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/notifiers:/etc/grafana/provisioning/notifiers
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    ports:
+      - 8081
+    environment:
+      ENABLE_METRICS: 'true'
   prometheus:
     image: prom/prometheus
     ports:
