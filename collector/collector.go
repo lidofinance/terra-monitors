@@ -3,6 +3,7 @@ package collector
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -74,7 +75,15 @@ func (c *LCDCollector) UpdateData(ctx context.Context) error {
 
 func (c *LCDCollector) RegisterMonitor(m Monitor) {
 	for _, metric := range m.ProvidedMetrics() {
+		if founded, found := c.Metrics[metric]; found {
+			panic(fmt.Sprintf("register mintor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), founded.Name(), metric))
+		}
 		c.Metrics[metric] = m
+		_, err := m.Get(metric)
+		var doesNotExistsError *MetricDoesNotExistsError
+		if err != nil && errors.As(err, &doesNotExistsError) {
+			panic(fmt.Sprintf("register mintor %s failed. Metric validation error. %+v", m.Name(), err))
+		}
 	}
 	c.Monitors = append(c.Monitors, m)
 	m.SetApiClient(c.apiClient)
@@ -82,6 +91,7 @@ func (c *LCDCollector) RegisterMonitor(m Monitor) {
 }
 
 type Monitor interface {
+	Name() string
 	SetApiClient(*client.TerraLiteForTerra)
 	SetLogger(*logrus.Logger)
 	Handler(ctx context.Context) error

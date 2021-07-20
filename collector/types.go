@@ -1,6 +1,8 @@
 package collector
 
 import (
+	"fmt"
+
 	"github.com/go-openapi/runtime"
 	"github.com/lidofinance/terra-monitors/client/wasm"
 )
@@ -90,4 +92,12 @@ func (o *PayloadExtractor) ReadResponse(response runtime.ClientResponse, consume
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
+}
+
+type MetricDoesNotExistsError struct {
+	metricName Metrics
+}
+
+func (m *MetricDoesNotExistsError) Error() string {
+	return fmt.Sprintf("metric \"%s\" does not exists on monitor", m.metricName)
 }

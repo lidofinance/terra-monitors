@@ -30,6 +30,10 @@ type HubStateMonitor struct {
 	logger     *logrus.Logger
 }
 
+func (h HubStateMonitor) Name() string {
+	return "HubState"
+}
+
 func (h *HubStateMonitor) Handler(ctx context.Context) error {
 	hubreq, hubresp := GetHubStatePair()
 	reqRaw, err := json.Marshal(&hubreq)
@@ -69,7 +73,7 @@ func (h HubStateMonitor) Get(metric Metrics) (float64, error) {
 	case BlunaExchangeRate:
 		return strconv.ParseFloat(h.State.ExchangeRate, 64)
 	}
-	return 0, fmt.Errorf("metric \"%s\" not found", metric)
+	return 0, &MetricDoesNotExistsError{metricName: metric}
 }
 
 func (h *HubStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {

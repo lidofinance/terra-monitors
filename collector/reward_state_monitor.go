@@ -29,6 +29,10 @@ type RewardStateMonitor struct {
 	logger          *logrus.Logger
 }
 
+func (h RewardStateMonitor) Name() string {
+	return "RewardState"
+}
+
 func (h *RewardStateMonitor) Handler(ctx context.Context) error {
 	rewardreq, rewardresp := GetRewardStatePair()
 	reqRaw, err := json.Marshal(&rewardreq)
@@ -65,7 +69,7 @@ func (h RewardStateMonitor) Get(metric Metrics) (float64, error) {
 	case GlobalIndex:
 		return strconv.ParseFloat(h.State.GlobalIndex, 64)
 	}
-	return 0, fmt.Errorf("metric \"%s\" not found", metric)
+	return 0, &MetricDoesNotExistsError{metricName: metric}
 }
 
 func (h *RewardStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {

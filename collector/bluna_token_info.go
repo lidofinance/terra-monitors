@@ -29,6 +29,10 @@ type BlunaTokenInfoMonitor struct {
 	logger          *logrus.Logger
 }
 
+func (h BlunaTokenInfoMonitor) Name() string {
+	return "BlunaTokenInfo"
+}
+
 func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
 	rewardreq, rewardresp := GetCommonTokenInfoPair()
 	reqRaw, err := json.Marshal(&rewardreq)
@@ -65,7 +69,7 @@ func (h BlunaTokenInfoMonitor) Get(metric Metrics) (float64, error) {
 	case BlunaTotalSupply:
 		return strconv.ParseFloat(h.State.TotalSupply, 64)
 	}
-	return 0, fmt.Errorf("metric \"%s\" not found", metric)
+	return 0, &MetricDoesNotExistsError{metricName: metric}
 }
 
 func (h *BlunaTokenInfoMonitor) SetApiClient(client *client.TerraLiteForTerra) {
