@@ -12,8 +12,8 @@ import (
 func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtractor {
 	p := PromExtractor{}
 	p.collector = c
-	p.Gauges = make(map[collector.Metrics]prometheus.Gauge)
-	p.GaugeMetrics = []collector.Metrics{}
+	p.Gauges = make(map[collector.Metric]prometheus.Gauge)
+	p.GaugeMetrics = []collector.Metric{}
 	p.log = logger
 	for _, m := range p.collector.ProvidedMetrics() {
 		p.addGauge(m)
@@ -23,12 +23,12 @@ func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtracto
 
 type PromExtractor struct {
 	collector    collector.Collector
-	Gauges       map[collector.Metrics]prometheus.Gauge
-	GaugeMetrics []collector.Metrics
+	Gauges       map[collector.Metric]prometheus.Gauge
+	GaugeMetrics []collector.Metric
 	log          *logrus.Logger
 }
 
-func (p *PromExtractor) addGauge(name collector.Metrics) {
+func (p *PromExtractor) addGauge(name collector.Metric) {
 	p.Gauges[name] = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: string(name),
@@ -37,7 +37,7 @@ func (p *PromExtractor) addGauge(name collector.Metrics) {
 	p.GaugeMetrics = append(p.GaugeMetrics, name)
 }
 
-func (p *PromExtractor) updateGaugeValue(name collector.Metrics) error {
+func (p *PromExtractor) updateGaugeValue(name collector.Metric) error {
 	value, err := p.collector.Get(name)
 	if err != nil {
 		return fmt.Errorf("failed to update metric \"%s\": %w", name, err)

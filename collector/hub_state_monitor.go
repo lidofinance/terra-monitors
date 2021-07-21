@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	BlunaBondedAmount Metrics = "bluna_bonded_amount"
-	BlunaExchangeRate Metrics = "bluna_exchange_rate"
+	BlunaBondedAmount Metric = "bluna_bonded_amount"
+	BlunaExchangeRate Metric = "bluna_exchange_rate"
 )
 
 func NewHubStateMintor(address string) HubStateMonitor {
@@ -59,14 +59,14 @@ func (h *HubStateMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h HubStateMonitor) ProvidedMetrics() []Metrics {
-	return []Metrics{
+func (h HubStateMonitor) ProvidedMetrics() []Metric {
+	return []Metric{
 		BlunaExchangeRate,
 		BlunaBondedAmount,
 	}
 }
 
-func (h HubStateMonitor) Get(metric Metrics) (float64, error) {
+func (h HubStateMonitor) Get(metric Metric) (float64, error) {
 	switch metric {
 	case BlunaBondedAmount:
 		return strconv.ParseFloat(h.State.TotalBondAmount, 64)

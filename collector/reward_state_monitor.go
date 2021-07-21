@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	GlobalIndex Metrics = "global_index"
+	GlobalIndex Metric = "global_index"
 )
 
 func NewRewardStateMintor(address string) RewardStateMonitor {
@@ -58,13 +58,13 @@ func (h *RewardStateMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h RewardStateMonitor) ProvidedMetrics() []Metrics {
-	return []Metrics{
+func (h RewardStateMonitor) ProvidedMetrics() []Metric {
+	return []Metric{
 		GlobalIndex,
 	}
 }
 
-func (h RewardStateMonitor) Get(metric Metrics) (float64, error) {
+func (h RewardStateMonitor) Get(metric Metric) (float64, error) {
 	switch metric {
 	case GlobalIndex:
 		return strconv.ParseFloat(h.State.GlobalIndex, 64)

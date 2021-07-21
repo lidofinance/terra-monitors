@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	BlunaTotalSupply Metrics = "bluna_total_supply"
+	BlunaTotalSupply Metric = "bluna_total_supply"
 )
 
 func NewBlunaTokenInfoMintor(address string) BlunaTokenInfoMonitor {
@@ -58,13 +58,13 @@ func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h BlunaTokenInfoMonitor) ProvidedMetrics() []Metrics {
-	return []Metrics{
+func (h BlunaTokenInfoMonitor) ProvidedMetrics() []Metric {
+	return []Metric{
 		BlunaTotalSupply,
 	}
 }
 
-func (h BlunaTokenInfoMonitor) Get(metric Metrics) (float64, error) {
+func (h BlunaTokenInfoMonitor) Get(metric Metric) (float64, error) {
 	switch metric {
 	case BlunaTotalSupply:
 		return strconv.ParseFloat(h.State.TotalSupply, 64)

@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Metrics string
+type Metric string
 
 func CastMapToStruct(m interface{}, ret interface{}) error {
 	data, err := json.Marshal(m)
@@ -27,8 +27,8 @@ func CastMapToStruct(m interface{}, ret interface{}) error {
 }
 
 type Collector interface {
-	Get(metric Metrics) (float64, error)
-	ProvidedMetrics() []Metrics
+	Get(metric Metric) (float64, error)
+	ProvidedMetrics() []Metric
 	UpdateData(ctx context.Context) error
 }
 
@@ -38,21 +38,21 @@ type HttpClient interface {
 
 func NewLCDCollector(logger *logrus.Logger) LCDCollector {
 	return LCDCollector{
-		Metrics:   make(map[Metrics]Monitor),
+		Metrics:   make(map[Metric]Monitor),
 		logger:    logger,
 		apiClient: client.NewHTTPClient(nil),
 	}
 }
 
 type LCDCollector struct {
-	Metrics   map[Metrics]Monitor
+	Metrics   map[Metric]Monitor
 	Monitors  []Monitor
 	logger    *logrus.Logger
 	apiClient *client.TerraLiteForTerra
 }
 
-func (c LCDCollector) ProvidedMetrics() []Metrics {
-	metrics := []Metrics{}
+func (c LCDCollector) ProvidedMetrics() []Metric {
+	metrics := []Metric{}
 	for m := range c.Metrics {
 		metrics = append(metrics, m)
 	}
@@ -63,7 +63,7 @@ func (c *LCDCollector) SetTransport(transport runtime.ClientTransport) {
 	c.apiClient.SetTransport(transport)
 }
 
-func (c LCDCollector) Get(metric Metrics) (float64, error) {
+func (c LCDCollector) Get(metric Metric) (float64, error) {
 	monitor, found := c.Metrics[metric]
 	if !found {
 		return 0, fmt.Errorf("monitor for metric \"%s\" not found", metric)
@@ -83,13 +83,13 @@ func (c *LCDCollector) UpdateData(ctx context.Context) error {
 
 func (c *LCDCollector) RegisterMonitor(m Monitor) {
 	for _, metric := range m.ProvidedMetrics() {
-		if founded, found := c.Metrics[metric]; found {
-			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), founded.Name(), metric))
+		if wantedMonitor, found := c.Metrics[metric]; found {
+			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), wantedMonitor.Name(), metric))
 		}
 		c.Metrics[metric] = m
 		_, err := m.Get(metric)
-		var doesNotExistsError *MetricDoesNotExistError
-		if err != nil && errors.As(err, &doesNotExistsError) {
+		var doesNotExistError *MetricDoesNotExistError
+		if err != nil && errors.As(err, &doesNotExistError) {
 			panic(fmt.Sprintf("register monitor %s failed. Metric validation error. %+v", m.Name(), err))
 		}
 	}
@@ -104,8 +104,8 @@ type Monitor interface {
 	SetLogger(*logrus.Logger)
 	// Handler fetches the data to inner storage
 	Handler(ctx context.Context) error
-	ProvidedMetrics() []Metrics
+	ProvidedMetrics() []Metric
 	// Get - provides metric fetched by Handler method
 	// In case metric does not exist on the monitor, you MUST return MetricDoesNotExistError type error
-	Get(m Metrics) (float64, error)
+	Get(m Metric) (float64, error)
 }

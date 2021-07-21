@@ -65,7 +65,7 @@ func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
 }
 
 type MetricDoesNotExistError struct {
-	metricName Metrics
+	metricName Metric
 }
 
 func (m *MetricDoesNotExistError) Error() string {
