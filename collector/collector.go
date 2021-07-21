@@ -28,6 +28,7 @@ func CastMapToStruct(m interface{}, ret interface{}) error {
 
 type Collector interface {
 	Get(metric Metrics) (float64, error)
+	ProvidedMetrics() []Metrics
 	UpdateData(ctx context.Context) error
 }
 
@@ -48,6 +49,14 @@ type LCDCollector struct {
 	Monitors  []Monitor
 	logger    *logrus.Logger
 	apiClient *client.TerraLiteForTerra
+}
+
+func (c LCDCollector) ProvidedMetrics() []Metrics {
+	metrics := []Metrics{}
+	for m := range c.Metrics {
+		metrics = append(metrics, m)
+	}
+	return metrics
 }
 
 func (c *LCDCollector) SetTransport(transport runtime.ClientTransport) {

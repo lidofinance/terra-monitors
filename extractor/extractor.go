@@ -15,9 +15,9 @@ func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtracto
 	p.Gauges = make(map[collector.Metrics]prometheus.Gauge)
 	p.GaugeMetrics = []collector.Metrics{}
 	p.log = logger
-	p.addGauge(collector.BlunaTotalSupply)
-	p.addGauge(collector.GlobalIndex)
-	p.addGauge(collector.BlunaExchangeRate)
+	for _, m := range p.collector.ProvidedMetrics() {
+		p.addGauge(m)
+	}
 	return p
 }
 
