@@ -1,4 +1,4 @@
-package collector
+package monitors
 
 import (
 	"fmt"
@@ -40,9 +40,7 @@ func NewServerWithError(errorMessage string) *httptest.Server {
 }
 
 func NewServerWithClosedConnectionError() *httptest.Server {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-	}))
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	ts.Close()
 	return ts
 }

@@ -1,4 +1,4 @@
-package collector
+package monitors
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/client/wasm"
+	"github.com/lidofinance/terra-monitors/collector/types"
+	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,15 +18,24 @@ var (
 	BlunaExchangeRate Metric = "bluna_exchange_rate"
 )
 
-func NewHubStateMintor(address string) HubStateMonitor {
-	return HubStateMonitor{
-		State:      &HubStateResponse{},
+func NewHubStateMintor(address string, apiClient *client.TerraLiteForTerra, logger *logrus.Logger) HubStateMonitor {
+	m := HubStateMonitor{
+		State:      &types.HubStateResponse{},
 		HubAddress: address,
+		apiClient:  apiClient,
 	}
+
+	if apiClient == nil {
+		m.apiClient = client.NewHTTPClient(nil)
+	}
+	if logger == nil {
+		m.logger = logging.NewDefaultLogger()
+	}
+	return m
 }
 
 type HubStateMonitor struct {
-	State      *HubStateResponse
+	State      *types.HubStateResponse
 	HubAddress string
 	apiClient  *client.TerraLiteForTerra
 	logger     *logrus.Logger
@@ -35,21 +46,24 @@ func (h HubStateMonitor) Name() string {
 }
 
 func (h *HubStateMonitor) Handler(ctx context.Context) error {
-	hubreq, hubresp := GetHubStatePair()
+	hubreq, hubresp := types.GetHubStatePair()
+
 	reqRaw, err := json.Marshal(&hubreq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal HubState request: %w", err)
 	}
+
 	p := wasm.GetWasmContractsContractAddressStoreParams{}
 	p.SetContext(ctx)
 	p.SetContractAddress(h.HubAddress)
 	p.SetQueryMsg(string(reqRaw))
-	resp, err := h.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 
+	resp, err := h.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 	if err != nil {
 		return fmt.Errorf("failed to process HubState request: %w", err)
 	}
-	err = CastMapToStruct(resp.Payload.Result, &hubresp)
+
+	err = types.CastMapToStruct(resp.Payload.Result, &hubresp)
 	if err != nil {
 		return fmt.Errorf("failed to parse HubState body interface: %w", err)
 	}

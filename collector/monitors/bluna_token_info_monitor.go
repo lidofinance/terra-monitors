@@ -1,4 +1,4 @@
-package collector
+package monitors
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/client/wasm"
+	"github.com/lidofinance/terra-monitors/collector/types"
+	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,15 +17,24 @@ var (
 	BlunaTotalSupply Metric = "bluna_total_supply"
 )
 
-func NewBlunaTokenInfoMintor(address string) BlunaTokenInfoMonitor {
-	return BlunaTokenInfoMonitor{
-		State:           &TokenInfoResponse{},
+func NewBlunaTokenInfoMintor(address string, apiClient *client.TerraLiteForTerra, logger *logrus.Logger) BlunaTokenInfoMonitor {
+	m := BlunaTokenInfoMonitor{
+		State:           &types.TokenInfoResponse{},
 		ContractAddress: address,
+		apiClient:       apiClient,
+		logger:          logger,
 	}
+	if apiClient == nil {
+		m.apiClient = client.NewHTTPClient(nil)
+	}
+	if logger == nil {
+		m.logger = logging.NewDefaultLogger()
+	}
+	return m
 }
 
 type BlunaTokenInfoMonitor struct {
-	State           *TokenInfoResponse
+	State           *types.TokenInfoResponse
 	ContractAddress string
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
@@ -34,21 +45,24 @@ func (h BlunaTokenInfoMonitor) Name() string {
 }
 
 func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
-	rewardreq, rewardresp := GetCommonTokenInfoPair()
+	rewardreq, rewardresp := types.GetCommonTokenInfoPair()
+
 	reqRaw, err := json.Marshal(&rewardreq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal BlunaTokenInfo request: %w", err)
 	}
+
 	p := wasm.GetWasmContractsContractAddressStoreParams{}
 	p.SetContext(ctx)
 	p.SetContractAddress(h.ContractAddress)
 	p.SetQueryMsg(string(reqRaw))
-	resp, err := h.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 
+	resp, err := h.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 	if err != nil {
 		return fmt.Errorf("failed to process BlunaTokenInfo request: %w", err)
 	}
-	err = CastMapToStruct(resp.Payload.Result, &rewardresp)
+
+	err = types.CastMapToStruct(resp.Payload.Result, &rewardresp)
 	if err != nil {
 		return fmt.Errorf("failed to parse BlunaTokenInfo body interface: %w", err)
 	}

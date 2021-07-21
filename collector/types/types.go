@@ -1,8 +1,23 @@
-package collector
+package types
 
 import (
+	"encoding/json"
 	"fmt"
 )
+
+func CastMapToStruct(m interface{}, ret interface{}) error {
+	data, err := json.Marshal(m)
+	if err != nil {
+		return fmt.Errorf("failed to marshal body interface{}: %w", err)
+	}
+
+	err = json.Unmarshal(data, ret)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal response body: %w", err)
+	}
+
+	return nil
+}
 
 func GetRewardStatePair() (CommonStateRequest, RewardStateResponse) {
 	return CommonStateRequest{}, RewardStateResponse{}
@@ -62,12 +77,4 @@ type HubStateResponse struct {
 
 func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
 	return CommonStateRequest{}, HubStateResponse{}
-}
-
-type MetricDoesNotExistError struct {
-	metricName Metric
-}
-
-func (m *MetricDoesNotExistError) Error() string {
-	return fmt.Sprintf("metric \"%s\" does not exists on monitor", m.metricName)
 }

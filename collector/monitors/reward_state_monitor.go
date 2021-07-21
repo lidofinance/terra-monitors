@@ -1,4 +1,4 @@
-package collector
+package monitors
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/client/wasm"
+	"github.com/lidofinance/terra-monitors/collector/types"
+	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,15 +17,24 @@ var (
 	GlobalIndex Metric = "global_index"
 )
 
-func NewRewardStateMintor(address string) RewardStateMonitor {
-	return RewardStateMonitor{
-		State:           &RewardStateResponse{},
+func NewRewardStateMintor(address string, apiClient *client.TerraLiteForTerra, logger *logrus.Logger) RewardStateMonitor {
+	m := RewardStateMonitor{
+		State:           &types.RewardStateResponse{},
 		ContractAddress: address,
+		apiClient:       apiClient,
 	}
+
+	if apiClient == nil {
+		m.apiClient = client.NewHTTPClient(nil)
+	}
+	if logger == nil {
+		m.logger = logging.NewDefaultLogger()
+	}
+	return m
 }
 
 type RewardStateMonitor struct {
-	State           *RewardStateResponse
+	State           *types.RewardStateResponse
 	ContractAddress string
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
@@ -34,21 +45,24 @@ func (h RewardStateMonitor) Name() string {
 }
 
 func (h *RewardStateMonitor) Handler(ctx context.Context) error {
-	rewardreq, rewardresp := GetRewardStatePair()
+	rewardreq, rewardresp := types.GetRewardStatePair()
+
 	reqRaw, err := json.Marshal(&rewardreq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal RewardState request: %w", err)
 	}
+
 	p := wasm.GetWasmContractsContractAddressStoreParams{}
 	p.SetContext(ctx)
 	p.SetContractAddress(h.ContractAddress)
 	p.SetQueryMsg(string(reqRaw))
-	resp, err := h.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 
+	resp, err := h.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 	if err != nil {
 		return fmt.Errorf("failed to process RewardState request: %w", err)
 	}
-	err = CastMapToStruct(resp.Payload.Result, &rewardresp)
+
+	err = types.CastMapToStruct(resp.Payload.Result, &rewardresp)
 	if err != nil {
 		return fmt.Errorf("failed to parse RewardState body interface: %w", err)
 	}

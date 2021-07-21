@@ -6,6 +6,7 @@ import (
 
 	"github.com/lidofinance/terra-monitors/app"
 	"github.com/lidofinance/terra-monitors/collector"
+	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/extractor"
 	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
@@ -24,13 +25,13 @@ func createCollector(logger *logrus.Logger) collector.LCDCollector {
 	c := collector.NewLCDCollector(
 		logger,
 	)
-	hubStateMonitor := collector.NewHubStateMintor(HubContract)
+	hubStateMonitor := monitors.NewHubStateMintor(HubContract, c.GetApiClient(), nil)
 	c.RegisterMonitor(&hubStateMonitor)
 
-	rewardStateMonitor := collector.NewRewardStateMintor(RewardContract)
+	rewardStateMonitor := monitors.NewRewardStateMintor(RewardContract, c.GetApiClient(), nil)
 	c.RegisterMonitor(&rewardStateMonitor)
 
-	blunaTokenInfoMonitor := collector.NewBlunaTokenInfoMintor(BlunaTokenInfoContract)
+	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMintor(BlunaTokenInfoContract, c.GetApiClient(), nil)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
 	return c
 }
@@ -42,8 +43,8 @@ func main() {
 	p := extractor.NewPromExtractor(&c, logger)
 	app := app.NewAppHTTP(p)
 	http.Handle("/metrics", app)
-
 	logger.Printf("Starting web server at %s\n", *addr)
+
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		logger.Errorf("http.ListenAndServer: %v\n", err)
