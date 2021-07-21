@@ -48,7 +48,7 @@ func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to process BlunaTokenInfo request: %w", err)
 	}
-	err = ParseRequestBody(resp.Payload.Result, &rewardresp)
+	err = CastMapToStruct(resp.Payload.Result, &rewardresp)
 	if err != nil {
 		return fmt.Errorf("failed to parse BlunaTokenInfo body interface: %w", err)
 	}

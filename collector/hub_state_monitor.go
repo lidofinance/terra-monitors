@@ -49,7 +49,7 @@ func (h *HubStateMonitor) Handler(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to process HubState request: %w", err)
 	}
-	err = ParseRequestBody(resp.Payload.Result, &hubresp)
+	err = CastMapToStruct(resp.Payload.Result, &hubresp)
 	if err != nil {
 		return fmt.Errorf("failed to parse HubState body interface: %w", err)
 	}

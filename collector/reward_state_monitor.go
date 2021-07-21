@@ -48,7 +48,7 @@ func (h *RewardStateMonitor) Handler(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to process RewardState request: %w", err)
 	}
-	err = ParseRequestBody(resp.Payload.Result, &rewardresp)
+	err = CastMapToStruct(resp.Payload.Result, &rewardresp)
 	if err != nil {
 		return fmt.Errorf("failed to parse RewardState body interface: %w", err)
 	}

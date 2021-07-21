@@ -14,12 +14,12 @@ import (
 
 type Metrics string
 
-func ParseRequestBody(body interface{}, ret interface{}) error {
-	date, err := json.Marshal(body)
+func CastMapToStruct(m interface{}, ret interface{}) error {
+	data, err := json.Marshal(m)
 	if err != nil {
 		return fmt.Errorf("failed to marshal body interface{}: %w", err)
 	}
-	err = json.Unmarshal(date, ret)
+	err = json.Unmarshal(data, ret)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal response body: %w", err)
 	}
