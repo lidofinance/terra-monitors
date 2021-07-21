@@ -1,7 +1,7 @@
 # terra-monitors
 
 ```shell
-docker-compose up -d
+TELEGRAM_CHAT_ID=<telegram_chat_id> TELEGRAM_BOTTOKEN=<telegram_bottoken> docker-compose up -d
 ```
 
 Grafana dashboards avaliable by link http://127.0.0.1:3000
