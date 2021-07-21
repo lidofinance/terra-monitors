@@ -2,8 +2,10 @@ package collector
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/stretchr/testify/suite"
 )
@@ -18,47 +20,52 @@ func (suite *CollectorTestSuite) SetupTest() {
 	out := bytes.NewBuffer(nil)
 	logger.Out = out
 	suite.Collector = NewLCDCollector(logger)
-	httpClient := NewMockClient()
-	tr := NewMockTransport(httpClient)
-	suite.Collector.SetTransport(tr)
 }
 
-// func (suite *CollectorTestSuite) TestSuccessfullQueryRequest() {
-// 	expected := TokenInfoResponse{
-// 		Name:        "Bonded Luna",
-// 		Symbol:      "BLUNA",
-// 		Decimals:    6,
-// 		TotalSupply: "79178685320809",
-// 	}
-// 	// req, resp := GetCommonTokenInfoPair()
-// 	// err := suite.Collector.buildAndProcessRequest(context.Background(), suite.Collector.BlunaContractAddress, req, &resp)
-// 	resp, err := suite.Collector.getBlunaTokenInfo(context.Background())
-// 	suite.Require().NoError(err)
-// 	suite.Equal(expected, resp)
-// }
+func (suite *CollectorTestSuite) TestSuccessfullQueryRequest() {
+	expected := TokenInfoResponse{
+		Name:        "Bonded Luna",
+		Symbol:      "BLUNA",
+		Decimals:    6,
+		TotalSupply: "79178685320809",
+	}
+	ts := NewServerWithResponse(BlunaTokenInfo)
+	cfg := NewTransportConfig(ts.URL)
+	transport := httptransport.New(cfg.Host, cfg.BasePath, cfg.Schemes)
+	suite.Collector.SetTransport(transport)
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMintor("bluna_token_contract_address")
+	suite.Collector.RegisterMonitor(&blunaTokenInfoMonitor)
+	err := blunaTokenInfoMonitor.Handler(context.Background())
+	suite.Require().NoError(err)
+	suite.Equal(expected, *blunaTokenInfoMonitor.State)
+}
 
-// func (suite *CollectorTestSuite) TestBadQueryRequest() {
-// 	resp := struct{}{}
-// 	err := suite.Collector.buildAndProcessRequest(context.Background(), suite.Collector.BlunaContractAddress, struct{ ConnectionRefused string }{}, &resp)
-// 	resp, err := suite.Collector.getBlunaTokenInfo(context.Background())
+func (suite *CollectorTestSuite) TestBadQueryRequest() {
+	expectedErr := "bad query"
+	ts := NewServerWithError(expectedErr)
+	cfg := NewTransportConfig(ts.URL)
+	transport := httptransport.New(cfg.Host, cfg.BasePath, cfg.Schemes)
+	suite.Collector.SetTransport(transport)
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMintor("bluna_token_contract_address")
+	suite.Collector.RegisterMonitor(&blunaTokenInfoMonitor)
+	err := blunaTokenInfoMonitor.Handler(context.Background())
+	suite.Require().Error(err)
+	suite.Contains(err.Error(), expectedErr)
+}
 
-// 	suite.Require().Error(err)
-// 	suite.Contains(err.Error(), "connection refused")
-// }
-
-// func (suite *CollectorTestSuite) TestConnectionRefusedRequest() {
-// 	resp := struct {
-// 		Error string `json:"error"`
-// 	}{}
-// 	req := struct {
-// 		BadQuery struct{} `json:"bad_query"`
-// 	}{}
-// 	err := suite.Collector.buildAndProcessRequest(context.Background(), suite.Collector.BlunaContractAddress, req, &resp)
-// 	suite.Require().Error(err)
-// 	suite.Contains(err.Error(), "parsing anchor_basset_hub::msg::QueryMsg: unknown variant")
-// }
+func (suite *CollectorTestSuite) TestConnectionRefusedRequest() {
+	expectedErr := "connection refused"
+	ts := NewServerWithClosedConnectionError()
+	cfg := NewTransportConfig(ts.URL)
+	transport := httptransport.New(cfg.Host, cfg.BasePath, cfg.Schemes)
+	suite.Collector.SetTransport(transport)
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMintor("bluna_token_contract_address")
+	suite.Collector.RegisterMonitor(&blunaTokenInfoMonitor)
+	err := blunaTokenInfoMonitor.Handler(context.Background())
+	suite.Require().Error(err)
+	suite.Contains(err.Error(), expectedErr)
+}
 
 func TestLocales(t *testing.T) {
 	suite.Run(t, new(CollectorTestSuite))
-
 }
