@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/lidofinance/terra-monitors/client"
+	"github.com/lidofinance/terra-monitors/openapi/client"
 )
 
 var BlunaTokenInfo = `{"height":"3754668","result":{"name":"Bonded Luna","symbol":"BLUNA","decimals":6,"total_supply":"79178685320809"}}`

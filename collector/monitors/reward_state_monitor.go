@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/lidofinance/terra-monitors/client"
-	"github.com/lidofinance/terra-monitors/client/wasm"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/logging"
+	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 	"github.com/sirupsen/logrus"
 )
 

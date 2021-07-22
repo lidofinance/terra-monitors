@@ -5,9 +5,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/logging"
+	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )
