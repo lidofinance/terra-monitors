@@ -1,5 +1,5 @@
 gen_client:
-	swagger generate client -f swagger.yaml
+	mkdir -p ./openapi/ && swagger generate client -f swagger.yaml
 
 dev_server: gen_client
 	go run main.go

@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/internal/logging"
+	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
 )
 

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
+	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
 )
 
