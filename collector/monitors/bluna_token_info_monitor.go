@@ -8,8 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/client/wasm"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,23 +17,19 @@ var (
 	BlunaTotalSupply Metric = "bluna_total_supply"
 )
 
-func NewBlunaTokenInfoMintor(address string, apiClient *client.TerraLiteForTerra, logger *logrus.Logger) BlunaTokenInfoMonitor {
+func NewBlunaTokenInfoMintor(cfg config.CollectorConfig) BlunaTokenInfoMonitor {
 	m := BlunaTokenInfoMonitor{
+		metrics:         make(map[Metric]float64),
 		State:           &types.TokenInfoResponse{},
-		ContractAddress: address,
-		apiClient:       apiClient,
-		logger:          logger,
-	}
-	if apiClient == nil {
-		m.apiClient = client.NewHTTPClient(nil)
-	}
-	if logger == nil {
-		m.logger = logging.NewDefaultLogger()
+		ContractAddress: cfg.BlunaTokenInfoContract,
+		apiClient:       cfg.GetTerraClient(),
+		logger:          cfg.Logger,
 	}
 	return m
 }
 
 type BlunaTokenInfoMonitor struct {
+	metrics         map[Metric]float64
 	State           *types.TokenInfoResponse
 	ContractAddress string
 	apiClient       *client.TerraLiteForTerra
@@ -44,10 +40,18 @@ func (h BlunaTokenInfoMonitor) Name() string {
 	return "BlunaTokenInfo"
 }
 
-func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
-	rewardreq, rewardresp := types.GetCommonTokenInfoPair()
+func (h *BlunaTokenInfoMonitor) InitMetrics() {
+	h.setStringMetric(BlunaTotalSupply, "0")
+}
 
-	reqRaw, err := json.Marshal(&rewardreq)
+func (h *BlunaTokenInfoMonitor) updateMetrics() {
+	h.setStringMetric(BlunaTotalSupply, h.State.TotalSupply)
+}
+
+func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
+	rewardReq, rewardResp := types.GetCommonTokenInfoPair()
+
+	reqRaw, err := json.Marshal(&rewardReq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal BlunaTokenInfo request: %w", err)
 	}
@@ -62,28 +66,27 @@ func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to process BlunaTokenInfo request: %w", err)
 	}
 
-	err = types.CastMapToStruct(resp.Payload.Result, &rewardresp)
+	err = types.CastMapToStruct(resp.Payload.Result, &rewardResp)
 	if err != nil {
 		return fmt.Errorf("failed to parse BlunaTokenInfo body interface: %w", err)
 	}
 
 	h.logger.Infoln("updated BlunaTokenInfo")
-	h.State = &rewardresp
+	h.State = &rewardResp
+	h.updateMetrics()
 	return nil
 }
 
-func (h BlunaTokenInfoMonitor) ProvidedMetrics() []Metric {
-	return []Metric{
-		BlunaTotalSupply,
+func (h *BlunaTokenInfoMonitor) setStringMetric(m Metric, rawValue string) {
+	v, err := strconv.ParseFloat(rawValue, 64)
+	if err != nil {
+		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
+	h.metrics[m] = v
 }
 
-func (h BlunaTokenInfoMonitor) Get(metric Metric) (float64, error) {
-	switch metric {
-	case BlunaTotalSupply:
-		return strconv.ParseFloat(h.State.TotalSupply, 64)
-	}
-	return 0, &MetricDoesNotExistError{metricName: metric}
+func (h BlunaTokenInfoMonitor) GetMetrics() map[Metric]float64 {
+	return h.metrics
 }
 
 func (h *BlunaTokenInfoMonitor) SetApiClient(client *client.TerraLiteForTerra) {

@@ -2,10 +2,10 @@ package collector
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/lidofinance/terra-monitors/client"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/sirupsen/logrus"
 )
@@ -16,11 +16,11 @@ type Collector interface {
 	UpdateData(ctx context.Context) error
 }
 
-func NewLCDCollector(logger *logrus.Logger) LCDCollector {
+func NewLCDCollector(cfg config.CollectorConfig) LCDCollector {
 	return LCDCollector{
 		Metrics:   make(map[monitors.Metric]monitors.Monitor),
-		logger:    logger,
-		apiClient: client.NewHTTPClient(nil),
+		logger:    cfg.Logger,
+		apiClient: cfg.GetTerraClient(),
 	}
 }
 
@@ -52,8 +52,7 @@ func (c LCDCollector) Get(metric monitors.Metric) (float64, error) {
 	if !found {
 		return 0, fmt.Errorf("monitor for metric \"%s\" not found", metric)
 	}
-
-	return monitor.Get(metric)
+	return monitor.GetMetrics()[metric], nil
 }
 
 func (c *LCDCollector) UpdateData(ctx context.Context) error {
@@ -67,18 +66,13 @@ func (c *LCDCollector) UpdateData(ctx context.Context) error {
 }
 
 func (c *LCDCollector) RegisterMonitor(m monitors.Monitor) {
-	for _, metric := range m.ProvidedMetrics() {
+	m.InitMetrics()
+	for metric := range m.GetMetrics() {
 		if wantedMonitor, found := c.Metrics[metric]; found {
 			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), wantedMonitor.Name(), metric))
 		}
 
 		c.Metrics[metric] = m
-
-		var doesNotExistError *monitors.MetricDoesNotExistError
-		_, err := m.Get(metric)
-		if err != nil && errors.As(err, &doesNotExistError) {
-			panic(fmt.Sprintf("register monitor %s failed. Metric validation error. %+v", m.Name(), err))
-		}
 	}
 	c.Monitors = append(c.Monitors, m)
 }

@@ -6,32 +6,26 @@ import (
 
 	"github.com/lidofinance/terra-monitors/app"
 	"github.com/lidofinance/terra-monitors/collector"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/extractor"
 	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	HubContract            = "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts"
-	RewardContract         = "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0"
-	BlunaTokenInfoContract = "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp"
-)
-
 var addr = flag.String("listen-address", ":8080",
 	"The address to listen on for HTTP requests.")
 
 func createCollector(logger *logrus.Logger) collector.LCDCollector {
-	c := collector.NewLCDCollector(
-		logger,
-	)
-	hubStateMonitor := monitors.NewHubStateMintor(HubContract, c.GetApiClient(), nil)
+	defConfig := config.DefaultCollectorConfig()
+	c := collector.NewLCDCollector(defConfig)
+	hubStateMonitor := monitors.NewHubStateMintor(defConfig)
 	c.RegisterMonitor(&hubStateMonitor)
 
-	rewardStateMonitor := monitors.NewRewardStateMintor(RewardContract, c.GetApiClient(), nil)
+	rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
 	c.RegisterMonitor(&rewardStateMonitor)
 
-	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMintor(BlunaTokenInfoContract, c.GetApiClient(), nil)
+	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMintor(defConfig)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
 	return c
 }

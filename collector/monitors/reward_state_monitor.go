@@ -8,8 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/client/wasm"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,23 +17,20 @@ var (
 	GlobalIndex Metric = "global_index"
 )
 
-func NewRewardStateMintor(address string, apiClient *client.TerraLiteForTerra, logger *logrus.Logger) RewardStateMonitor {
+func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 	m := RewardStateMonitor{
+		metrics:         make(map[Metric]float64),
 		State:           &types.RewardStateResponse{},
-		ContractAddress: address,
-		apiClient:       apiClient,
+		ContractAddress: cfg.RewardContract,
+		apiClient:       cfg.GetTerraClient(),
+		logger:          cfg.Logger,
 	}
 
-	if apiClient == nil {
-		m.apiClient = client.NewHTTPClient(nil)
-	}
-	if logger == nil {
-		m.logger = logging.NewDefaultLogger()
-	}
 	return m
 }
 
 type RewardStateMonitor struct {
+	metrics         map[Metric]float64
 	State           *types.RewardStateResponse
 	ContractAddress string
 	apiClient       *client.TerraLiteForTerra
@@ -44,10 +41,18 @@ func (h RewardStateMonitor) Name() string {
 	return "RewardState"
 }
 
-func (h *RewardStateMonitor) Handler(ctx context.Context) error {
-	rewardreq, rewardresp := types.GetRewardStatePair()
+func (h *RewardStateMonitor) InitMetrics() {
+	h.setStringMetric(GlobalIndex, "0")
+}
 
-	reqRaw, err := json.Marshal(&rewardreq)
+func (h *RewardStateMonitor) updateMetrics() {
+	h.setStringMetric(GlobalIndex, h.State.GlobalIndex)
+}
+
+func (h *RewardStateMonitor) Handler(ctx context.Context) error {
+	rewardReq, rewardResp := types.GetRewardStatePair()
+
+	reqRaw, err := json.Marshal(&rewardReq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal RewardState request: %w", err)
 	}
@@ -62,28 +67,27 @@ func (h *RewardStateMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to process RewardState request: %w", err)
 	}
 
-	err = types.CastMapToStruct(resp.Payload.Result, &rewardresp)
+	err = types.CastMapToStruct(resp.Payload.Result, &rewardResp)
 	if err != nil {
 		return fmt.Errorf("failed to parse RewardState body interface: %w", err)
 	}
 
 	h.logger.Infoln("updated RewardState")
-	h.State = &rewardresp
+	h.State = &rewardResp
+	h.updateMetrics()
 	return nil
 }
 
-func (h RewardStateMonitor) ProvidedMetrics() []Metric {
-	return []Metric{
-		GlobalIndex,
+func (h *RewardStateMonitor) setStringMetric(m Metric, rawValue string) {
+	v, err := strconv.ParseFloat(rawValue, 64)
+	if err != nil {
+		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
+	h.metrics[m] = v
 }
 
-func (h RewardStateMonitor) Get(metric Metric) (float64, error) {
-	switch metric {
-	case GlobalIndex:
-		return strconv.ParseFloat(h.State.GlobalIndex, 64)
-	}
-	return 0, &MetricDoesNotExistError{metricName: metric}
+func (h RewardStateMonitor) GetMetrics() map[Metric]float64 {
+	return h.metrics
 }
 
 func (h *RewardStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {

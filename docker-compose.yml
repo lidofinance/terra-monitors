@@ -6,15 +6,13 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+    env_file:
+      ./docker/env/.telegram.env
     environment:
       - GF_RENDERING_SERVER_URL=http://renderer:8081/render
       - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
-      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
-      - TELEGRAM_BOTTOKEN=${TELEGRAM_BOTTOKEN}
     volumes:
-      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./config/grafana/notifiers:/etc/grafana/provisioning/notifiers
+      - ./docker/config/grafana/provisioning:/etc/grafana/provisioning
   renderer:
     image: grafana/grafana-image-renderer:latest
     ports:
@@ -28,11 +26,7 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
-      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      # - '--storage.tsdb.path=/prometheus'
-      # - '--web.console.libraries=/etc/prometheus/console_libraries'
-      # - '--web.console.templates=/etc/prometheus/consoles'
-      # - '--web.enable-lifecycle'
+      - ./docker/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       - lido_terra
   lido_terra:

@@ -8,8 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/client"
 	"github.com/lidofinance/terra-monitors/client/wasm"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,23 +18,20 @@ var (
 	BlunaExchangeRate Metric = "bluna_exchange_rate"
 )
 
-func NewHubStateMintor(address string, apiClient *client.TerraLiteForTerra, logger *logrus.Logger) HubStateMonitor {
+func NewHubStateMintor(cfg config.CollectorConfig) HubStateMonitor {
 	m := HubStateMonitor{
+		metrics:    make(map[Metric]float64),
 		State:      &types.HubStateResponse{},
-		HubAddress: address,
-		apiClient:  apiClient,
+		HubAddress: cfg.HubContract,
+		apiClient:  cfg.GetTerraClient(),
+		logger:     cfg.Logger,
 	}
 
-	if apiClient == nil {
-		m.apiClient = client.NewHTTPClient(nil)
-	}
-	if logger == nil {
-		m.logger = logging.NewDefaultLogger()
-	}
 	return m
 }
 
 type HubStateMonitor struct {
+	metrics    map[Metric]float64
 	State      *types.HubStateResponse
 	HubAddress string
 	apiClient  *client.TerraLiteForTerra
@@ -45,10 +42,20 @@ func (h HubStateMonitor) Name() string {
 	return "HubState"
 }
 
-func (h *HubStateMonitor) Handler(ctx context.Context) error {
-	hubreq, hubresp := types.GetHubStatePair()
+func (h *HubStateMonitor) InitMetrics() {
+	h.setStringMetric(BlunaBondedAmount, "0")
+	h.setStringMetric(BlunaExchangeRate, "0")
+}
 
-	reqRaw, err := json.Marshal(&hubreq)
+func (h *HubStateMonitor) updateMetrics() {
+	h.setStringMetric(BlunaBondedAmount, h.State.TotalBondAmount)
+	h.setStringMetric(BlunaExchangeRate, h.State.ExchangeRate)
+}
+
+func (h *HubStateMonitor) Handler(ctx context.Context) error {
+	hubReq, hubResp := types.GetHubStatePair()
+
+	reqRaw, err := json.Marshal(&hubReq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal HubState request: %w", err)
 	}
@@ -63,31 +70,27 @@ func (h *HubStateMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to process HubState request: %w", err)
 	}
 
-	err = types.CastMapToStruct(resp.Payload.Result, &hubresp)
+	err = types.CastMapToStruct(resp.Payload.Result, &hubResp)
 	if err != nil {
 		return fmt.Errorf("failed to parse HubState body interface: %w", err)
 	}
 
 	h.logger.Infoln("updated HubState")
-	h.State = &hubresp
+	h.State = &hubResp
+	h.updateMetrics()
 	return nil
 }
 
-func (h HubStateMonitor) ProvidedMetrics() []Metric {
-	return []Metric{
-		BlunaExchangeRate,
-		BlunaBondedAmount,
+func (h *HubStateMonitor) setStringMetric(m Metric, rawValue string) {
+	v, err := strconv.ParseFloat(rawValue, 64)
+	if err != nil {
+		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
+	h.metrics[m] = v
 }
 
-func (h HubStateMonitor) Get(metric Metric) (float64, error) {
-	switch metric {
-	case BlunaBondedAmount:
-		return strconv.ParseFloat(h.State.TotalBondAmount, 64)
-	case BlunaExchangeRate:
-		return strconv.ParseFloat(h.State.ExchangeRate, 64)
-	}
-	return 0, &MetricDoesNotExistError{metricName: metric}
+func (h HubStateMonitor) GetMetrics() map[Metric]float64 {
+	return h.metrics
 }
 
 func (h *HubStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {
