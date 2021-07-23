@@ -22,6 +22,7 @@ func NewRewardStateMintor(address string, apiClient *client.TerraLiteForTerra, l
 		State:           &types.RewardStateResponse{},
 		ContractAddress: address,
 		apiClient:       apiClient,
+		logger:          logger,
 	}
 
 	if apiClient == nil {

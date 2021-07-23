@@ -1,0 +1,51 @@
+{
+    "next": 128232046,
+    "limit": 1,
+    "txs": [
+        {
+            "height": "3800440",
+            "txhash": "C68491343E081C92A4A398243E6126A8AEF4786FE866FAF6730443A214516B4B",
+            "codespace": "sdk",
+            "code": 11,
+            "raw_log": "out of gas: out of gas in location: Loading CosmWasm module: execute; gasWanted: 1842713, gasUsed: 1854478",
+            "gas_wanted": "1842713",
+            "gas_used": "1854478",
+            "tx": {
+                "type": "core/StdTx",
+                "value": {
+                    "msg": [
+                        {
+                            "type": "wasm/MsgExecuteContract",
+                            "value": {
+                                "sender": "terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy",
+                                "contract": "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts",
+                                "execute_msg": "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0=",
+                                "coins": []
+                            }
+                        }
+                    ],
+                    "fee": {
+                        "amount": [
+                            {
+                                "denom": "uusd",
+                                "amount": "276407"
+                            }
+                        ],
+                        "gas": "1842713"
+                    },
+                    "signatures": [
+                        {
+                            "pub_key": {
+                                "type": "tendermint/PubKeySecp256k1",
+                                "value": "A+8kqigpHrDvPbnbeEmFQ4tT1VWR1HSHma40b/coMWMO"
+                            },
+                            "signature": "467gDLHwUdOuXCEwHA19ucw7cBHN5fLCOHvyqHE37mFJ5hz9bIQ6ZjKa1ZT88PwV/rpU50vK2xcwI2RWcyVHog=="
+                        }
+                    ],
+                    "memo": ""
+                }
+            },
+            "timestamp": "2021-07-19T01:48:29Z"
+        }
+    ]
+}

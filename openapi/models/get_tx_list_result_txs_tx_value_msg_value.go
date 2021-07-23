@@ -20,24 +20,40 @@ import (
 // swagger:model getTxListResult.txs.tx.value.msg.value
 type GetTxListResultTxsTxValueMsgValue struct {
 
-	// inputs
+	// coins
 	// Required: true
-	Inputs []*GetTxListResultTxsTxValueMsgValueInputs `json:"inputs"`
+	Coins []*GetTxListResultTxsTxValueMsgValueInputsCoins `json:"coins"`
 
-	// outputs
+	// contract
 	// Required: true
-	Outputs []*GetTxListResultTxsTxValueMsgValueOutputs `json:"outputs"`
+	Contract *string `json:"contract"`
+
+	// execute msg
+	// Required: true
+	ExecuteMsg *string `json:"execute_msg"`
+
+	// sender
+	// Required: true
+	Sender *string `json:"sender"`
 }
 
 // Validate validates this get tx list result txs tx value msg value
 func (m *GetTxListResultTxsTxValueMsgValue) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateInputs(formats); err != nil {
+	if err := m.validateCoins(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateOutputs(formats); err != nil {
+	if err := m.validateContract(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateExecuteMsg(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSender(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -47,21 +63,21 @@ func (m *GetTxListResultTxsTxValueMsgValue) Validate(formats strfmt.Registry) er
 	return nil
 }
 
-func (m *GetTxListResultTxsTxValueMsgValue) validateInputs(formats strfmt.Registry) error {
+func (m *GetTxListResultTxsTxValueMsgValue) validateCoins(formats strfmt.Registry) error {
 
-	if err := validate.Required("inputs", "body", m.Inputs); err != nil {
+	if err := validate.Required("coins", "body", m.Coins); err != nil {
 		return err
 	}
 
-	for i := 0; i < len(m.Inputs); i++ {
-		if swag.IsZero(m.Inputs[i]) { // not required
+	for i := 0; i < len(m.Coins); i++ {
+		if swag.IsZero(m.Coins[i]) { // not required
 			continue
 		}
 
-		if m.Inputs[i] != nil {
-			if err := m.Inputs[i].Validate(formats); err != nil {
+		if m.Coins[i] != nil {
+			if err := m.Coins[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("inputs" + "." + strconv.Itoa(i))
+					return ve.ValidateName("coins" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -72,26 +88,28 @@ func (m *GetTxListResultTxsTxValueMsgValue) validateInputs(formats strfmt.Regist
 	return nil
 }
 
-func (m *GetTxListResultTxsTxValueMsgValue) validateOutputs(formats strfmt.Registry) error {
+func (m *GetTxListResultTxsTxValueMsgValue) validateContract(formats strfmt.Registry) error {
 
-	if err := validate.Required("outputs", "body", m.Outputs); err != nil {
+	if err := validate.Required("contract", "body", m.Contract); err != nil {
 		return err
 	}
 
-	for i := 0; i < len(m.Outputs); i++ {
-		if swag.IsZero(m.Outputs[i]) { // not required
-			continue
-		}
+	return nil
+}
 
-		if m.Outputs[i] != nil {
-			if err := m.Outputs[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("outputs" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
+func (m *GetTxListResultTxsTxValueMsgValue) validateExecuteMsg(formats strfmt.Registry) error {
 
+	if err := validate.Required("execute_msg", "body", m.ExecuteMsg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *GetTxListResultTxsTxValueMsgValue) validateSender(formats strfmt.Registry) error {
+
+	if err := validate.Required("sender", "body", m.Sender); err != nil {
+		return err
 	}
 
 	return nil
@@ -101,11 +119,7 @@ func (m *GetTxListResultTxsTxValueMsgValue) validateOutputs(formats strfmt.Regis
 func (m *GetTxListResultTxsTxValueMsgValue) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateInputs(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateOutputs(ctx, formats); err != nil {
+	if err := m.contextValidateCoins(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -115,32 +129,14 @@ func (m *GetTxListResultTxsTxValueMsgValue) ContextValidate(ctx context.Context,
 	return nil
 }
 
-func (m *GetTxListResultTxsTxValueMsgValue) contextValidateInputs(ctx context.Context, formats strfmt.Registry) error {
+func (m *GetTxListResultTxsTxValueMsgValue) contextValidateCoins(ctx context.Context, formats strfmt.Registry) error {
 
-	for i := 0; i < len(m.Inputs); i++ {
+	for i := 0; i < len(m.Coins); i++ {
 
-		if m.Inputs[i] != nil {
-			if err := m.Inputs[i].ContextValidate(ctx, formats); err != nil {
+		if m.Coins[i] != nil {
+			if err := m.Coins[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("inputs" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *GetTxListResultTxsTxValueMsgValue) contextValidateOutputs(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Outputs); i++ {
-
-		if m.Outputs[i] != nil {
-			if err := m.Outputs[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("outputs" + "." + strconv.Itoa(i))
+					return ve.ValidateName("coins" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

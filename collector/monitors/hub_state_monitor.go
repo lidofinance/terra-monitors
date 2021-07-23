@@ -23,6 +23,7 @@ func NewHubStateMintor(address string, apiClient *client.TerraLiteForTerra, logg
 		State:      &types.HubStateResponse{},
 		HubAddress: address,
 		apiClient:  apiClient,
+		logger:     logger,
 	}
 
 	if apiClient == nil {
