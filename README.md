@@ -1,6 +1,6 @@
 # terra-monitors
 
-Before running the service you have to fill .env file `./docker/env/.telegram.env` with the following varibles
+Before running the service you have to fill .env file `./docker/env/.telegram.env` with the following variables
 ```shell
 cat ./docker/env/.telegram.env 
 TELEGRAM_BOTTOKEN=<telegram_bottoken>
