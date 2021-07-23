@@ -17,7 +17,7 @@ var (
 	BlunaTotalSupply Metric = "bluna_total_supply"
 )
 
-func NewBlunaTokenInfoMintor(cfg config.CollectorConfig) BlunaTokenInfoMonitor {
+func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor {
 	m := BlunaTokenInfoMonitor{
 		metrics:         make(map[Metric]float64),
 		State:           &types.TokenInfoResponse{},

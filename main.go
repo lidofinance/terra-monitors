@@ -25,7 +25,7 @@ func createCollector(logger *logrus.Logger) collector.LCDCollector {
 	rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
 	c.RegisterMonitor(&rewardStateMonitor)
 
-	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMintor(defConfig)
+	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
 	return c
 }
