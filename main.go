@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"flag"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/lidofinance/terra-monitors/app"
@@ -27,6 +31,9 @@ func createCollector(logger *logrus.Logger) collector.LCDCollector {
 
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMintor(defConfig)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
+
+	updateBlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
+	c.RegisterMonitor((&updateBlobalIndexMonitor))
 	return c
 }
 
@@ -43,4 +50,27 @@ func main() {
 	if err != nil {
 		logger.Errorf("http.ListenAndServer: %v\n", err)
 	}
+}
+
+func main2() {
+	defConfig := config.DefaultCollectorConfig()
+
+	// c := collector.NewLCDCollector(
+	// 	defConfig,
+	// )
+	m := monitors.NewUpdateGlobalIndexMonitor(defConfig)
+	err := m.Handler(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for _, l := range m.ApiResponse.Txs[0].Logs {
+		for _, e := range l.Events {
+			data, err := json.Marshal(e)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			fmt.Println(string(data))
+		}
+	}
+
 }

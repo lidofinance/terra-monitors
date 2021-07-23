@@ -7,12 +7,13 @@ import (
 )
 
 type CollectorConfig struct {
-	Logger                 *logrus.Logger
-	LCDEndpoint            string
-	HubContract            string
-	RewardContract         string
-	BlunaTokenInfoContract string
-	Schemes                []string
+	Logger                      *logrus.Logger
+	LCDEndpoint                 string
+	HubContract                 string
+	RewardContract              string
+	BlunaTokenInfoContract      string
+	UpdateGlobalIndexBotAddress string
+	Schemes                     []string
 }
 
 func (c CollectorConfig) getSchemes() []string {

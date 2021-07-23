@@ -6,11 +6,13 @@ package transactions
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/lidofinance/terra-monitors/openapi/models"
 )
@@ -29,6 +31,12 @@ func (o *GetV1TxsReader) ReadResponse(response runtime.ClientResponse, consumer 
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewGetV1TxsBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
@@ -63,5 +71,80 @@ func (o *GetV1TxsOK) readResponse(response runtime.ClientResponse, consumer runt
 		return err
 	}
 
+	return nil
+}
+
+// NewGetV1TxsBadRequest creates a GetV1TxsBadRequest with default headers values
+func NewGetV1TxsBadRequest() *GetV1TxsBadRequest {
+	return &GetV1TxsBadRequest{}
+}
+
+/* GetV1TxsBadRequest describes a response with status code 400, with default header values.
+
+Error
+*/
+type GetV1TxsBadRequest struct {
+	Payload *GetV1TxsBadRequestBody
+}
+
+func (o *GetV1TxsBadRequest) Error() string {
+	return fmt.Sprintf("[GET /v1/txs][%d] getV1TxsBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetV1TxsBadRequest) GetPayload() *GetV1TxsBadRequestBody {
+	return o.Payload
+}
+
+func (o *GetV1TxsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(GetV1TxsBadRequestBody)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+/*GetV1TxsBadRequestBody get v1 txs bad request body
+swagger:model GetV1TxsBadRequestBody
+*/
+type GetV1TxsBadRequestBody struct {
+
+	// code
+	Code float64 `json:"code,omitempty"`
+
+	// message
+	Message string `json:"message,omitempty"`
+
+	// type
+	Type string `json:"type,omitempty"`
+}
+
+// Validate validates this get v1 txs bad request body
+func (o *GetV1TxsBadRequestBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get v1 txs bad request body based on context it is used
+func (o *GetV1TxsBadRequestBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetV1TxsBadRequestBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetV1TxsBadRequestBody) UnmarshalBinary(b []byte) error {
+	var res GetV1TxsBadRequestBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }
