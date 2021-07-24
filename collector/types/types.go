@@ -1,6 +1,25 @@
-package collector
+package types
 
-func GetRewardResponseStatePair() (CommonStateRequest, RewardStateResponse) {
+import (
+	"encoding/json"
+	"fmt"
+)
+
+func CastMapToStruct(m interface{}, ret interface{}) error {
+	data, err := json.Marshal(m)
+	if err != nil {
+		return fmt.Errorf("failed to marshal body interface{}: %w", err)
+	}
+
+	err = json.Unmarshal(data, ret)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal response body: %w", err)
+	}
+
+	return nil
+}
+
+func GetRewardStatePair() (CommonStateRequest, RewardStateResponse) {
 	return CommonStateRequest{}, RewardStateResponse{}
 }
 
@@ -45,6 +64,7 @@ type TokenInfoResponse struct {
 //     pub last_processed_batch: u64,
 // }
 
+//shoud be corrtced after contract migration according new response schema
 type HubStateResponse struct {
 	ExchangeRate          string `json:"exchange_rate"`     //decimal
 	TotalBondAmount       string `json:"total_bond_amount"` //uint128
@@ -55,8 +75,6 @@ type HubStateResponse struct {
 	LastProcessedBatch    uint64 `json:"last_processed_batch"`
 }
 
-type CollectedData struct {
-	HubState       HubStateResponse
-	RewardState    RewardStateResponse
-	BlunaTokenInfo TokenInfoResponse
+func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
+	return CommonStateRequest{}, HubStateResponse{}
 }

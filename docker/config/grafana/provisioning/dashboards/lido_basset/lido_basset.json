@@ -15,91 +15,44 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 4,
   "links": [],
   "panels": [
     {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.8
+              ],
+              "type": "gt"
             },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
+            "operator": {
+              "type": "and"
             },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
             },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
           }
-        },
-        "overrides": []
+        ],
+        "executionErrorState": "keep_state",
+        "for": "2m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Bluna/luna exchange rate out of range",
+        "noDataState": "no_data",
+        "notifications": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "bluna_bonded_amount{}",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Panel Title",
-      "type": "timeseries"
-    },
-    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -155,7 +108,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 0
       },
       "id": 2,
       "options": {
@@ -171,16 +124,25 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "global_index{}",
+          "expr": "bluna_exchange_rate{}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0.8,
+          "visible": true
         }
       ],
       "title": "Panel Title",
       "type": "timeseries"
     }
   ],
+  "refresh": "",
   "schemaVersion": 30,
   "style": "dark",
   "tags": [],
@@ -188,12 +150,12 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Basic",
-  "uid": "7UodMUi7z",
+  "title": "Lido monitors",
+  "uid": "xxixR7Z7z",
   "version": 1
 }

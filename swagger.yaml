@@ -1,0 +1,80 @@
+swagger: "2.0"
+info:
+  version: "3.0"
+  title: 'Terra-Lite for Terra'
+  description: A REST interface for state queries, transaction generation and broadcasting.
+tags:
+  - name: Transactions
+    description: Search, encode, or broadcast transactions.
+  - name: Tendermint RPC
+    description: Tendermint APIs, such as query blocks, transactions and validatorset
+  - name: Auth
+    description: Authenticate accounts
+  - name: Bank
+    description: Create and broadcast transactions
+  - name: Staking
+    description: Stake module APIs
+  - name: Governance
+    description: Governance module APIs
+  - name: Slashing
+    description: Slashing module APIs
+  - name: Distribution
+    description: Fee distribution module APIs
+  - name: Mint
+    description: Minting module APIs
+  - name: Supply
+    description: Supply module APIs
+  - name: Market
+    description: Market modules APIs
+  - name: Oracle
+    description: Get price and voting modules APIs
+  - name: Treasury
+    description: Treasury modules APIs
+  - name: Wasm
+    description: Wasm modules APIs
+  - name: Authorization
+    description: Authorization modules APIs
+schemes:
+  - https
+host: lcd.terra.dev
+securityDefinitions:
+  kms:
+    type: basic
+
+paths:
+  /wasm/contracts/{contractAddress}/store:
+    get:
+      summary: Get stored information with query msg
+      tags:
+        - Wasm
+      parameters:
+        - in: path
+          name: contractAddress
+          description: contract address you want to lookup
+          required: true
+          type: string
+        - in: query
+          name: query_msg
+          description: json formatted query msg
+          required: true
+          type: string
+          x-example: "{}"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              height:
+                type: string
+              result:
+                type: object
+        500:
+          description: Error
+          schema:
+            type: object
+            properties:
+              error:
+                type: string

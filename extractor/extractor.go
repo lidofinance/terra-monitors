@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/lidofinance/terra-monitors/collector"
+	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
@@ -12,22 +13,23 @@ import (
 func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtractor {
 	p := PromExtractor{}
 	p.collector = c
-	p.Gauges = make(map[collector.Metrics]prometheus.Gauge)
-	p.GaugeMetrics = []collector.Metrics{}
+	p.Gauges = make(map[monitors.Metric]prometheus.Gauge)
+	p.GaugeMetrics = []monitors.Metric{}
 	p.log = logger
-	p.addGauge(collector.BlunaTotalSupply)
-	p.addGauge(collector.GlobalIndex)
+	for _, m := range p.collector.ProvidedMetrics() {
+		p.addGauge(m)
+	}
 	return p
 }
 
 type PromExtractor struct {
 	collector    collector.Collector
-	Gauges       map[collector.Metrics]prometheus.Gauge
-	GaugeMetrics []collector.Metrics
+	Gauges       map[monitors.Metric]prometheus.Gauge
+	GaugeMetrics []monitors.Metric
 	log          *logrus.Logger
 }
 
-func (p *PromExtractor) addGauge(name collector.Metrics) {
+func (p *PromExtractor) addGauge(name monitors.Metric) {
 	p.Gauges[name] = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: string(name),
@@ -36,21 +38,22 @@ func (p *PromExtractor) addGauge(name collector.Metrics) {
 	p.GaugeMetrics = append(p.GaugeMetrics, name)
 }
 
-func (p *PromExtractor) updateGaugeValue(name collector.Metrics) error {
+func (p *PromExtractor) updateGaugeValue(name monitors.Metric) error {
 	value, err := p.collector.Get(name)
 	if err != nil {
 		return fmt.Errorf("failed to update metric \"%s\": %w", name, err)
 	}
+
 	p.Gauges[name].Set(value)
 	return nil
 }
 
 func (p PromExtractor) UpdateMetrics(ctx context.Context) {
-
 	err := p.collector.UpdateData(ctx)
 	if err != nil {
 		p.log.Errorf("failed to update collector data: %v", err)
 	}
+
 	for _, gaugeName := range p.GaugeMetrics {
 		err = p.updateGaugeValue(gaugeName)
 		if err != nil {
