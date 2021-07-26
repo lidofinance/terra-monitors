@@ -3,6 +3,8 @@
     "limit": 1,
     "txs": [
         {
+            "id": 128232046,
+            "chainId": "columbus-4",
             "height": "3800440",
             "txhash": "C68491343E081C92A4A398243E6126A8AEF4786FE866FAF6730443A214516B4B",
             "codespace": "sdk",

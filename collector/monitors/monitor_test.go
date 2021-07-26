@@ -17,7 +17,7 @@ func (suite *MonitorTestSuite) SetupTest() {
 
 }
 
-func (suite *MonitorTestSuite) TestSuccessfullQueryRequest() {
+func (suite *MonitorTestSuite) TestSuccessfulQueryRequest() {
 	totalSupply := 79178685320809.0
 	expected := types.TokenInfoResponse{
 		Name:        "Bonded Luna",
@@ -27,7 +27,7 @@ func (suite *MonitorTestSuite) TestSuccessfullQueryRequest() {
 	}
 	ts := NewServerWithResponse(BlunaTokenInfo)
 	cfg := NewTestCollectorConfig(ts.URL)
-	blunaTokenInfoMonitor := NewBlunaTokenInfoMintor(cfg)
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg)
 
 	err := blunaTokenInfoMonitor.Handler(context.Background())
 	suite.Require().NoError(err)
@@ -39,7 +39,7 @@ func (suite *MonitorTestSuite) TestBadQueryRequest() {
 	expectedErr := "bad query"
 	ts := NewServerWithError(expectedErr)
 	cfg := NewTestCollectorConfig(ts.URL)
-	blunaTokenInfoMonitor := NewBlunaTokenInfoMintor(cfg)
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg)
 
 	err := blunaTokenInfoMonitor.Handler(context.Background())
 	suite.Require().Error(err)
@@ -50,7 +50,7 @@ func (suite *MonitorTestSuite) TestConnectionRefusedRequest() {
 	expectedErr := "connection refused"
 	ts := NewServerWithClosedConnectionError()
 	cfg := NewTestCollectorConfig(ts.URL)
-	blunaTokenInfoMonitor := NewBlunaTokenInfoMintor(cfg)
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg)
 
 	err := blunaTokenInfoMonitor.Handler(context.Background())
 	suite.Require().Error(err)
@@ -59,4 +59,5 @@ func (suite *MonitorTestSuite) TestConnectionRefusedRequest() {
 
 func TestLocales(t *testing.T) {
 	suite.Run(t, new(MonitorTestSuite))
+	suite.Run(t, new(UpdateGlobalIndexMonitorTestSuite))
 }

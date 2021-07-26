@@ -6,25 +6,34 @@ import (
 	"strconv"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/lidofinance/terra-monitors/openapi/models"
 	"github.com/sirupsen/logrus"
 )
 
-var UpdateGlobalIndexBase64Encoded = "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0="
+type UpdateGlobalIndexTxsVariants int
 
-var (
-	UpdateGlobalIndexTxSinceLastCheck Metric = "update_global_index_tx_since_last_check"
-	UpdateGlobaIndexGasWanted         Metric = "update_global_index_gas_wanted"
-	UpdateGlobaIndexGasUsed           Metric = "update_global_index_gas_used"
-	UpdateGlobaIndexUUSDFee           Metric = "update_global_index_uusd_fee"
+const (
+	NonUpdateGlobalIndexTX UpdateGlobalIndexTxsVariants = iota
+	SuccessfulUpdateGlobalIndexTX
+	FailedUpdateGlobalIndex
 )
+
+const UpdateGlobalIndexBase64Encoded = "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0="
+
+const (
+	UpdateGlobalIndexSuccessfulTxSinceLastCheck Metric = "update_global_index_successful_tx_since_last_check"
+	UpdateGlobalIndexFailedTxSinceLastCheck     Metric = "update_global_index_failed_tx_since_last_check"
+	UpdateGlobalIndexGasWanted                  Metric = "update_global_index_gas_wanted"
+	UpdateGlobalIndexGasUsed                    Metric = "update_global_index_gas_used"
+	UpdateGlobalIndexUUSDFee                    Metric = "update_global_index_uusd_fee"
+)
+
+const threshold int = 10
 
 type UpdateGlobalIndexMonitor struct {
 	metrics          map[Metric]float64
-	state            types.UpdateGlobalIndexBotState
 	ApiResponse      *models.GetTxListResult
 	ContractAddress  string
 	apiClient        *client.TerraLiteForTerra
@@ -35,7 +44,6 @@ type UpdateGlobalIndexMonitor struct {
 func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
 		metrics:         make(map[Metric]float64),
-		state:           types.UpdateGlobalIndexBotState{},
 		ContractAddress: cfg.UpdateGlobalIndexBotAddress,
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
@@ -44,30 +52,31 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) UpdateGlobalIndexMo
 	return m
 }
 
-func (h UpdateGlobalIndexMonitor) Name() string {
+func (m UpdateGlobalIndexMonitor) Name() string {
 	return "UpdateGlobalIndexMonitor"
 }
 
 func (m *UpdateGlobalIndexMonitor) InitMetrics() {
-	m.metrics[UpdateGlobalIndexTxSinceLastCheck] = 0
-	m.metrics[UpdateGlobaIndexGasWanted] = 0
-	m.metrics[UpdateGlobaIndexGasUsed] = 0
-	m.metrics[UpdateGlobaIndexUUSDFee] = 0
-}
-
-func (m *UpdateGlobalIndexMonitor) updateMetrics() {
-	m.metrics[UpdateGlobalIndexTxSinceLastCheck] = m.state.SuccessfulTxSinceLastCheck
-	m.metrics[UpdateGlobaIndexGasWanted] = m.state.GasWantedSinceLastCheck
-	m.metrics[UpdateGlobaIndexGasUsed] = m.state.GasUsedSinceLastCheck
-	m.metrics[UpdateGlobaIndexUUSDFee] = m.state.UUSDFeeSinceLastCheck
+	m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck] = 0
+	m.metrics[UpdateGlobalIndexGasWanted] = 0
+	m.metrics[UpdateGlobalIndexGasUsed] = 0
+	m.metrics[UpdateGlobalIndexUUSDFee] = 0
+	m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck] = 0
 }
 
 func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
-
-	m.state = types.UpdateGlobalIndexBotState{}
 	var offset *float64
 	var fetchedTxs int
-	for {
+	var firstCheck bool
+	if m.lastMaxCheckedID == 0 {
+		firstCheck = true
+	}
+
+	iterations := 0
+	var maxProcessedID int
+	var alreadyProcessedFound bool
+	m.InitMetrics()
+	for iterations < threshold {
 		p := transactions.GetV1TxsParams{}
 		p.SetAccount(&m.ContractAddress)
 		p.SetContext(ctx)
@@ -78,22 +87,22 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 			return fmt.Errorf("failed to fetch transaction history for UpdateGlobalIndexBotContract account: %w", err)
 		}
 
-		procesedState, maxID, alreadyProcessedFound := m.processTransactions(resp.Payload.Txs, m.lastMaxCheckedID)
+		maxProcessedID, alreadyProcessedFound = m.processTransactions(resp.Payload.Txs, m.lastMaxCheckedID)
 		fetchedTxs += len(resp.Payload.Txs)
-		m.state.GasUsedSinceLastCheck += procesedState.GasUsedSinceLastCheck
-		m.state.GasWantedSinceLastCheck += procesedState.GasWantedSinceLastCheck
-		m.state.SuccessfulTxSinceLastCheck += procesedState.SuccessfulTxSinceLastCheck
-		m.state.UUSDFeeSinceLastCheck += procesedState.UUSDFeeSinceLastCheck
-		if alreadyProcessedFound || m.lastMaxCheckedID == 0 {
-			m.lastMaxCheckedID = maxID
+		maxProcessedID = maxInt(m.lastMaxCheckedID, maxProcessedID)
+		if alreadyProcessedFound || firstCheck {
 			break
 		}
 		offset = resp.Payload.Next
+		iterations++
 	}
-
-	m.logger.Infoln("update global index txs processed:", fetchedTxs)
-	m.logger.Infoln("update global index state:", m.state)
-	m.updateMetrics()
+	m.lastMaxCheckedID = maxProcessedID
+	if threshold == iterations {
+		m.logger.Warning("update global index processing stopped due to requests threshold - ", threshold)
+	}
+	m.logger.Infoln("update global index txs fetched:", fetchedTxs)
+	m.logger.Infoln("update global index state:", m.metrics)
+	// m.updateMetrics()
 	return nil
 }
 
@@ -104,53 +113,58 @@ func maxInt(a, b int) int {
 	return b
 }
 
-func (m UpdateGlobalIndexMonitor) processTransactions(txs []*models.GetTxListResultTxs, previousMaxCheckedID int) (state types.UpdateGlobalIndexBotState, newMaxCheckedID int, alreadyProcessedFound bool) {
+func (m *UpdateGlobalIndexMonitor) processTransactions(txs []*models.GetTxListResultTxs, previousMaxCheckedID int) (newMaxCheckedID int, alreadyProcessedFound bool) {
 	for i, tx := range txs {
 		if i == 0 {
 			newMaxCheckedID = maxInt(int(*tx.ID), previousMaxCheckedID)
 		}
 		if previousMaxCheckedID == int(*tx.ID) {
 			// we have already checked this and earlier transactions
-			m.logger.Infoln("stopping processing, lastchecked transaction is found:", previousMaxCheckedID)
+			m.logger.Infoln("stopping processing, last checked transaction is found:", previousMaxCheckedID)
 			alreadyProcessedFound = true
 			break
 		}
-		if isSuccessfulTxUpdateGlobalIndex(tx) {
-			state.SuccessfulTxSinceLastCheck++
+		switch isTxUpdateGlobalIndex(tx) {
+		case SuccessfulUpdateGlobalIndexTX:
+			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck]++
+		case FailedUpdateGlobalIndex:
+			m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck]++
+			m.logger.Warning("failed tx detected: ", getTxRawLog(tx))
+		case NonUpdateGlobalIndexTX:
 		}
-
-		state.GasUsedSinceLastCheck += gasUsed(m.logger, tx)
-		state.GasWantedSinceLastCheck += gasWanted(m.logger, tx)
-		state.UUSDFeeSinceLastCheck += uusdFee(m.logger, tx)
+		m.metrics[UpdateGlobalIndexGasUsed] += gasUsed(m.logger, tx)
+		m.metrics[UpdateGlobalIndexGasWanted] += gasWanted(m.logger, tx)
+		m.metrics[UpdateGlobalIndexUUSDFee] += uusdFee(m.logger, tx)
 	}
-	return state, newMaxCheckedID, alreadyProcessedFound
+	return newMaxCheckedID, alreadyProcessedFound
 }
 
-func (h *UpdateGlobalIndexMonitor) setStringMetric(m Metric, rawValue string) {
-	v, err := strconv.ParseFloat(rawValue, 64)
-	if err != nil {
-		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
+func (m UpdateGlobalIndexMonitor) GetMetrics() map[Metric]float64 {
+	return m.metrics
+}
+
+func getTxRawLog(tx *models.GetTxListResultTxs) string {
+	if tx == nil || tx.RawLog == nil {
+		return ""
 	}
-	h.metrics[m] = v
+	return *tx.RawLog
 }
 
-func (h UpdateGlobalIndexMonitor) GetMetrics() map[Metric]float64 {
-	return h.metrics
-}
-
-func isSuccessfulTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) bool {
+func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVariants {
 	if tx == nil || tx.Tx == nil || tx.Tx.Value == nil || len(tx.Tx.Value.Msg) == 0 {
-		return false
+		return NonUpdateGlobalIndexTX
 	}
 	for _, msg := range tx.Tx.Value.Msg {
 		if msg.Value == nil || msg.Value.ExecuteMsg == nil {
 			continue
 		}
-		if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded {
-			return true
+		if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) > 0 {
+			return SuccessfulUpdateGlobalIndexTX
+		} else if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) == 0 {
+			return FailedUpdateGlobalIndex
 		}
 	}
-	return false
+	return NonUpdateGlobalIndexTX
 }
 
 func gasUsed(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {

@@ -2,9 +2,12 @@ package monitors
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
@@ -50,5 +53,53 @@ func NewServerWithError(errorMessage string) *httptest.Server {
 func NewServerWithClosedConnectionError() *httptest.Server {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	ts.Close()
+	return ts
+}
+
+func makeTxFromData(data []byte) map[string]interface{} {
+	txData := make(map[string]interface{})
+	err := json.Unmarshal(data, &txData)
+	if err != nil {
+		panic(err)
+	}
+	return txData
+}
+
+func makeTxs(offset int) string {
+	resp := map[string]interface{}{
+		"next":  offset - 10,
+		"limit": 10,
+		"txs":   []interface{}{},
+	}
+	txDataRaw, err := ioutil.ReadFile("./test_data/update_global_index_template.json")
+	if err != nil {
+		panic(err)
+	}
+	var txData map[string]interface{}
+	for i := 0; i < 10; i++ {
+		txData = makeTxFromData(txDataRaw)
+		txData["id"] = offset - i
+		resp["txs"] = append(resp["txs"].([]interface{}), txData)
+	}
+	respRaw, err := json.Marshal(resp)
+	if err != nil {
+		panic(err)
+	}
+	return string(respRaw)
+}
+
+func NewServerForUpdateGlobalIndex() *httptest.Server {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		offsetRaw := r.URL.Query().Get("offset")
+		if offsetRaw == "" {
+			offsetRaw = "200"
+		}
+		offset, err := strconv.Atoi(offsetRaw)
+		if err != nil {
+			panic(err)
+		}
+		w.Header().Add("Content-Type", "application/json")
+		fmt.Fprintln(w, makeTxs(offset))
+	}))
 	return ts
 }

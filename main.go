@@ -1,11 +1,7 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"flag"
-	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/lidofinance/terra-monitors/app"
@@ -13,34 +9,32 @@ import (
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/extractor"
-	"github.com/lidofinance/terra-monitors/internal/logging"
-	"github.com/sirupsen/logrus"
 )
 
 var addr = flag.String("listen-address", ":8080",
 	"The address to listen on for HTTP requests.")
 
-func createCollector(logger *logrus.Logger) collector.LCDCollector {
+func createCollector() collector.LCDCollector {
 	defConfig := config.DefaultCollectorConfig()
 	c := collector.NewLCDCollector(defConfig)
-	hubStateMonitor := monitors.NewHubStateMintor(defConfig)
+	hubStateMonitor := monitors.NewHubStateMonitor(defConfig)
 	c.RegisterMonitor(&hubStateMonitor)
 
 	rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
 	c.RegisterMonitor(&rewardStateMonitor)
 
-	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMintor(defConfig)
+	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
 
-	updateBlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
-	c.RegisterMonitor((&updateBlobalIndexMonitor))
+	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
+	c.RegisterMonitor(&updateGlobalIndexMonitor)
 	return c
 }
 
 func main() {
 	flag.Parse()
-	logger := logging.NewDefaultLogger()
-	c := createCollector(logger)
+	c := createCollector()
+	logger := c.GetLogger()
 	p := extractor.NewPromExtractor(&c, logger)
 	app := app.NewAppHTTP(p)
 	http.Handle("/metrics", app)
@@ -50,27 +44,4 @@ func main() {
 	if err != nil {
 		logger.Errorf("http.ListenAndServer: %v\n", err)
 	}
-}
-
-func main2() {
-	defConfig := config.DefaultCollectorConfig()
-
-	// c := collector.NewLCDCollector(
-	// 	defConfig,
-	// )
-	m := monitors.NewUpdateGlobalIndexMonitor(defConfig)
-	err := m.Handler(context.Background())
-	if err != nil {
-		log.Fatalln(err)
-	}
-	for _, l := range m.ApiResponse.Txs[0].Logs {
-		for _, e := range l.Events {
-			data, err := json.Marshal(e)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			fmt.Println(string(data))
-		}
-	}
-
 }
