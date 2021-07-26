@@ -10,7 +10,8 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/lidofinance/terra-monitors/client/wasm"
+	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
+	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 )
 
 // Default terra lite for terra HTTP client.
@@ -19,7 +20,7 @@ var Default = NewHTTPClient(nil)
 const (
 	// DefaultHost is the default Host
 	// found in Meta (info) section of spec file
-	DefaultHost string = "lcd.terra.dev"
+	DefaultHost string = "fcd.terra.dev"
 	// DefaultBasePath is the default BasePath
 	// found in Meta (info) section of spec file
 	DefaultBasePath string = "/"
@@ -55,6 +56,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *TerraLiteF
 
 	cli := new(TerraLiteForTerra)
 	cli.Transport = transport
+	cli.Transactions = transactions.New(transport, formats)
 	cli.Wasm = wasm.New(transport, formats)
 	return cli
 }
@@ -100,6 +102,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // TerraLiteForTerra is a client for terra lite for terra
 type TerraLiteForTerra struct {
+	Transactions transactions.ClientService
+
 	Wasm wasm.ClientService
 
 	Transport runtime.ClientTransport
@@ -108,5 +112,6 @@ type TerraLiteForTerra struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *TerraLiteForTerra) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
+	c.Transactions.SetTransport(transport)
 	c.Wasm.SetTransport(transport)
 }

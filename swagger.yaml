@@ -36,7 +36,7 @@ tags:
     description: Authorization modules APIs
 schemes:
   - https
-host: lcd.terra.dev
+host: fcd.terra.dev
 securityDefinitions:
   kms:
     type: basic
@@ -78,3 +78,610 @@ paths:
             properties:
               error:
                 type: string
+  /v1/txs:
+    get:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - description: Account address
+          in: query
+          name: account
+          required: false
+          type: string
+        - description: Type of tx (account is required)
+          in: query
+          name: action
+          required: false
+          type: string
+        - description: Block number
+          in: query
+          name: block
+          required: false
+          type: string
+        - description: Memo filter
+          in: query
+          name: memo
+          required: false
+          type: string
+        - description: ',''DESC''] Ordering (default: DESC)'
+          in: query
+          name: order
+          required: false
+          type: string
+        - description: 'Chain ID of Blockchain (default: chain id of mainnet)'
+          in: query
+          name: chainId
+          required: false
+          type: string
+        - description: Timestamp from
+          in: query
+          name: from
+          required: false
+          type: number
+        - description: Timestamp to
+          in: query
+          name: to
+          required: false
+          type: number
+        - description: Use last id from previous result for pagination
+          in: query
+          name: offset
+          required: false
+          type: number
+        - description: '# of page'
+          in: query
+          name: page
+          required: false
+          type: number
+        - description: Size of page
+          in: query
+          name: limit
+          required: false
+          type: number
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/getTxListResult'
+      tags:
+        - Transactions
+      description: Get Tx List
+      summary: Get Tx List
+
+
+definitions:
+  getTxListResult:
+    properties:
+      limit:
+        description: Per page item limit
+        type: number
+      txs:
+        description: tx list
+        items:
+          $ref: '#/definitions/getTxListResult.txs'
+        type: array
+    required:
+      - limit
+      - txs
+  getTxListResult.txs:
+    properties:
+      events:
+        description: events of tx
+        items:
+          $ref: '#/definitions/getTxListResult.txs.events'
+        type: array
+      gas_used:
+        description: total gas used in tx
+        type: string
+      gas_wanted:
+        description: gas wanted
+        type: string
+      height:
+        description: block height
+        type: string
+      logs:
+        description: tx logs
+        items:
+          $ref: '#/definitions/getTxListResult.txs.logs'
+        type: array
+      raw_log:
+        description: tx raw log
+        type: string
+      timestamp:
+        description: timestamp tx in utc 0
+        type: string
+      tx:
+        $ref: '#/definitions/getTxListResult.txs.tx'
+        description: tx info
+        type: object
+      txhash:
+        description: tx hash
+        type: string
+    required:
+      - tx
+      - events
+      - logs
+      - height
+      - txhash
+      - raw_log
+      - gas_used
+      - timestamp
+      - gas_wanted
+  getTxListResult.txs.events:
+    properties:
+      attributes:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.events.attributes'
+        type: array
+      type:
+        description: ''
+        type: string
+    required:
+      - type
+      - attributes
+  getTxListResult.txs.events.attributes:
+    properties:
+      key:
+        description: ''
+        type: string
+      value:
+        description: ''
+        type: string
+    required:
+      - key
+      - value
+  getTxListResult.txs.logs:
+    properties:
+      events:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.logs.events'
+        type: array
+      log:
+        $ref: '#/definitions/getTxListResult.txs.logs.log'
+        description: ''
+        type: object
+      msg_index:
+        description: ''
+        type: number
+      success:
+        description: ''
+        type: boolean
+    required:
+      - msg_index
+      - success
+      - log
+      - events
+  getTxListResult.txs.logs.events:
+    properties:
+      attributes:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.logs.events.attributes'
+        type: array
+      type:
+        description: ''
+        type: string
+    required:
+      - type
+      - attributes
+  getTxListResult.txs.logs.events.attributes:
+    properties:
+      key:
+        description: ''
+        type: string
+      value:
+        description: ''
+        type: string
+    required:
+      - key
+      - value
+  getTxListResult.txs.logs.log:
+    properties:
+      tax:
+        description: ''
+        type: string
+    required:
+      - tax
+  getTxListResult.txs.tx:
+    properties:
+      type:
+        description: Tx type
+        type: string
+      value:
+        $ref: '#/definitions/getTxListResult.txs.tx.value'
+        description: ''
+        type: object
+    required:
+      - type
+      - value
+  getTxListResult.txs.tx.value:
+    properties:
+      fee:
+        $ref: '#/definitions/getTxListResult.txs.tx.value.fee'
+        description: ''
+        type: object
+      memo:
+        description: ''
+        type: string
+      msg:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg'
+        type: array
+      signatures:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.signatures'
+        type: array
+    required:
+      - fee
+      - memo
+      - msg
+      - signatures
+  getTxListResult.txs.tx.value.fee:
+    properties:
+      amount:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.fee.amount'
+        type: array
+      gas:
+        description: ''
+        type: string
+    required:
+      - gas
+      - amount
+  getTxListResult.txs.tx.value.fee.amount:
+    properties:
+      amount:
+        description: ''
+        type: string
+      denom:
+        description: ''
+        type: string
+    required:
+      - denom
+      - amount
+  getTxListResult.txs.tx.value.msg:
+    properties:
+      type:
+        description: ''
+        type: string
+      value:
+        $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value'
+        description: ''
+        type: object
+    required:
+      - type
+      - value
+  getTxListResult.txs.tx.value.msg.value:
+    properties:
+      inputs:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.inputs'
+        type: array
+      outputs:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.outputs'
+        type: array
+    required:
+      - inputs
+      - outputs
+  getTxListResult.txs.tx.value.msg.value.inputs:
+    properties:
+      address:
+        description: ''
+        type: string
+      coins:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.inputs.coins'
+        type: array
+    required:
+      - address
+      - coins
+  getTxListResult.txs.tx.value.msg.value.inputs.coins:
+    properties:
+      amount:
+        description: ''
+        type: string
+      deonm:
+        description: ''
+        type: string
+    required:
+      - deonm
+      - amount
+  getTxListResult.txs.tx.value.msg.value.outputs:
+    properties:
+      address:
+        description: ''
+        type: string
+      coins:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.outputs.coins'
+        type: array
+    required:
+      - address
+      - coins
+  getTxListResult.txs.tx.value.msg.value.outputs.coins:
+    properties:
+      amount:
+        description: ''
+        type: string
+      deonm:
+        description: ''
+        type: string
+    required:
+      - deonm
+      - amount
+  getTxListResult.txs.tx.value.signatures:
+    properties:
+      pub_key:
+        $ref: '#/definitions/getTxListResult.txs.tx.value.signatures.pub_key'
+        description: ''
+        type: object
+      signature:
+        description: ''
+        type: string
+    required:
+      - signature
+      - pub_key
+  getTxListResult.txs.tx.value.signatures.pub_key:
+    properties:
+      type:
+        description: ''
+        type: string
+      value:
+        description: ''
+        type: string
+    required:
+      - type
+      - value
+  getTxResult:
+    properties:
+      chainId:
+        description: ''
+        type: string
+      events:
+        description: events of tx
+        items:
+          $ref: '#/definitions/getTxResult.events'
+        type: array
+      gas_used:
+        description: total gas used in tx
+        type: string
+      gas_wanted:
+        description: gas wanted
+        type: string
+      height:
+        description: block height
+        type: string
+      logs:
+        description: tx logs
+        items:
+          $ref: '#/definitions/getTxResult.logs'
+        type: array
+      raw_log:
+        description: tx raw log
+        type: string
+      timestamp:
+        description: timestamp tx in utc 0
+        type: string
+      tx:
+        $ref: '#/definitions/getTxResult.tx'
+        description: tx info
+        type: object
+      txhash:
+        description: tx hash
+        type: string
+    required:
+      - tx
+      - events
+      - logs
+      - height
+      - txhash
+      - raw_log
+      - gas_used
+      - timestamp
+      - gas_wanted
+      - chainId
+  getTxResult.events:
+    properties:
+      attributes:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.events.attributes'
+        type: array
+      type:
+        description: ''
+        type: string
+    required:
+      - type
+      - attributes
+  getTxResult.events.attributes:
+    properties:
+      key:
+        description: ''
+        type: string
+      value:
+        description: ''
+        type: string
+    required:
+      - key
+      - value
+  getTxResult.logs:
+    properties:
+      events:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.logs.events'
+        type: array
+      log:
+        $ref: '#/definitions/getTxResult.logs.log'
+        description: ''
+        type: object
+      msg_index:
+        description: ''
+        type: number
+      success:
+        description: ''
+        type: boolean
+    required:
+      - events
+      - log
+      - msg_index
+      - success
+  getTxResult.logs.events:
+    properties:
+      attributes:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.logs.events.attributes'
+        type: array
+      types:
+        description: ''
+        type: string
+    required:
+      - attributes
+      - types
+  getTxResult.logs.events.attributes:
+    properties:
+      key:
+        description: ''
+        type: string
+      value:
+        description: ''
+        type: string
+    required:
+      - key
+      - value
+  getTxResult.logs.log:
+    properties:
+      tax:
+        description: ''
+        type: string
+    required:
+      - tax
+  getTxResult.tx:
+    properties:
+      type:
+        description: tx type
+        type: string
+      value:
+        $ref: '#/definitions/getTxResult.tx.value'
+        description: ''
+        type: object
+    required:
+      - type
+      - value
+  getTxResult.tx.value:
+    properties:
+      fee:
+        $ref: '#/definitions/getTxResult.tx.value.fee'
+        description: ''
+        type: object
+      memo:
+        description: ''
+        type: string
+      msg:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.tx.value.msg'
+        type: array
+      signatures:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.tx.value.signatures'
+        type: array
+    required:
+      - fee
+      - memo
+      - msg
+      - signatures
+  getTxResult.tx.value.fee:
+    properties:
+      amount:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.tx.value.fee.amount'
+        type: array
+      gas:
+        description: ''
+        type: string
+    required:
+      - amount
+      - gas
+  getTxResult.tx.value.fee.amount:
+    properties:
+      amount:
+        description: ''
+        type: string
+      denom:
+        description: ''
+        type: string
+    required:
+      - denom
+      - amount
+  getTxResult.tx.value.msg:
+    properties:
+      type:
+        description: ''
+        type: string
+      value:
+        $ref: '#/definitions/getTxResult.tx.value.msg.value'
+        description: ''
+        type: object
+    required:
+      - type
+      - value
+  getTxResult.tx.value.msg.value:
+    properties:
+      amount:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.tx.value.msg.value.amount'
+        type: array
+    required:
+      - amount
+  getTxResult.tx.value.msg.value.amount:
+    properties:
+      amount:
+        description: ''
+        type: string
+      denom:
+        description: ''
+        type: string
+    required:
+      - denom
+      - amount
+  getTxResult.tx.value.signatures:
+    properties:
+      pubKey:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxResult.tx.value.signatures.pubKey'
+        type: array
+      signature:
+        description: ''
+        type: string
+    required:
+      - pubKey
+      - signature
+  getTxResult.tx.value.signatures.pubKey:
+    properties:
+      type:
+        description: ''
+        type: string
+      value:
+        description: ''
+        type: string
+    required:
+      - type
+      - value
