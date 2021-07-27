@@ -9,3 +9,7 @@ start:
 
 stop:
 	docker-compose down --remove-orphans
+
+
+test:
+	go test ./...
