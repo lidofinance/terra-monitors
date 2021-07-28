@@ -19,9 +19,9 @@ var (
 
 func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 	m := RewardStateMonitor{
-		metrics:         make(map[Metric]float64),
 		State:           &types.RewardStateResponse{},
 		ContractAddress: cfg.RewardContract,
+		metrics:         make(map[Metric]float64),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
@@ -30,9 +30,9 @@ func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 }
 
 type RewardStateMonitor struct {
-	metrics         map[Metric]float64
 	State           *types.RewardStateResponse
 	ContractAddress string
+	metrics         map[Metric]float64
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
 }

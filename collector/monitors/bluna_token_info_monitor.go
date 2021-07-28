@@ -19,9 +19,9 @@ var (
 
 func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor {
 	m := BlunaTokenInfoMonitor{
-		metrics:         make(map[Metric]float64),
 		State:           &types.TokenInfoResponse{},
 		ContractAddress: cfg.BlunaTokenInfoContract,
+		metrics:         make(map[Metric]float64),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
@@ -29,9 +29,9 @@ func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor 
 }
 
 type BlunaTokenInfoMonitor struct {
-	metrics         map[Metric]float64
 	State           *types.TokenInfoResponse
 	ContractAddress string
+	metrics         map[Metric]float64
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
 }

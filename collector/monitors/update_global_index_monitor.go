@@ -33,8 +33,8 @@ const (
 const threshold int = 10
 
 type UpdateGlobalIndexMonitor struct {
-	metrics          map[Metric]float64
 	ContractAddress  string
+	metrics          map[Metric]float64
 	apiClient        *client.TerraLiteForTerra
 	logger           *logrus.Logger
 	lastMaxCheckedID int
@@ -42,8 +42,8 @@ type UpdateGlobalIndexMonitor struct {
 
 func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
-		metrics:         make(map[Metric]float64),
 		ContractAddress: cfg.UpdateGlobalIndexBotAddress,
+		metrics:         make(map[Metric]float64),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
