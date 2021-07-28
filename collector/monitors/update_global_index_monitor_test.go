@@ -99,6 +99,7 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
 	suite.Equal(expectedSuccessTxs*expectedUUSDUsedPerTX, metrics[UpdateGlobalIndexUUSDFee])
 	actualMessages := fmt.Sprintln(cfg.Logger.Out)
 	suite.Contains(actualMessages, expectedErrorMessagePattern)
+	suite.Equal(200, m.lastMaxCheckedID)
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
@@ -127,4 +128,5 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
 	suite.Equal(expectedSuccessTxs*expectedUUSDUsedPerTX, metrics[UpdateGlobalIndexUUSDFee])
 	actualMessages := fmt.Sprintln(cfg.Logger.Out)
 	suite.Contains(actualMessages, expectedErrorMessagePattern)
+	suite.Equal(200, m.lastMaxCheckedID)
 }

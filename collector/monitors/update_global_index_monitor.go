@@ -17,7 +17,7 @@ type UpdateGlobalIndexTxsVariants int
 const (
 	NonUpdateGlobalIndexTX UpdateGlobalIndexTxsVariants = iota
 	SuccessfulUpdateGlobalIndexTX
-	FailedUpdateGlobalIndex
+	FailedUpdateGlobalIndexTx
 )
 
 const UpdateGlobalIndexBase64Encoded = "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0="
@@ -34,7 +34,6 @@ const threshold int = 10
 
 type UpdateGlobalIndexMonitor struct {
 	metrics          map[Metric]float64
-	ApiResponse      *models.GetTxListResult
 	ContractAddress  string
 	apiClient        *client.TerraLiteForTerra
 	logger           *logrus.Logger
@@ -74,6 +73,7 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 
 	iterations := 0
 	var maxProcessedID int
+	var maxProcessedIDPerRequest int
 	var alreadyProcessedFound bool
 	m.InitMetrics()
 	for iterations < threshold {
@@ -87,9 +87,9 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 			return fmt.Errorf("failed to fetch transaction history for UpdateGlobalIndexBotContract account: %w", err)
 		}
 
-		maxProcessedID, alreadyProcessedFound = m.processTransactions(resp.Payload.Txs, m.lastMaxCheckedID)
+		maxProcessedIDPerRequest, alreadyProcessedFound = m.processTransactions(resp.Payload.Txs, m.lastMaxCheckedID)
 		fetchedTxs += len(resp.Payload.Txs)
-		maxProcessedID = maxInt(m.lastMaxCheckedID, maxProcessedID)
+		maxProcessedID = maxInt(maxProcessedID, maxProcessedIDPerRequest)
 		if alreadyProcessedFound || firstCheck {
 			break
 		}
@@ -102,7 +102,6 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	}
 	m.logger.Infoln("update global index txs fetched:", fetchedTxs)
 	m.logger.Infoln("update global index state:", m.metrics)
-	// m.updateMetrics()
 	return nil
 }
 
@@ -127,7 +126,7 @@ func (m *UpdateGlobalIndexMonitor) processTransactions(txs []*models.GetTxListRe
 		switch isTxUpdateGlobalIndex(tx) {
 		case SuccessfulUpdateGlobalIndexTX:
 			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck]++
-		case FailedUpdateGlobalIndex:
+		case FailedUpdateGlobalIndexTx:
 			m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck]++
 			m.logger.Warning("failed tx detected: ", getTxRawLog(tx))
 		case NonUpdateGlobalIndexTX:
@@ -161,7 +160,7 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 		if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) > 0 {
 			return SuccessfulUpdateGlobalIndexTX
 		} else if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) == 0 {
-			return FailedUpdateGlobalIndex
+			return FailedUpdateGlobalIndexTx
 		}
 	}
 	return NonUpdateGlobalIndexTX
