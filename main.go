@@ -33,6 +33,12 @@ func createCollector() collector.LCDCollector {
 	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
 	c.RegisterMonitor(&updateGlobalIndexMonitor)
 
+	hubParameters := monitors.NewHubParametersMonitor(defConfig)
+	c.RegisterMonitor(&hubParameters)
+
+	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(defConfig)
+	c.RegisterMonitor(&configCRC32Monitor)
+
 	return c
 }
 
