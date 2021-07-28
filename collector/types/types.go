@@ -116,3 +116,14 @@ type HubParameters struct {
 type HubParametersRequest struct {
 	Parameters struct{} `json:"parameters"`
 }
+
+//pub struct ConfigResponse {
+//pub hub_contract: HumanAddr,
+//pub reward_denom: String,
+//}
+
+
+type BlunaRewardConfig struct {
+	HubContract string `json:"hub_contract"`
+	RewardDenom string `json:"reward_denom"`
+}

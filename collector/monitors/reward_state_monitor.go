@@ -20,8 +20,9 @@ var (
 func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 	m := RewardStateMonitor{
 		State:           &types.RewardStateResponse{},
-		ContractAddress: cfg.RewardContract,
+		//ContractAddress: cfg.RewardContract,
 		metrics:         make(map[Metric]float64),
+		ContractAddress: cfg.BlunaRewardContract,
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}

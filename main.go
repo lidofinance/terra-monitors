@@ -35,6 +35,9 @@ func createCollector() collector.LCDCollector {
 	hubConfig := monitors.NewHubConfigMonitor(defConfig)
 	c.RegisterMonitor(&hubConfig)
 
+	blunaRewardConfig := monitors.NewBlunaRewardConfigMonitor(defConfig)
+	c.RegisterMonitor(&blunaRewardConfig)
+
 	return c
 }
 

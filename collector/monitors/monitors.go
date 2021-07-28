@@ -50,8 +50,9 @@ func (h BaseMonitor) GetContract() string {
 
 
 
-func makeStoreQuery(resp1, req1 interface{}, ctx context.Context, m StoreQueryMonitor) error {
-	reqRaw, err := json.Marshal(&req1)
+
+func makeStoreQuery(responsePtr, request interface{}, ctx context.Context, m StoreQueryMonitor) error {
+	reqRaw, err := json.Marshal(&request)
 	if err != nil {
 		return fmt.Errorf("failed to marshal %s request: %w", m.Name(), err)
 	}
@@ -65,7 +66,8 @@ func makeStoreQuery(resp1, req1 interface{}, ctx context.Context, m StoreQueryMo
 	if err != nil {
 		return fmt.Errorf("failed to process %s request: %w", m.Name(), err)
 	}
-	err = types.CastMapToStruct(resp.Payload.Result, resp1)
+
+	err = types.CastMapToStruct(resp.Payload.Result, responsePtr)
 	if err != nil {
 		return fmt.Errorf("failed to parse %s body interface: %w", m.Name(), err)
 	}

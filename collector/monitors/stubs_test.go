@@ -25,7 +25,7 @@ func NewTestCollectorConfig(urlWithScheme string) config.CollectorConfig {
 		LCDEndpoint:            host,
 		Logger:                 logging.NewDefaultLogger(),
 		HubContract:            "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts",
-		RewardContract:         "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
+		BlunaRewardContract:    "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
 		BlunaTokenInfoContract: "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp",
 		Schemes:                []string{"http"},
 	}
