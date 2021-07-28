@@ -32,6 +32,8 @@ const (
 
 const threshold int = 10
 
+const UUSDDenom = "uusd"
+
 type UpdateGlobalIndexMonitor struct {
 	ContractAddress  string
 	metrics          map[Metric]float64
@@ -112,7 +114,11 @@ func maxInt(a, b int) int {
 	return b
 }
 
-func (m *UpdateGlobalIndexMonitor) processTransactions(txs []*models.GetTxListResultTxs, previousMaxCheckedID int) (newMaxCheckedID int, alreadyProcessedFound bool) {
+func (m *UpdateGlobalIndexMonitor) processTransactions(
+	txs []*models.GetTxListResultTxs,
+	previousMaxCheckedID int,
+) (newMaxCheckedID int, alreadyProcessedFound bool) {
+	// transactions are reverse ordered by ID field
 	for i, tx := range txs {
 		if i == 0 {
 			newMaxCheckedID = maxInt(int(*tx.ID), previousMaxCheckedID)
@@ -160,6 +166,10 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 		if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) > 0 {
 			return SuccessfulUpdateGlobalIndexTX
 		} else if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) == 0 {
+			// https://fcd.terra.dev/v1/txs?offset=126987824
+			// tx with id = 126987823 is a failed tx due to out of gas
+			// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.
+			// The second one - "raw_log" contains human readable message with error
 			return FailedUpdateGlobalIndexTx
 		}
 	}
@@ -210,7 +220,7 @@ func uusdFee(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {
 			}
 			continue
 		}
-		if *amount.Denom == "uusd" {
+		if *amount.Denom == UUSDDenom {
 			uusdFeeAmount, err := strconv.ParseFloat(*amount.Amount, 64)
 			if err != nil && logger != nil {
 				logger.Errorln("failed to parse uusdFeeAmount:", err)
