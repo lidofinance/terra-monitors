@@ -9,7 +9,7 @@ TELEGRAM_CHAT_ID=<telegram_chat_id>
 
 To run the service
 ```shell
-docker-compose up -d
+make start
 ```
 
 Grafana dashboards avaliable by link http://127.0.0.1:3000
