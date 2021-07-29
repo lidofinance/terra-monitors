@@ -80,7 +80,6 @@ func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
 	return CommonStateRequest{}, HubStateResponse{}
 }
 
-
 //pub struct Config {
 //pub creator: CanonicalAddr,
 //pub reward_dispatcher_contract: Option<CanonicalAddr>,
@@ -91,26 +90,25 @@ func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
 //}
 
 type HubConfig struct {
-	Creator string `json:"creator"`
-	RewardDispatcherContract string`json:"reward_dispatcher_contract"`
-	ValidatorsRegistryContract string`json:"validators_registry_contract"`
-	BlunaTokenContract string`json:"bluna_token_contract"`
-	StlunaTokenContract string`json:"stluna_token_contract"`
-	AirdropRegistryContract string`json:"airdrop_registry_contract"`
+	Creator                    string `json:"creator"`
+	RewardDispatcherContract   string `json:"reward_dispatcher_contract"`
+	ValidatorsRegistryContract string `json:"validators_registry_contract"`
+	BlunaTokenContract         string `json:"bluna_token_contract"`
+	StlunaTokenContract        string `json:"stluna_token_contract"`
+	AirdropRegistryContract    string `json:"airdrop_registry_contract"`
 }
 
 type CommonConfigRequest struct {
 	Config struct{} `json:"config"`
 }
 
-
 type HubParameters struct {
-	EpochPeriod uint64 `json:"epoch_period"`
-	UnderlyingCoinDenom string`json:"underlying_coin_denom"`
-	UnbondingPeriod uint64`json:"unbonding_period"`
-	PegRecoveryFee string `json:"peg_recovery_fee"` //Decimal128 as string
-	ErThreshold string `json:"er_threshold"` //Decimal128 as string
-	RewardDenom string `json:"reward_denom"`
+	EpochPeriod         uint64 `json:"epoch_period"`
+	UnderlyingCoinDenom string `json:"underlying_coin_denom"`
+	UnbondingPeriod     uint64 `json:"unbonding_period"`
+	PegRecoveryFee      string `json:"peg_recovery_fee"` //Decimal128 as string
+	ErThreshold         string `json:"er_threshold"`     //Decimal128 as string
+	RewardDenom         string `json:"reward_denom"`
 }
 
 type HubParametersRequest struct {
@@ -122,8 +120,27 @@ type HubParametersRequest struct {
 //pub reward_denom: String,
 //}
 
-
 type BlunaRewardConfig struct {
 	HubContract string `json:"hub_contract"`
 	RewardDenom string `json:"reward_denom"`
+}
+
+//pub struct Config {
+//pub owner: CanonicalAddr,
+//pub hub_contract: CanonicalAddr,
+//pub bluna_reward_contract: CanonicalAddr,
+//pub stluna_reward_denom: String,
+//pub bluna_reward_denom: String,
+//pub lido_fee_address: CanonicalAddr,
+//pub lido_fee_rate: Decimal,
+//}
+
+type RewardDispatcherConfig struct {
+	Owner               string `json:"owner"`
+	HubContract         string `json:"hub_contract"`
+	BlunaRewardContract string `json:"bluna_reward_contract"`
+	StlunaRewardDenom   string `json:"stluna_reward_denom"`
+	BlunaRewardDenom    string `json:"bluna_reward_denom"`
+	LidoFeeAddress      string `json:"lido_fee_address"`
+	LidoFeeRate         string `json:"lido_fee_rate"` //decimal128
 }

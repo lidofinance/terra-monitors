@@ -7,15 +7,14 @@ import (
 )
 
 type CollectorConfig struct {
-
-	Logger                      *logrus.Logger
-	LCDEndpoint                 string
-	HubContract                 string
-	BlunaRewardContract              string
-	BlunaTokenInfoContract      string
-	UpdateGlobalIndexBotAddress string
-	Schemes                     []string
-
+	Logger                         *logrus.Logger
+	LCDEndpoint                    string
+	HubContract                    string
+	BlunaRewardContract            string
+	BlunaTokenInfoContract         string
+	UpdateGlobalIndexBotAddress    string
+	RewardDispatcherConfigContract string
+	Schemes                        []string
 }
 
 func (c CollectorConfig) getSchemes() []string {
@@ -42,7 +41,7 @@ func DefaultCollectorConfig() CollectorConfig {
 	return CollectorConfig{
 		Logger:                      logging.NewDefaultLogger(),
 		HubContract:                 "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts",
-		BlunaRewardContract:              "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
+		BlunaRewardContract:         "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
 		BlunaTokenInfoContract:      "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp",
 		UpdateGlobalIndexBotAddress: "terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy",
 	}

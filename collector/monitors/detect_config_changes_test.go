@@ -137,3 +137,64 @@ func (suite *DetectorTestSuite) TestHubConfig() {
 	//detects crc32 is changed due to changed config data
 	suite.NotEqual(crc32first, crc32second)
 }
+
+
+func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
+	rewardDispatcherConfig := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.RewardDispatcherConfig{
+			Owner:               "owner",
+			HubContract:         "hub",
+			BlunaRewardContract: "bluna",
+			StlunaRewardDenom:   "stluna",
+			BlunaRewardDenom:    "blunareward",
+			LidoFeeAddress:      "lidofee",
+			LidoFeeRate:         "0.01",
+		},
+	}
+	responseData, err := json.Marshal(rewardDispatcherConfig)
+	suite.NoError(err)
+	ts := NewServerWithResponse(string(responseData))
+	cfg := NewTestCollectorConfig(ts.URL)
+	rewardDispatcherConfigMonitor := NewRewardDispatcherConfigMonitor(cfg)
+
+	err = rewardDispatcherConfigMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(rewardDispatcherConfig.Result, *rewardDispatcherConfigMonitor.State)
+	crc32first := rewardDispatcherConfigMonitor.metrics[RewardDispatcherConfigCRC32]
+
+
+	//   changing response data
+	newRewardDispatcherConfig := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.RewardDispatcherConfig{
+			Owner:               "owner_new",
+			HubContract:         "hub_new",
+			BlunaRewardContract: "bluna_new",
+			StlunaRewardDenom:   "stluna_new",
+			BlunaRewardDenom:    "blunareward_new",
+			LidoFeeAddress:      "lidofee_new",
+			LidoFeeRate:         "0.005",
+		},
+	}
+	responseData, err = json.Marshal(newRewardDispatcherConfig)
+	suite.NoError(err)
+
+	ts = NewServerWithResponse(string(responseData))
+	cfg = NewTestCollectorConfig(ts.URL)
+	rewardDispatcherConfigMonitor = NewRewardDispatcherConfigMonitor(cfg)
+
+	err = rewardDispatcherConfigMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(newRewardDispatcherConfig.Result, *rewardDispatcherConfigMonitor.State)
+
+
+	crc32second := rewardDispatcherConfigMonitor.metrics[RewardDispatcherConfigCRC32]
+
+	//detects crc32 is changed due to changed config data
+	suite.NotEqual(crc32first, crc32second)
+}
