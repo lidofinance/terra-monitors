@@ -15,6 +15,7 @@ type CollectorConfig struct {
 	UpdateGlobalIndexBotAddress string
 	RewardDispatcherContract    string
 	ValidatorsRegistryContract  string
+	AirDropRegistryContract     string
 	Schemes                     []string
 }
 
@@ -47,6 +48,7 @@ func DefaultCollectorConfig() CollectorConfig {
 		UpdateGlobalIndexBotAddress: "terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy",
 
 		// change the fields to appropriate contracts values
+		AirDropRegistryContract: "dummy",
 		RewardDispatcherContract:   "dummy",
 		ValidatorsRegistryContract: "dummy",
 	}

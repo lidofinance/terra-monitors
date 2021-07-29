@@ -129,9 +129,17 @@
         {
           "hide": false,
           "refId": "F"
+        },
+        {
+          "exemplar": true,
+          "expr": "airdrop_registry_config_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "G"
         }
       ],
-      "title": "Panel Title",
+      "title": "configs crc32",
       "type": "timeseries"
     },
     {
@@ -189,8 +197,8 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
-        "y": 8
+        "x": 12,
+        "y": 0
       },
       "id": 4,
       "options": {
@@ -338,7 +346,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 16
+        "y": 8
       },
       "id": 2,
       "options": {
@@ -368,7 +376,7 @@
           "visible": true
         }
       ],
-      "title": "Panel Title",
+      "title": "Bluna/uluna exchange rate",
       "type": "timeseries"
     }
   ],

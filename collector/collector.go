@@ -13,7 +13,7 @@ import (
 type Collector interface {
 	Get(metric monitors.Metric) (float64, error)
 	ProvidedMetrics() []monitors.Metric
-	UpdateData(ctx context.Context) error
+	UpdateData(ctx context.Context) []error
 }
 
 func NewLCDCollector(cfg config.CollectorConfig) LCDCollector {
@@ -55,14 +55,17 @@ func (c LCDCollector) Get(metric monitors.Metric) (float64, error) {
 	return monitor.GetMetrics()[metric], nil
 }
 
-func (c *LCDCollector) UpdateData(ctx context.Context) error {
+func (c *LCDCollector) UpdateData(ctx context.Context) []error {
+	var errors []error
 	for _, monitor := range c.Monitors {
 		err := monitor.Handler(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to update data: %w", err)
+			// one error is not a reason to stop collecting data
+			// collecting monitors errors to return them to calling code
+			errors = append(errors,fmt.Errorf("failed to update data: %w", err))
 		}
 	}
-	return nil
+	return errors
 }
 
 func (c *LCDCollector) RegisterMonitor(m monitors.Monitor) {

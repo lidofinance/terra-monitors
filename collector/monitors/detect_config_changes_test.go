@@ -38,7 +38,6 @@ func (suite *DetectorTestSuite) TestBlunaRewardConfig() {
 
 	crc32first := blunaRewardConfigMonitor.metrics[BlunaRewardConfigCRC32]
 
-
 	//   changing response data
 	rewardConfigFakeResponse = struct {
 		Height string
@@ -67,20 +66,18 @@ func (suite *DetectorTestSuite) TestBlunaRewardConfig() {
 	suite.NotEqual(crc32first, crc32second)
 }
 
-
 func (suite *DetectorTestSuite) TestHubConfig() {
 	hubConfigFakeResponse := struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
 		Result: types.HubConfig{
-			Creator: "creator",
-			RewardDispatcherContract: "1",
+			Creator:                    "creator",
+			RewardDispatcherContract:   "1",
 			ValidatorsRegistryContract: "2",
-			BlunaTokenContract: "3",
-			StlunaTokenContract: "4",
-			AirdropRegistryContract: "5",
-
+			BlunaTokenContract:         "3",
+			StlunaTokenContract:        "4",
+			AirdropRegistryContract:    "5",
 		},
 	}
 	responseData, err := json.Marshal(hubConfigFakeResponse)
@@ -100,20 +97,18 @@ func (suite *DetectorTestSuite) TestHubConfig() {
 
 	crc32first := blunaRewardConfigMonitor.metrics[HubConfigCRC32]
 
-
 	//   changing response data
 	hubConfigFakeResponse = struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
 		Result: types.HubConfig{
-			Creator: "creator_new",
-			RewardDispatcherContract: "1_new",
+			Creator:                    "creator_new",
+			RewardDispatcherContract:   "1_new",
 			ValidatorsRegistryContract: "2_new",
-			BlunaTokenContract: "3_new",
-			StlunaTokenContract: "4_new",
-			AirdropRegistryContract: "5_new",
-
+			BlunaTokenContract:         "3_new",
+			StlunaTokenContract:        "4_new",
+			AirdropRegistryContract:    "5_new",
 		},
 	}
 	responseData, err = json.Marshal(hubConfigFakeResponse)
@@ -137,7 +132,6 @@ func (suite *DetectorTestSuite) TestHubConfig() {
 	//detects crc32 is changed due to changed config data
 	suite.NotEqual(crc32first, crc32second)
 }
-
 
 func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
 	rewardDispatcherConfigFakeResponse := struct {
@@ -165,7 +159,6 @@ func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
 	suite.Equal(rewardDispatcherConfigFakeResponse.Result, *rewardDispatcherConfigMonitor.State)
 	crc32first := rewardDispatcherConfigMonitor.metrics[RewardDispatcherConfigCRC32]
 
-
 	//   changing response data
 	newRewardDispatcherConfigFakeResponse := struct {
 		Height string
@@ -192,7 +185,6 @@ func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
 	suite.NoError(err)
 	suite.Equal(newRewardDispatcherConfigFakeResponse.Result, *rewardDispatcherConfigMonitor.State)
 
-
 	crc32second := rewardDispatcherConfigMonitor.metrics[RewardDispatcherConfigCRC32]
 
 	//detects crc32 is changed due to changed config data
@@ -205,8 +197,8 @@ func (suite *DetectorTestSuite) TestValidatorsRegistryConfig() {
 		Result interface{}
 	}{Height: "100",
 		Result: types.ValidatorsRegistryConfig{
-			Owner:               "owner",
-			HubContract:         "hub",
+			Owner:       "owner",
+			HubContract: "hub",
 		},
 	}
 	responseData, err := json.Marshal(validatorsRegistryConfigFakeResponse)
@@ -220,15 +212,14 @@ func (suite *DetectorTestSuite) TestValidatorsRegistryConfig() {
 	suite.Equal(validatorsRegistryConfigFakeResponse.Result, *validatorsRegistryConfigMonitor.State)
 	crc32first := validatorsRegistryConfigMonitor.metrics[ValidatorsRegistryConfigCRC32]
 
-
 	//   changing response data
 	newValidatorsRegistryConfigFakeResponse := struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
 		Result: types.ValidatorsRegistryConfig{
-			Owner:               "owner_new",
-			HubContract:         "hub_new",
+			Owner:       "owner_new",
+			HubContract: "hub_new",
 		},
 	}
 	responseData, err = json.Marshal(newValidatorsRegistryConfigFakeResponse)
@@ -241,7 +232,6 @@ func (suite *DetectorTestSuite) TestValidatorsRegistryConfig() {
 	err = validatorsRegistryConfigMonitor.Handler(context.Background())
 	suite.NoError(err)
 	suite.Equal(newValidatorsRegistryConfigFakeResponse.Result, *validatorsRegistryConfigMonitor.State)
-
 
 	crc32second := validatorsRegistryConfigMonitor.metrics[RewardDispatcherConfigCRC32]
 
@@ -274,7 +264,6 @@ func (suite *DetectorTestSuite) TestHubParameters() {
 	suite.Equal(hubParametersFakeResponse.Result, *hubParametersMonitor.State)
 	crc32first := hubParametersMonitor.metrics[HubParametersCRC32]
 
-
 	//   changing response data
 	newHubParametersFakeResponse := struct {
 		Height string
@@ -300,8 +289,57 @@ func (suite *DetectorTestSuite) TestHubParameters() {
 	suite.NoError(err)
 	suite.Equal(newHubParametersFakeResponse.Result, *hubParametersMonitor.State)
 
-
 	crc32second := hubParametersMonitor.metrics[HubParametersCRC32]
+
+	//detects crc32 is changed due to changed config data
+	suite.NotEqual(crc32first, crc32second)
+}
+
+func (suite *DetectorTestSuite) TestAirDropRegistryConfig() {
+	airdropRegistryConfigFakeResponse := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.AirDropRegistryConfig{
+			Owner:       "owner",
+			HubContract: "hub",
+			AirDropToken: []string{"token1"},
+		},
+	}
+	responseData, err := json.Marshal(airdropRegistryConfigFakeResponse)
+	suite.NoError(err)
+	ts := NewServerWithResponse(string(responseData))
+	cfg := NewTestCollectorConfig(ts.URL)
+	airdropRegistryConfigMonitor := NewAirDropRegistryConfigMonitor(cfg)
+
+	err = airdropRegistryConfigMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(airdropRegistryConfigFakeResponse.Result, *airdropRegistryConfigMonitor.State)
+	crc32first := airdropRegistryConfigMonitor.metrics[AirDropRegistryConfigCRC32]
+
+	//   changing response data
+	newAirDropRegistryConfigFakeResponse := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.AirDropRegistryConfig{
+			Owner:       "owner_new",
+			HubContract: "hub_new",
+			AirDropToken: []string{"token1","token2"},
+		},
+	}
+	responseData, err = json.Marshal(newAirDropRegistryConfigFakeResponse)
+	suite.NoError(err)
+
+	ts = NewServerWithResponse(string(responseData))
+	cfg = NewTestCollectorConfig(ts.URL)
+	airdropRegistryConfigMonitor = NewAirDropRegistryConfigMonitor(cfg)
+
+	err = airdropRegistryConfigMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(newAirDropRegistryConfigFakeResponse.Result, *airdropRegistryConfigMonitor.State)
+
+	crc32second := airdropRegistryConfigMonitor.metrics[AirDropRegistryConfigCRC32]
 
 	//detects crc32 is changed due to changed config data
 	suite.NotEqual(crc32first, crc32second)

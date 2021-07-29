@@ -80,15 +80,6 @@ func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
 	return CommonStateRequest{}, HubStateResponse{}
 }
 
-//pub struct Config {
-//pub creator: CanonicalAddr,
-//pub reward_dispatcher_contract: Option<CanonicalAddr>,
-//pub validators_registry_contract: Option<CanonicalAddr>,
-//pub bluna_token_contract: Option<CanonicalAddr>,
-//pub stluna_token_contract: Option<CanonicalAddr>,
-//pub airdrop_registry_contract: Option<CanonicalAddr>,
-//}
-
 type HubConfig struct {
 	Creator                    string `json:"creator"`
 	RewardDispatcherContract   string `json:"reward_dispatcher_contract"`
@@ -115,25 +106,10 @@ type HubParametersRequest struct {
 	Parameters struct{} `json:"parameters"`
 }
 
-//pub struct ConfigResponse {
-//pub hub_contract: HumanAddr,
-//pub reward_denom: String,
-//}
-
 type BlunaRewardConfig struct {
 	HubContract string `json:"hub_contract"`
 	RewardDenom string `json:"reward_denom"`
 }
-
-//pub struct Config {
-//pub owner: CanonicalAddr,
-//pub hub_contract: CanonicalAddr,
-//pub bluna_reward_contract: CanonicalAddr,
-//pub stluna_reward_denom: String,
-//pub bluna_reward_denom: String,
-//pub lido_fee_address: CanonicalAddr,
-//pub lido_fee_rate: Decimal,
-//}
 
 type RewardDispatcherConfig struct {
 	Owner               string `json:"owner"`
@@ -145,8 +121,13 @@ type RewardDispatcherConfig struct {
 	LidoFeeRate         string `json:"lido_fee_rate"` //decimal128
 }
 
-
 type ValidatorsRegistryConfig struct {
-	Owner               string `json:"owner"`
-	HubContract         string `json:"hub_contract"`
+	Owner       string `json:"owner"`
+	HubContract string `json:"hub_contract"`
+}
+
+type AirDropRegistryConfig struct {
+	Owner       string `json:"owner"`
+	HubContract string `json:"hub_contract"`
+	AirDropToken []string `json:"airdrop_tokens"`
 }

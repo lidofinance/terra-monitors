@@ -44,6 +44,9 @@ func createCollector() collector.LCDCollector {
 	rewardDispatcherMonitor := monitors.NewRewardDispatcherConfigMonitor(defConfig)
 	c.RegisterMonitor(&rewardDispatcherMonitor)
 
+	airdropRegistryMonitor := monitors.NewAirDropRegistryConfigMonitor(defConfig)
+	c.RegisterMonitor(&airdropRegistryMonitor)
+
 	return c
 }
 
