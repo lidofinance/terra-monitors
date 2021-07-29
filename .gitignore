@@ -16,3 +16,5 @@
 .golangci.yml
 .vscode
 .telegram.env
+
+.idea/

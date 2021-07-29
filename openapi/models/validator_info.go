@@ -13,20 +13,20 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// GetTxListResultTxsLogsLog get tx list result txs logs log
-// swagger:model getTxListResult.txs.logs.log
-type GetTxListResultTxsLogsLog struct {
+// ValidatorInfo validator info
+// swagger:model ValidatorInfo
+type ValidatorInfo struct {
 
-	// tax
+	// consensus pubkey
 	// Required: true
-	Tax *string `json:"tax"`
+	ConsensusPubkey *string `json:"consensus_pubkey"`
 }
 
-// Validate validates this get tx list result txs logs log
-func (m *GetTxListResultTxsLogsLog) Validate(formats strfmt.Registry) error {
+// Validate validates this validator info
+func (m *ValidatorInfo) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateTax(formats); err != nil {
+	if err := m.validateConsensusPubkey(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -36,9 +36,9 @@ func (m *GetTxListResultTxsLogsLog) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *GetTxListResultTxsLogsLog) validateTax(formats strfmt.Registry) error {
+func (m *ValidatorInfo) validateConsensusPubkey(formats strfmt.Registry) error {
 
-	if err := validate.Required("tax", "body", m.Tax); err != nil {
+	if err := validate.Required("consensus_pubkey", "body", m.ConsensusPubkey); err != nil {
 		return err
 	}
 
@@ -46,7 +46,7 @@ func (m *GetTxListResultTxsLogsLog) validateTax(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *GetTxListResultTxsLogsLog) MarshalBinary() ([]byte, error) {
+func (m *ValidatorInfo) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -54,8 +54,8 @@ func (m *GetTxListResultTxsLogsLog) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *GetTxListResultTxsLogsLog) UnmarshalBinary(b []byte) error {
-	var res GetTxListResultTxsLogsLog
+func (m *ValidatorInfo) UnmarshalBinary(b []byte) error {
+	var res ValidatorInfo
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

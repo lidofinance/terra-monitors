@@ -13,6 +13,7 @@ notifiers:
     settings:
       uploadImage: true
       chatid: $TELEGRAM_CHAT_ID
-    # Secure settings that will be encrypted in the database (supported since Grafana v7.2). See `Supported Settings` section for secure settings supported for each notifier.
+    # Secure settings that will be encrypted in the database (supported since Grafana v7.2).
+    # See `Supported Settings` section for secure settings supported for each notifier.
     secure_settings:
       bottoken: $TELEGRAM_BOTTOKEN

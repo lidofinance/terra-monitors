@@ -71,11 +71,255 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 0
       },
-      "id": 4,
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "slashing_num_jailed_validators{}",
+          "interval": "",
+          "legendFormat": "currently jailed validators",
+          "refId": "A"
+        }
+      ],
+      "title": "Slashing: Jailed Validators",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "slashing_num_missed_blocks{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "number of missed blocks (all validators)",
+          "refId": "C"
+        }
+      ],
+      "title": "Slashing: Missed Blocks",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "slashing_num_tombstoned_validators{}",
+          "interval": "",
+          "legendFormat": "currently tombstoned validators",
+          "refId": "A"
+        }
+      ],
+      "title": "Slashing: Jailed Validators",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 6,
       "options": {
         "legend": {
           "calcs": [],
@@ -92,7 +336,7 @@
           "expr": "update_global_index_gas_used{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "gas used",
           "refId": "B"
         },
         {
@@ -100,7 +344,7 @@
           "expr": "update_global_index_gas_wanted{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "gas wanted",
           "refId": "C"
         },
         {
@@ -108,7 +352,7 @@
           "expr": "update_global_index_uusd_fee{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "successful txs scince last check",
           "refId": "E"
         }
       ],
@@ -169,11 +413,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
+        "w": 8,
+        "x": 8,
         "y": 8
       },
-      "id": 6,
+      "id": 4,
       "options": {
         "legend": {
           "calcs": [],
@@ -189,7 +433,7 @@
           "exemplar": true,
           "expr": "update_global_index_failed_tx_since_last_check{}",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "failed txs since last check",
           "refId": "A"
         },
         {
@@ -197,7 +441,7 @@
           "expr": "update_global_index_successful_tx_since_last_check{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "uusd fee",
           "refId": "B"
         }
       ],
@@ -213,7 +457,7 @@
               "params": [
                 0.8
               ],
-              "type": "gt"
+              "type": "lt"
             },
             "operator": {
               "type": "and"
@@ -292,10 +536,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 16
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 8
       },
       "id": 2,
       "options": {
@@ -313,7 +557,7 @@
           "exemplar": true,
           "expr": "bluna_exchange_rate{}",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "exchange rate",
           "refId": "A"
         }
       ],
@@ -321,15 +565,21 @@
         {
           "colorMode": "critical",
           "op": "gt",
-          "value": 0.8,
+          "value": 1,
+          "visible": true
+        },
+        {
+          "colorMode": "critical",
+          "op": "lt",
+          "value": 0.9,
           "visible": true
         }
       ],
-      "title": "Panel Title",
+      "title": "bLuna Exchange Rate",
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "5s",
   "schemaVersion": 30,
   "style": "dark",
   "tags": [],

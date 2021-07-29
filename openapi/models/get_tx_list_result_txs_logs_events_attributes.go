@@ -6,16 +6,14 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxListResultTxsLogsEventsAttributes get tx list result txs logs events attributes
-//
 // swagger:model getTxListResult.txs.logs.events.attributes
 type GetTxListResultTxsLogsEventsAttributes struct {
 
@@ -61,11 +59,6 @@ func (m *GetTxListResultTxsLogsEventsAttributes) validateValue(formats strfmt.Re
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this get tx list result txs logs events attributes based on context it is used
-func (m *GetTxListResultTxsLogsEventsAttributes) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

@@ -6,17 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"strconv"
 
+	strfmt "github.com/go-openapi/strfmt"
+
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxResultTxValueMsgValue get tx result tx value msg value
-//
 // swagger:model getTxResult.tx.value.msg.value
 type GetTxResultTxValueMsgValue struct {
 
@@ -52,38 +51,6 @@ func (m *GetTxResultTxValueMsgValue) validateAmount(formats strfmt.Registry) err
 
 		if m.Amount[i] != nil {
 			if err := m.Amount[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("amount" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// ContextValidate validate this get tx result tx value msg value based on the context it is used
-func (m *GetTxResultTxValueMsgValue) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateAmount(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *GetTxResultTxValueMsgValue) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Amount); i++ {
-
-		if m.Amount[i] != nil {
-			if err := m.Amount[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("amount" + "." + strconv.Itoa(i))
 				}

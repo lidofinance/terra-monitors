@@ -13,82 +13,68 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/strfmt"
+
+	strfmt "github.com/go-openapi/strfmt"
 )
 
-// NewGetWasmContractsContractAddressStoreParams creates a new GetWasmContractsContractAddressStoreParams object,
-// with the default timeout for this client.
-//
-// Default values are not hydrated, since defaults are normally applied by the API server side.
-//
-// To enforce default values in parameter, use SetDefaults or WithDefaults.
+// NewGetWasmContractsContractAddressStoreParams creates a new GetWasmContractsContractAddressStoreParams object
+// with the default values initialized.
 func NewGetWasmContractsContractAddressStoreParams() *GetWasmContractsContractAddressStoreParams {
+	var ()
 	return &GetWasmContractsContractAddressStoreParams{
+
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetWasmContractsContractAddressStoreParamsWithTimeout creates a new GetWasmContractsContractAddressStoreParams object
-// with the ability to set a timeout on a request.
+// with the default values initialized, and the ability to set a timeout on a request
 func NewGetWasmContractsContractAddressStoreParamsWithTimeout(timeout time.Duration) *GetWasmContractsContractAddressStoreParams {
+	var ()
 	return &GetWasmContractsContractAddressStoreParams{
+
 		timeout: timeout,
 	}
 }
 
 // NewGetWasmContractsContractAddressStoreParamsWithContext creates a new GetWasmContractsContractAddressStoreParams object
-// with the ability to set a context for a request.
+// with the default values initialized, and the ability to set a context for a request
 func NewGetWasmContractsContractAddressStoreParamsWithContext(ctx context.Context) *GetWasmContractsContractAddressStoreParams {
+	var ()
 	return &GetWasmContractsContractAddressStoreParams{
+
 		Context: ctx,
 	}
 }
 
 // NewGetWasmContractsContractAddressStoreParamsWithHTTPClient creates a new GetWasmContractsContractAddressStoreParams object
-// with the ability to set a custom HTTPClient for a request.
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
 func NewGetWasmContractsContractAddressStoreParamsWithHTTPClient(client *http.Client) *GetWasmContractsContractAddressStoreParams {
+	var ()
 	return &GetWasmContractsContractAddressStoreParams{
 		HTTPClient: client,
 	}
 }
 
-/* GetWasmContractsContractAddressStoreParams contains all the parameters to send to the API endpoint
-   for the get wasm contracts contract address store operation.
-
-   Typically these are written to a http.Request.
+/*GetWasmContractsContractAddressStoreParams contains all the parameters to send to the API endpoint
+for the get wasm contracts contract address store operation typically these are written to a http.Request
 */
 type GetWasmContractsContractAddressStoreParams struct {
 
-	/* ContractAddress.
+	/*ContractAddress
+	  contract address you want to lookup
 
-	   contract address you want to lookup
 	*/
 	ContractAddress string
+	/*QueryMsg
+	  json formatted query msg
 
-	/* QueryMsg.
-
-	   json formatted query msg
 	*/
 	QueryMsg string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
-}
-
-// WithDefaults hydrates default values in the get wasm contracts contract address store params (not the query body).
-//
-// All values with no default are reset to their zero value.
-func (o *GetWasmContractsContractAddressStoreParams) WithDefaults() *GetWasmContractsContractAddressStoreParams {
-	o.SetDefaults()
-	return o
-}
-
-// SetDefaults hydrates default values in the get wasm contracts contract address store params (not the query body).
-//
-// All values with no default are reset to their zero value.
-func (o *GetWasmContractsContractAddressStoreParams) SetDefaults() {
-	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get wasm contracts contract address store params
@@ -163,7 +149,6 @@ func (o *GetWasmContractsContractAddressStoreParams) WriteToRequest(r runtime.Cl
 	qrQueryMsg := o.QueryMsg
 	qQueryMsg := qrQueryMsg
 	if qQueryMsg != "" {
-
 		if err := r.SetQueryParam("query_msg", qQueryMsg); err != nil {
 			return err
 		}

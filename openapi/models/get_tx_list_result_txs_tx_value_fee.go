@@ -6,17 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"strconv"
 
+	strfmt "github.com/go-openapi/strfmt"
+
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxListResultTxsTxValueFee get tx list result txs tx value fee
-//
 // swagger:model getTxListResult.txs.tx.value.fee
 type GetTxListResultTxsTxValueFee struct {
 
@@ -76,38 +75,6 @@ func (m *GetTxListResultTxsTxValueFee) validateGas(formats strfmt.Registry) erro
 
 	if err := validate.Required("gas", "body", m.Gas); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this get tx list result txs tx value fee based on the context it is used
-func (m *GetTxListResultTxsTxValueFee) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateAmount(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *GetTxListResultTxsTxValueFee) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Amount); i++ {
-
-		if m.Amount[i] != nil {
-			if err := m.Amount[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("amount" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil

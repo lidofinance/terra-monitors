@@ -78,3 +78,15 @@ type HubStateResponse struct {
 func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
 	return CommonStateRequest{}, HubStateResponse{}
 }
+
+type HubWhitelistedValidatorsRequest struct {
+	WhitelistedValidators struct{} `json:"whitelisted_validators"`
+}
+
+type HubWhitelistedValidatorsResponse struct {
+	Validators []string `json:"validators"`
+}
+
+func GetHubWhitelistedValidatorsPair() (HubWhitelistedValidatorsRequest, HubWhitelistedValidatorsResponse) {
+	return HubWhitelistedValidatorsRequest{}, HubWhitelistedValidatorsResponse{}
+}

@@ -34,6 +34,7 @@ func (p *PromExtractor) addGauge(name monitors.Metric) {
 		prometheus.GaugeOpts{
 			Name: string(name),
 		})
+
 	prometheus.MustRegister(p.Gauges[name])
 	p.GaugeMetrics = append(p.GaugeMetrics, name)
 }
