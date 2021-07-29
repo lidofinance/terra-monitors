@@ -22,7 +22,7 @@ func NewRewardDispatcherConfigMonitor(cfg config.CollectorConfig) RewardDispatch
 	m := RewardDispatcherConfigMonitor{
 		State:   &types.RewardDispatcherConfig{},
 		metrics: make(map[Metric]float64),
-		BaseMonitor: BaseMonitor{ContractAddress: cfg.RewardDispatcherConfigContract,
+		BaseMonitor: BaseMonitor{ContractAddress: cfg.RewardDispatcherContract,
 			apiClient: cfg.GetTerraClient(),
 			logger:    cfg.Logger,
 		},
@@ -49,13 +49,13 @@ func (h *RewardDispatcherConfigMonitor) updateMetrics() {
 }
 
 func (h *RewardDispatcherConfigMonitor) Handler(ctx context.Context) error {
-	blunaReq, blunaResp := types.CommonConfigRequest{}, types.RewardDispatcherConfig{}
+	rewardReq, rewardResp := types.CommonConfigRequest{}, types.RewardDispatcherConfig{}
 
-	err := makeStoreQuery(&blunaResp, blunaReq, ctx, h)
+	err := makeStoreQuery(&rewardResp, rewardReq, ctx, h)
 	if err != nil {
 		return fmt.Errorf("failed to make %s request: %w", h.Name(), err)
 	}
-	h.State = &blunaResp
+	h.State = &rewardResp
 	h.updateMetrics()
 	return nil
 }

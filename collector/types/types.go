@@ -144,3 +144,9 @@ type RewardDispatcherConfig struct {
 	LidoFeeAddress      string `json:"lido_fee_address"`
 	LidoFeeRate         string `json:"lido_fee_rate"` //decimal128
 }
+
+
+type ValidatorsRegistryConfig struct {
+	Owner               string `json:"owner"`
+	HubContract         string `json:"hub_contract"`
+}

@@ -16,7 +16,7 @@ func (suite *DetectorTestSuite) SetupTest() {
 }
 
 func (suite *DetectorTestSuite) TestBlunaRewardConfig() {
-	rewardConfig := struct {
+	rewardConfigFakeResponse := struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
@@ -25,7 +25,7 @@ func (suite *DetectorTestSuite) TestBlunaRewardConfig() {
 			RewardDenom: "uusd",
 		},
 	}
-	responseData, err := json.Marshal(rewardConfig)
+	responseData, err := json.Marshal(rewardConfigFakeResponse)
 	suite.NoError(err)
 	ts := NewServerWithResponse(string(responseData))
 	cfg := NewTestCollectorConfig(ts.URL)
@@ -40,7 +40,7 @@ func (suite *DetectorTestSuite) TestBlunaRewardConfig() {
 
 
 	//   changing response data
-	rewardConfig = struct {
+	rewardConfigFakeResponse = struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
@@ -49,7 +49,7 @@ func (suite *DetectorTestSuite) TestBlunaRewardConfig() {
 			RewardDenom: "uluna",
 		},
 	}
-	responseData, err = json.Marshal(rewardConfig)
+	responseData, err = json.Marshal(rewardConfigFakeResponse)
 	suite.NoError(err)
 
 	ts = NewServerWithResponse(string(responseData))
@@ -69,7 +69,7 @@ func (suite *DetectorTestSuite) TestBlunaRewardConfig() {
 
 
 func (suite *DetectorTestSuite) TestHubConfig() {
-	hubConfig := struct {
+	hubConfigFakeResponse := struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
@@ -83,7 +83,7 @@ func (suite *DetectorTestSuite) TestHubConfig() {
 
 		},
 	}
-	responseData, err := json.Marshal(hubConfig)
+	responseData, err := json.Marshal(hubConfigFakeResponse)
 	suite.NoError(err)
 	ts := NewServerWithResponse(string(responseData))
 	cfg := NewTestCollectorConfig(ts.URL)
@@ -102,7 +102,7 @@ func (suite *DetectorTestSuite) TestHubConfig() {
 
 
 	//   changing response data
-	hubConfig = struct {
+	hubConfigFakeResponse = struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
@@ -116,7 +116,7 @@ func (suite *DetectorTestSuite) TestHubConfig() {
 
 		},
 	}
-	responseData, err = json.Marshal(hubConfig)
+	responseData, err = json.Marshal(hubConfigFakeResponse)
 	suite.NoError(err)
 
 	ts = NewServerWithResponse(string(responseData))
@@ -140,7 +140,7 @@ func (suite *DetectorTestSuite) TestHubConfig() {
 
 
 func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
-	rewardDispatcherConfig := struct {
+	rewardDispatcherConfigFakeResponse := struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
@@ -154,7 +154,7 @@ func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
 			LidoFeeRate:         "0.01",
 		},
 	}
-	responseData, err := json.Marshal(rewardDispatcherConfig)
+	responseData, err := json.Marshal(rewardDispatcherConfigFakeResponse)
 	suite.NoError(err)
 	ts := NewServerWithResponse(string(responseData))
 	cfg := NewTestCollectorConfig(ts.URL)
@@ -162,12 +162,12 @@ func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
 
 	err = rewardDispatcherConfigMonitor.Handler(context.Background())
 	suite.NoError(err)
-	suite.Equal(rewardDispatcherConfig.Result, *rewardDispatcherConfigMonitor.State)
+	suite.Equal(rewardDispatcherConfigFakeResponse.Result, *rewardDispatcherConfigMonitor.State)
 	crc32first := rewardDispatcherConfigMonitor.metrics[RewardDispatcherConfigCRC32]
 
 
 	//   changing response data
-	newRewardDispatcherConfig := struct {
+	newRewardDispatcherConfigFakeResponse := struct {
 		Height string
 		Result interface{}
 	}{Height: "100",
@@ -181,7 +181,7 @@ func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
 			LidoFeeRate:         "0.005",
 		},
 	}
-	responseData, err = json.Marshal(newRewardDispatcherConfig)
+	responseData, err = json.Marshal(newRewardDispatcherConfigFakeResponse)
 	suite.NoError(err)
 
 	ts = NewServerWithResponse(string(responseData))
@@ -190,10 +190,118 @@ func (suite *DetectorTestSuite) TestRewardDispatcherConfig() {
 
 	err = rewardDispatcherConfigMonitor.Handler(context.Background())
 	suite.NoError(err)
-	suite.Equal(newRewardDispatcherConfig.Result, *rewardDispatcherConfigMonitor.State)
+	suite.Equal(newRewardDispatcherConfigFakeResponse.Result, *rewardDispatcherConfigMonitor.State)
 
 
 	crc32second := rewardDispatcherConfigMonitor.metrics[RewardDispatcherConfigCRC32]
+
+	//detects crc32 is changed due to changed config data
+	suite.NotEqual(crc32first, crc32second)
+}
+
+func (suite *DetectorTestSuite) TestValidatorsRegistryConfig() {
+	validatorsRegistryConfigFakeResponse := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.ValidatorsRegistryConfig{
+			Owner:               "owner",
+			HubContract:         "hub",
+		},
+	}
+	responseData, err := json.Marshal(validatorsRegistryConfigFakeResponse)
+	suite.NoError(err)
+	ts := NewServerWithResponse(string(responseData))
+	cfg := NewTestCollectorConfig(ts.URL)
+	validatorsRegistryConfigMonitor := NewValidatorsRegistryConfigMonitor(cfg)
+
+	err = validatorsRegistryConfigMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(validatorsRegistryConfigFakeResponse.Result, *validatorsRegistryConfigMonitor.State)
+	crc32first := validatorsRegistryConfigMonitor.metrics[ValidatorsRegistryConfigCRC32]
+
+
+	//   changing response data
+	newValidatorsRegistryConfigFakeResponse := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.ValidatorsRegistryConfig{
+			Owner:               "owner_new",
+			HubContract:         "hub_new",
+		},
+	}
+	responseData, err = json.Marshal(newValidatorsRegistryConfigFakeResponse)
+	suite.NoError(err)
+
+	ts = NewServerWithResponse(string(responseData))
+	cfg = NewTestCollectorConfig(ts.URL)
+	validatorsRegistryConfigMonitor = NewValidatorsRegistryConfigMonitor(cfg)
+
+	err = validatorsRegistryConfigMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(newValidatorsRegistryConfigFakeResponse.Result, *validatorsRegistryConfigMonitor.State)
+
+
+	crc32second := validatorsRegistryConfigMonitor.metrics[RewardDispatcherConfigCRC32]
+
+	//detects crc32 is changed due to changed config data
+	suite.NotEqual(crc32first, crc32second)
+}
+
+func (suite *DetectorTestSuite) TestHubParameters() {
+	hubParametersFakeResponse := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.HubParameters{
+			EpochPeriod:         10,
+			UnderlyingCoinDenom: "uluna",
+			UnbondingPeriod:     20,
+			PegRecoveryFee:      "0.5",
+			ErThreshold:         "1",
+			RewardDenom:         "uusd",
+		},
+	}
+	responseData, err := json.Marshal(hubParametersFakeResponse)
+	suite.NoError(err)
+	ts := NewServerWithResponse(string(responseData))
+	cfg := NewTestCollectorConfig(ts.URL)
+	hubParametersMonitor := NewHubParametersMonitor(cfg)
+
+	err = hubParametersMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(hubParametersFakeResponse.Result, *hubParametersMonitor.State)
+	crc32first := hubParametersMonitor.metrics[HubParametersCRC32]
+
+
+	//   changing response data
+	newHubParametersFakeResponse := struct {
+		Height string
+		Result interface{}
+	}{Height: "100",
+		Result: types.HubParameters{
+			EpochPeriod:         100,
+			UnderlyingCoinDenom: "uusd",
+			UnbondingPeriod:     200,
+			PegRecoveryFee:      "1.5",
+			ErThreshold:         "2",
+			RewardDenom:         "uluna",
+		},
+	}
+	responseData, err = json.Marshal(newHubParametersFakeResponse)
+	suite.NoError(err)
+
+	ts = NewServerWithResponse(string(responseData))
+	cfg = NewTestCollectorConfig(ts.URL)
+	hubParametersMonitor = NewHubParametersMonitor(cfg)
+
+	err = hubParametersMonitor.Handler(context.Background())
+	suite.NoError(err)
+	suite.Equal(newHubParametersFakeResponse.Result, *hubParametersMonitor.State)
+
+
+	crc32second := hubParametersMonitor.metrics[HubParametersCRC32]
 
 	//detects crc32 is changed due to changed config data
 	suite.NotEqual(crc32first, crc32second)

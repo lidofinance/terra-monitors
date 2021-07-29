@@ -14,14 +14,11 @@ import (
 )
 
 const (
-	HubParametersEpochPeriod Metric = "hub_parameters_epoch_period"
-	//HubParametersUnderlyingCoinDenomCRC32 crc32 checksum of CoinDenom string to detect string changes in grafana alerting
-	HubParametersUnderlyingCoinDenomCRC32 Metric = "hub_parameters_underlying_coin_denom_crc32"
-	HubParametersUnbondingPeriod          Metric = "hub_parameters_unbonding_period"
-	HubParametersPegRecoveryFee           Metric = "hub_parameters_peg_recovery_fee"
-	HubParametersErThreshold              Metric = "hub_parameters_er_threshold"
-	//HubParametersRewardDenomCRC32 crc32 checksum of RewardDenom string to detect string changes in grafana alerting
-	HubParametersRewardDenomCRC32 Metric = "hub_parameters_reward_denom_crc32"
+	HubParametersEpochPeriod     Metric = "hub_parameters_epoch_period"
+	HubParametersUnbondingPeriod Metric = "hub_parameters_unbonding_period"
+	HubParametersPegRecoveryFee  Metric = "hub_parameters_peg_recovery_fee"
+	HubParametersErThreshold     Metric = "hub_parameters_er_threshold"
+	HubParametersCRC32           Metric = "hub_parameters_crc32"
 )
 
 type HubParametersMonitor struct {
@@ -49,12 +46,11 @@ func (h HubParametersMonitor) Name() string {
 }
 
 func (h *HubParametersMonitor) InitMetrics() {
+	h.metrics[HubParametersCRC32] = 0
 	h.metrics[HubParametersEpochPeriod] = 0
-	h.metrics[HubParametersUnderlyingCoinDenomCRC32] = 0
 	h.metrics[HubParametersUnbondingPeriod] = 0
 	h.metrics[HubParametersPegRecoveryFee] = 0
 	h.metrics[HubParametersErThreshold] = 0
-	h.metrics[HubParametersRewardDenomCRC32] = 0
 }
 
 func (h *HubParametersMonitor) setStringMetric(m Metric, rawValue string) {
@@ -66,12 +62,15 @@ func (h *HubParametersMonitor) setStringMetric(m Metric, rawValue string) {
 }
 
 func (h *HubParametersMonitor) updateMetrics() {
+	data, err := json.Marshal(h.State)
+	if err != nil {
+		h.logger.Errorf("failed to marshal %s: %s", h.Name(), err)
+	}
+	h.metrics[HubParametersCRC32] = float64(crc32.ChecksumIEEE(data))
 	h.metrics[HubParametersEpochPeriod] = float64(h.State.EpochPeriod)
-	h.metrics[HubParametersUnderlyingCoinDenomCRC32] = float64(crc32.ChecksumIEEE([]byte(h.State.UnderlyingCoinDenom)))
 	h.metrics[HubParametersUnbondingPeriod] = float64(h.State.UnbondingPeriod)
 	h.setStringMetric(HubParametersPegRecoveryFee, h.State.PegRecoveryFee)
 	h.setStringMetric(HubParametersErThreshold, h.State.ErThreshold)
-	h.metrics[HubParametersRewardDenomCRC32] = float64(crc32.ChecksumIEEE([]byte(h.State.RewardDenom)))
 }
 
 func (h *HubParametersMonitor) Handler(ctx context.Context) error {
@@ -106,5 +105,3 @@ func (h *HubParametersMonitor) Handler(ctx context.Context) error {
 func (h HubParametersMonitor) GetMetrics() map[Metric]float64 {
 	return h.metrics
 }
-
-
