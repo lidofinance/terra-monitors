@@ -38,6 +38,12 @@ func createCollector() collector.LCDCollector {
 	blunaRewardConfig := monitors.NewBlunaRewardConfigMonitor(defConfig)
 	c.RegisterMonitor(&blunaRewardConfig)
 
+	validatorsRegistryMon := monitors.NewValidatorsRegistryConfigMonitor(defConfig)
+	c.RegisterMonitor(&validatorsRegistryMon)
+
+	rewardDispatcherMonitor := monitors.NewRewardDispatcherConfigMonitor(defConfig)
+	c.RegisterMonitor(&rewardDispatcherMonitor)
+
 	return c
 }
 
