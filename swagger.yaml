@@ -145,6 +145,17 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/getTxListResult'
+        400:
+          description: Error
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+              code:
+                type: number
       tags:
         - Transactions
       description: Get Tx List
@@ -154,6 +165,9 @@ paths:
 definitions:
   getTxListResult:
     properties:
+      next:
+        description: Offset
+        type: number
       limit:
         description: Per page item limit
         type: number
@@ -163,10 +177,14 @@ definitions:
           $ref: '#/definitions/getTxListResult.txs'
         type: array
     required:
+      - next
       - limit
       - txs
   getTxListResult.txs:
     properties:
+      id:
+        description: ''
+        type: number
       events:
         description: events of tx
         items:
@@ -200,6 +218,7 @@ definitions:
         description: tx hash
         type: string
     required:
+      - id
       - tx
       - events
       - logs
@@ -360,19 +379,28 @@ definitions:
       - value
   getTxListResult.txs.tx.value.msg.value:
     properties:
-      inputs:
+      coins:
         description: ''
         items:
-          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.inputs'
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.inputs.coins'
         type: array
-      outputs:
+
+      sender:
         description: ''
-        items:
-          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.outputs'
-        type: array
+        type: string
+
+      contract:
+        description: ''
+        type: string
+
+      execute_msg:
+        description: ''
+        type: string
     required:
-      - inputs
-      - outputs
+      - coins
+      - sender
+      - contract
+      - execute_msg
   getTxListResult.txs.tx.value.msg.value.inputs:
     properties:
       address:

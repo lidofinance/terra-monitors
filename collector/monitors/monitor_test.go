@@ -17,7 +17,7 @@ func (suite *MonitorTestSuite) SetupTest() {
 
 }
 
-func (suite *MonitorTestSuite) TestSuccessfullQueryRequest() {
+func (suite *MonitorTestSuite) TestSuccessfulQueryRequest() {
 	totalSupply := 79178685320809.0
 	expected := types.TokenInfoResponse{
 		Name:        "Bonded Luna",
@@ -59,4 +59,5 @@ func (suite *MonitorTestSuite) TestConnectionRefusedRequest() {
 
 func TestLocales(t *testing.T) {
 	suite.Run(t, new(MonitorTestSuite))
+	suite.Run(t, new(UpdateGlobalIndexMonitorTestSuite))
 }

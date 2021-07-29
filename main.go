@@ -9,17 +9,15 @@ import (
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/extractor"
-	"github.com/lidofinance/terra-monitors/internal/logging"
-	"github.com/sirupsen/logrus"
 )
 
 var addr = flag.String("listen-address", ":8080",
 	"The address to listen on for HTTP requests.")
 
-func createCollector(logger *logrus.Logger) collector.LCDCollector {
+func createCollector() collector.LCDCollector {
 	defConfig := config.DefaultCollectorConfig()
 	c := collector.NewLCDCollector(defConfig)
-	hubStateMonitor := monitors.NewHubStateMintor(defConfig)
+	hubStateMonitor := monitors.NewHubStateMonitor(defConfig)
 	c.RegisterMonitor(&hubStateMonitor)
 
 	rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
@@ -27,13 +25,16 @@ func createCollector(logger *logrus.Logger) collector.LCDCollector {
 
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
+
+	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
+	c.RegisterMonitor(&updateGlobalIndexMonitor)
 	return c
 }
 
 func main() {
 	flag.Parse()
-	logger := logging.NewDefaultLogger()
-	c := createCollector(logger)
+	c := createCollector()
+	logger := c.GetLogger()
 	p := extractor.NewPromExtractor(&c, logger)
 	app := app.NewAppHTTP(p)
 	http.Handle("/metrics", app)

@@ -24,6 +24,10 @@ type GetTxListResult struct {
 	// Required: true
 	Limit *float64 `json:"limit"`
 
+	// Offset
+	// Required: true
+	Next *float64 `json:"next"`
+
 	// tx list
 	// Required: true
 	Txs []*GetTxListResultTxs `json:"txs"`
@@ -34,6 +38,10 @@ func (m *GetTxListResult) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateLimit(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNext(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -50,6 +58,15 @@ func (m *GetTxListResult) Validate(formats strfmt.Registry) error {
 func (m *GetTxListResult) validateLimit(formats strfmt.Registry) error {
 
 	if err := validate.Required("limit", "body", m.Limit); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *GetTxListResult) validateNext(formats strfmt.Registry) error {
+
+	if err := validate.Required("next", "body", m.Next); err != nil {
 		return err
 	}
 

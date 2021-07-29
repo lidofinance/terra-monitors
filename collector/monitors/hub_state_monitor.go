@@ -18,11 +18,11 @@ var (
 	BlunaExchangeRate Metric = "bluna_exchange_rate"
 )
 
-func NewHubStateMintor(cfg config.CollectorConfig) HubStateMonitor {
+func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
 	m := HubStateMonitor{
-		metrics:    make(map[Metric]float64),
 		State:      &types.HubStateResponse{},
 		HubAddress: cfg.HubContract,
+		metrics:    make(map[Metric]float64),
 		apiClient:  cfg.GetTerraClient(),
 		logger:     cfg.Logger,
 	}
@@ -31,9 +31,9 @@ func NewHubStateMintor(cfg config.CollectorConfig) HubStateMonitor {
 }
 
 type HubStateMonitor struct {
-	metrics    map[Metric]float64
 	State      *types.HubStateResponse
 	HubAddress string
+	metrics    map[Metric]float64
 	apiClient  *client.TerraLiteForTerra
 	logger     *logrus.Logger
 }
