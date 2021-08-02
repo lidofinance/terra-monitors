@@ -76,6 +76,10 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 			m.logger.Errorf("failed to GetSlashingSigningInfos for validator %s: %s", validatorPublicKey, err)
 			continue
 		}
+		if err := signingInfoResponse.GetPayload().Validate(nil); err != nil {
+			m.logger.Errorf("failed to validate SignInfo for validator %s: %s", validatorPublicKey, err)
+			continue
+		}
 
 		var signingInfo = signingInfoResponse.GetPayload().Result
 
@@ -142,6 +146,10 @@ func (m *SlashingMonitor) getValidatorsPublicKeys(ctx context.Context) ([]string
 		if err != nil {
 			return nil, fmt.Errorf("failed to GetStakingValidatorsValidatorAddr: %w", err)
 		}
+		if err := validatorInfoResponse.GetPayload().Validate(nil); err != nil {
+			m.logger.Errorf("failed to validate ValidatorInfo for validator %s: %s", validatorAddress, err)
+			continue
+		}
 
 		validatorConsensusPublicKeys = append(validatorConsensusPublicKeys,
 			*validatorInfoResponse.GetPayload().Result.ConsensusPubkey)
@@ -182,6 +190,10 @@ func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]
 	resp, err := r.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 	if err != nil {
 		return nil, fmt.Errorf("failed to process HubWhitelistedValidators request: %w", err)
+	}
+
+	if err := resp.GetPayload().Validate(nil); err != nil {
+		return nil, fmt.Errorf("failed to validate ValidatorsWhitelist: %w", err)
 	}
 
 	err = types.CastMapToStruct(resp.Payload.Result, &hubResp)
