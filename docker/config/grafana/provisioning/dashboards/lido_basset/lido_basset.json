@@ -18,6 +18,41 @@
   "links": [],
   "panels": [
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "keep_state",
+        "for": "2m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Bluna/luna exchange rate out of range",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -181,6 +216,42 @@
       "type": "timeseries"
     },
     {
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "keep_state",
+        "for": "2m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Bluna/luna exchange rate out of range",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
