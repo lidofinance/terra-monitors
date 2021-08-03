@@ -18,14 +18,27 @@
   "links": [],
   "panels": [
     {
-<<<<<<< HEAD
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 24,
+      "panels": [],
+      "title": "contracts parameters monitoring",
+      "type": "row"
+    },
+    {
       "alert": {
         "alertRuleTags": {},
         "conditions": [
           {
             "evaluator": {
               "params": [
-                0.0
+                0
               ],
               "type": "gt"
             },
@@ -41,33 +54,42 @@
             },
             "reducer": {
               "params": [],
-              "type": "avg"
+              "type": "diff_abs"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
             },
             "type": "query"
           }
         ],
-        "executionErrorState": "keep_state",
-        "for": "2m",
-        "frequency": "30s",
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
         "handler": 1,
-        "name": "Bluna/luna exchange rate out of range",
+        "name": "Hub parameters epoch/unbinding period has been changed",
         "noDataState": "no_data",
         "notifications": []
       },
-      "collapsed": false,
-      "datasource": null,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 12,
-      "panels": [],
-      "title": "Hub parameters",
-      "type": "row"
-    },
-    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -125,7 +147,7 @@
         "x": 0,
         "y": 1
       },
-      "id": 8,
+      "id": 14,
       "options": {
         "legend": {
           "calcs": [],
@@ -150,391 +172,56 @@
           "hide": false,
           "interval": "",
           "legendFormat": "Unbonding period",
-          "refId": "E"
+          "refId": "B"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
         }
       ],
       "title": "Hub parameters",
       "type": "timeseries"
     },
     {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
             },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
+            "operator": {
+              "type": "and"
             },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
             },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
           }
-        },
-        "overrides": []
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Hub er threshold has been changed",
+        "noDataState": "no_data",
+        "notifications": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 1
-      },
-      "id": 14,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "hub_parameters_er_threshold{}",
-          "interval": "",
-          "legendFormat": "Er threshold",
-          "refId": "A"
-        }
-      ],
-      "title": "Er threshold hub parameter",
-      "type": "timeseries"
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 9
-      },
-      "id": 16,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "hub_parameters_peg_recovery_fee{}",
-          "interval": "",
-          "legendFormat": "Peg recovery fee",
-          "refId": "A"
-        }
-      ],
-      "title": "Peg recovery fee hub parameter",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "datasource": null,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 17
-      },
-      "id": 10,
-      "panels": [],
-      "title": "Row title",
-      "type": "row"
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 18
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "bluna_reward_config_crc32{}",
-          "interval": "",
-          "legendFormat": "bluna reward config crc32",
-          "refId": "A"
-        },
-        {
-          "exemplar": true,
-          "expr": "hub_config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "hub config crc32",
-          "refId": "B"
-        },
-        {
-          "exemplar": true,
-          "expr": "hub_parameters_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "hub parameters crc32",
-          "refId": "C"
-        },
-        {
-          "exemplar": true,
-          "expr": "reward_dispatcher_config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "reward dispatcher config crc32",
-          "refId": "D"
-        },
-        {
-          "exemplar": true,
-          "expr": "validators_registry_config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "validators registry config crc32",
-          "refId": "E"
-        },
-        {
-          "exemplar": true,
-          "expr": "airdrop_registry_config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "airdrop registry config crc32",
-          "refId": "G"
-        }
-      ],
-      "title": "configs crc32",
-      "type": "timeseries"
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 18
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "slashing_num_jailed_validators{}",
-          "interval": "",
-          "legendFormat": "currently jailed validators",
-          "refId": "A"
-        }
-      ],
-      "title": "Slashing: Jailed Validators",
-      "type": "timeseries"
-    },
-    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -590,9 +277,9 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 0
+        "y": 1
       },
-      "id": 10,
+      "id": 16,
       "options": {
         "legend": {
           "calcs": [],
@@ -606,14 +293,21 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "slashing_num_missed_blocks{}",
-          "hide": false,
+          "expr": "hub_parameters_er_threshold{}",
           "interval": "",
-          "legendFormat": "number of missed blocks (all validators)",
-          "refId": "C"
+          "legendFormat": "Er threshold",
+          "refId": "A"
         }
       ],
-      "title": "Slashing: Missed Blocks",
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "Hub er threshold",
       "type": "timeseries"
     },
     {
@@ -623,7 +317,7 @@
           {
             "evaluator": {
               "params": [
-                0.0
+                0
               ],
               "type": "gt"
             },
@@ -639,16 +333,16 @@
             },
             "reducer": {
               "params": [],
-              "type": "avg"
+              "type": "diff"
             },
             "type": "query"
           }
         ],
-        "executionErrorState": "keep_state",
-        "for": "2m",
-        "frequency": "30s",
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
         "handler": 1,
-        "name": "Bluna/luna exchange rate out of range",
+        "name": "Hub peg recovery has been changed",
         "noDataState": "no_data",
         "notifications": []
       },
@@ -707,9 +401,9 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 0
+        "y": 1
       },
-      "id": 8,
+      "id": 18,
       "options": {
         "legend": {
           "calcs": [],
@@ -723,10 +417,640 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "slashing_num_tombstoned_validators{}",
+          "expr": "hub_parameters_peg_recovery_fee{}",
           "interval": "",
-          "legendFormat": "currently tombstoned validators",
+          "legendFormat": "Peg recovery fee",
           "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "Hub peg recovery fee",
+      "type": "timeseries"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "D",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "E",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "F",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "one of the configs has been changed",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 9
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "airdrop_registry_config_crc32",
+          "interval": "",
+          "legendFormat": "airdrop registry config",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "bluna_reward_config_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "bluna reward config",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "hub_config_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "hub config",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "hub_parameters_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "hub parameters",
+          "refId": "D"
+        },
+        {
+          "exemplar": true,
+          "expr": "reward_dispatcher_config_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "reward dispatcher config",
+          "refId": "E"
+        },
+        {
+          "exemplar": true,
+          "expr": "validators_registry_config_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "validators registry config",
+          "refId": "F"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "crc32 sums of config data",
+      "type": "timeseries"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "keep_state",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Whitelisted validators set has been changed",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 9
+      },
+      "id": 26,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "whitelisted_validators_crc32{}",
+          "interval": "",
+          "legendFormat": "whitelisted validators crc32",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "Whitelisted validators CRC32",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 9
+      },
+      "id": 28,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "whitelisted_validators_num",
+          "interval": "",
+          "legendFormat": "number of whitelisted validators",
+          "refId": "A"
+        }
+      ],
+      "title": "Number of whitelisted validators",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 22,
+      "panels": [],
+      "title": "contracts state monitoring",
+      "type": "row"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "keep_state",
+        "for": "2m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Some validators were jailed.",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 18
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "slashing_num_jailed_validators{}",
+          "interval": "",
+          "legendFormat": "currently jailed validators",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
         }
       ],
       "title": "Slashing: Jailed Validators",
@@ -787,10 +1111,10 @@
       "gridPos": {
         "h": 8,
         "w": 8,
-        "x": 0,
-        "y": 8
+        "x": 8,
+        "y": 18
       },
-      "id": 6,
+      "id": 10,
       "options": {
         "legend": {
           "calcs": [],
@@ -804,30 +1128,138 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "update_global_index_gas_used{}",
+          "expr": "slashing_num_missed_blocks{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "gas used",
-          "refId": "B"
-        },
-        {
-          "exemplar": true,
-          "expr": "update_global_index_gas_wanted{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "gas wanted",
+          "legendFormat": "number of missed blocks (all validators)",
           "refId": "C"
-        },
-        {
-          "exemplar": true,
-          "expr": "update_global_index_uusd_fee{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "uusd fee",
-          "refId": "E"
         }
       ],
-      "title": "update global index fees",
+      "title": "Slashing: Missed Blocks",
+      "type": "timeseries"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "keep_state",
+        "for": "2m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Found tombstoned validators",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 18
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "slashing_num_tombstoned_validators{}",
+          "interval": "",
+          "legendFormat": "currently tombstoned validators",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "Slashing: Tombstoned Validators",
       "type": "timeseries"
     },
     {
@@ -885,8 +1317,141 @@
       "gridPos": {
         "h": 8,
         "w": 8,
+        "x": 0,
+        "y": 26
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "update_global_index_gas_used{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "gas used",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "update_global_index_gas_wanted{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "gas wanted",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "update_global_index_uusd_fee{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "uusd fee",
+          "refId": "E"
+        }
+      ],
+      "title": "update global index fees",
+      "type": "timeseries"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "max"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "keep_state",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "update global index bot failed transactions",
+        "noDataState": "ok",
+        "notifications": []
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
         "x": 8,
-        "y": 8
+        "y": 26
       },
       "id": 4,
       "options": {
@@ -896,7 +1461,7 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "multi"
         }
       },
       "targets": [
@@ -914,6 +1479,14 @@
           "interval": "",
           "legendFormat": "successful txs since last check",
           "refId": "B"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
         }
       ],
       "title": "update global index transactions",
@@ -1007,12 +1580,10 @@
         "overrides": []
       },
       "gridPos": {
-
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 8
-
+        "y": 26
       },
       "id": 2,
       "options": {
@@ -1060,7 +1631,7 @@
     "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},

@@ -39,6 +39,9 @@ func createCollector() collector.LCDCollector {
 	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(defConfig)
 	c.RegisterMonitor(&configCRC32Monitor)
 
+	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(defConfig,validatorsRepository)
+	c.RegisterMonitor(&whitelistedValidatorsMonitor)
+
 	return c
 }
 
