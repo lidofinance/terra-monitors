@@ -352,7 +352,7 @@
           "expr": "update_global_index_uusd_fee{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "successful txs scince last check",
+          "legendFormat": "uusd fee",
           "refId": "E"
         }
       ],
@@ -441,7 +441,7 @@
           "expr": "update_global_index_successful_tx_since_last_check{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "uusd fee",
+          "legendFormat": "successful txs since last check",
           "refId": "B"
         }
       ],
