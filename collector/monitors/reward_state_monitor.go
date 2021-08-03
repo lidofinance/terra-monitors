@@ -90,6 +90,10 @@ func (h RewardStateMonitor) GetMetrics() map[Metric]float64 {
 	return h.metrics
 }
 
+func (h RewardStateMonitor) GetMetricVectors() map[Metric]map[string]float64 {
+	return nil
+}
+
 func (h *RewardStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {
 	h.apiClient = client
 }

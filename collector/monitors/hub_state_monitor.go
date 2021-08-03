@@ -93,6 +93,10 @@ func (h HubStateMonitor) GetMetrics() map[Metric]float64 {
 	return h.metrics
 }
 
+func (h HubStateMonitor) GetMetricVectors() map[Metric]map[string]float64 {
+	return nil
+}
+
 func (h *HubStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {
 	h.apiClient = client
 }

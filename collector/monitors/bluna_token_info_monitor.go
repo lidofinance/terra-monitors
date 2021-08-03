@@ -89,6 +89,10 @@ func (h BlunaTokenInfoMonitor) GetMetrics() map[Metric]float64 {
 	return h.metrics
 }
 
+func (h BlunaTokenInfoMonitor) GetMetricVectors() map[Metric]map[string]float64 {
+	return nil
+}
+
 func (h *BlunaTokenInfoMonitor) SetApiClient(client *client.TerraLiteForTerra) {
 	h.apiClient = client
 }

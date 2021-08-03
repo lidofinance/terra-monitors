@@ -29,6 +29,7 @@ const (
 
 type SlashingMonitor struct {
 	metrics              map[Metric]float64
+	metricVectors        map[Metric]map[string]float64
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
@@ -37,6 +38,7 @@ type SlashingMonitor struct {
 func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *SlashingMonitor {
 	m := &SlashingMonitor{
 		metrics:              make(map[Metric]float64),
+		metricVectors:        make(map[Metric]map[string]float64),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
@@ -53,7 +55,10 @@ func (m *SlashingMonitor) InitMetrics() {
 	m.metrics = map[Metric]float64{
 		SlashingNumJailedValidators:     0,
 		SlashingNumTombstonedValidators: 0,
-		SlashingNumMissedBlocks:         0,
+	}
+
+	m.metricVectors = map[Metric]map[string]float64{
+		SlashingNumMissedBlocks: make(map[string]float64),
 	}
 }
 
@@ -110,7 +115,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
 			} else {
 				if numMissedBlocks > 0 {
-					m.metrics[SlashingNumMissedBlocks] += float64(numMissedBlocks)
+					m.metricVectors[SlashingNumMissedBlocks][validatorPublicKey] += float64(numMissedBlocks)
 				}
 			}
 		}
@@ -119,12 +124,16 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 			m.metrics[SlashingNumTombstonedValidators]++
 		}
 	}
-
+	m.logger.Infoln("updated",m.Name())
 	return nil
 }
 
 func (m *SlashingMonitor) GetMetrics() map[Metric]float64 {
 	return m.metrics
+}
+
+func (m SlashingMonitor) GetMetricVectors() map[Metric]map[string]float64 {
+	return m.metricVectors
 }
 
 func (m *SlashingMonitor) getValidatorsPublicKeys(ctx context.Context) ([]string, error) {

@@ -148,6 +148,10 @@ func (m UpdateGlobalIndexMonitor) GetMetrics() map[Metric]float64 {
 	return m.metrics
 }
 
+func (m UpdateGlobalIndexMonitor) GetMetricVectors() map[Metric]map[string]float64 {
+	return nil
+}
+
 func getTxRawLog(tx *models.GetTxListResultTxs) string {
 	if tx == nil || tx.RawLog == nil {
 		return ""
