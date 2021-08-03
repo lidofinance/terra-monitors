@@ -88,7 +88,7 @@ func (c *LCDCollector) UpdateData(ctx context.Context) []error {
 	return errors
 }
 
-func mapsContains(key monitors.Metric, maps ...map[monitors.Metric]monitors.Monitor) (monitors.Monitor, bool) {
+func findMaps(key monitors.Metric, maps ...map[monitors.Metric]monitors.Monitor) (monitors.Monitor, bool) {
 	for _, m := range maps {
 		if wantedMonitor, found := m[key]; found {
 			return wantedMonitor, true
@@ -100,14 +100,14 @@ func mapsContains(key monitors.Metric, maps ...map[monitors.Metric]monitors.Moni
 func (c *LCDCollector) RegisterMonitor(m monitors.Monitor) {
 	m.InitMetrics()
 	for metric := range m.GetMetrics() {
-		if wantedMonitor, found := mapsContains(metric, c.Metrics, c.MetricVectors); found {
+		if wantedMonitor, found := findMaps(metric, c.Metrics, c.MetricVectors); found {
 			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), wantedMonitor.Name(), metric))
 		}
 
 		c.Metrics[metric] = m
 	}
 	for metric := range m.GetMetricVectors() {
-		if wantedMonitor, found := mapsContains(metric, c.Metrics, c.MetricVectors); found {
+		if wantedMonitor, found := findMaps(metric, c.Metrics, c.MetricVectors); found {
 			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), wantedMonitor.Name(), metric))
 		}
 
