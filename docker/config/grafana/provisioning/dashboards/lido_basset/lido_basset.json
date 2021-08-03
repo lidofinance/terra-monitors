@@ -18,6 +18,7 @@
   "links": [],
   "panels": [
     {
+<<<<<<< HEAD
       "alert": {
         "alertRuleTags": {},
         "conditions": [
@@ -53,6 +54,20 @@
         "noDataState": "no_data",
         "notifications": []
       },
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 12,
+      "panels": [],
+      "title": "Hub parameters",
+      "type": "row"
+    },
+    {
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -108,7 +123,272 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 0
+        "y": 1
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "hub_parameters_epoch_period{}",
+          "interval": "",
+          "legendFormat": "Epoch period",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "hub_parameters_unbonding_period{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Unbonding period",
+          "refId": "E"
+        }
+      ],
+      "title": "Hub parameters",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "hub_parameters_er_threshold{}",
+          "interval": "",
+          "legendFormat": "Er threshold",
+          "refId": "A"
+        }
+      ],
+      "title": "Er threshold hub parameter",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "hub_parameters_peg_recovery_fee{}",
+          "interval": "",
+          "legendFormat": "Peg recovery fee",
+          "refId": "A"
+        }
+      ],
+      "title": "Peg recovery fee hub parameter",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 10,
+      "panels": [],
+      "title": "Row title",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
       },
       "id": 6,
       "options": {
@@ -118,7 +398,7 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "multi"
         }
       },
       "targets": [
@@ -126,7 +406,7 @@
           "exemplar": true,
           "expr": "bluna_reward_config_crc32{}",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "bluna reward config crc32",
           "refId": "A"
         },
         {
@@ -134,7 +414,7 @@
           "expr": "hub_config_crc32{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "hub config crc32",
           "refId": "B"
         },
         {
@@ -142,7 +422,7 @@
           "expr": "hub_parameters_crc32{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "hub parameters crc32",
           "refId": "C"
         },
         {
@@ -150,7 +430,7 @@
           "expr": "reward_dispatcher_config_crc32{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "reward dispatcher config crc32",
           "refId": "D"
         },
         {
@@ -158,19 +438,15 @@
           "expr": "validators_registry_config_crc32{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "validators registry config crc32",
           "refId": "E"
-        },
-        {
-          "hide": false,
-          "refId": "F"
         },
         {
           "exemplar": true,
           "expr": "airdrop_registry_config_crc32{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "airdrop registry config crc32",
           "refId": "G"
         }
       ],
@@ -233,7 +509,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 18
       },
       "id": 4,
       "options": {
@@ -731,10 +1007,12 @@
         "overrides": []
       },
       "gridPos": {
+
         "h": 8,
         "w": 8,
         "x": 16,
         "y": 8
+
       },
       "id": 2,
       "options": {

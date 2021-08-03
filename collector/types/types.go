@@ -64,7 +64,7 @@ type TokenInfoResponse struct {
 //     pub last_processed_batch: u64,
 // }
 
-//should be corrected after contract migration according new response schema
+//should be corrected after contract migration according the new response schema
 
 type HubStateResponse struct {
 	ExchangeRate          string `json:"exchange_rate"`     //decimal
