@@ -6,17 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"strconv"
 
+	strfmt "github.com/go-openapi/strfmt"
+
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxResultTxValueSignatures get tx result tx value signatures
-//
 // swagger:model getTxResult.tx.value.signatures
 type GetTxResultTxValueSignatures struct {
 
@@ -76,38 +75,6 @@ func (m *GetTxResultTxValueSignatures) validateSignature(formats strfmt.Registry
 
 	if err := validate.Required("signature", "body", m.Signature); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this get tx result tx value signatures based on the context it is used
-func (m *GetTxResultTxValueSignatures) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidatePubKey(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *GetTxResultTxValueSignatures) contextValidatePubKey(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.PubKey); i++ {
-
-		if m.PubKey[i] != nil {
-			if err := m.PubKey[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("pubKey" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil

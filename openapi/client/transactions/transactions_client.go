@@ -9,11 +9,12 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/strfmt"
+
+	strfmt "github.com/go-openapi/strfmt"
 )
 
 // New creates a new transactions API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -25,27 +26,90 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
-type ClientOption func(*runtime.ClientOperation)
+/*
+GetSlashingValidatorsValidatorPubKeySigningInfo gets validator signing info
 
-// ClientService is the interface for Client methods
-type ClientService interface {
-	GetV1Txs(params *GetV1TxsParams, opts ...ClientOption) (*GetV1TxsOK, error)
+Get Validator Signing Info
+*/
+func (a *Client) GetSlashingValidatorsValidatorPubKeySigningInfo(params *GetSlashingValidatorsValidatorPubKeySigningInfoParams) (*GetSlashingValidatorsValidatorPubKeySigningInfoOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetSlashingValidatorsValidatorPubKeySigningInfoParams()
+	}
 
-	SetTransport(transport runtime.ClientTransport)
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetSlashingValidatorsValidatorPubKeySigningInfo",
+		Method:             "GET",
+		PathPattern:        "/slashing/validators/{validatorPubKey}/signing_info",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetSlashingValidatorsValidatorPubKeySigningInfoReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetSlashingValidatorsValidatorPubKeySigningInfoOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetSlashingValidatorsValidatorPubKeySigningInfo: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-  GetV1Txs gets tx list
+GetStakingValidatorsValidatorAddr gets validator info
 
-  Get Tx List
+Get validator info
 */
-func (a *Client) GetV1Txs(params *GetV1TxsParams, opts ...ClientOption) (*GetV1TxsOK, error) {
+func (a *Client) GetStakingValidatorsValidatorAddr(params *GetStakingValidatorsValidatorAddrParams) (*GetStakingValidatorsValidatorAddrOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetStakingValidatorsValidatorAddrParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetStakingValidatorsValidatorAddr",
+		Method:             "GET",
+		PathPattern:        "/staking/validators/{validatorAddr}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetStakingValidatorsValidatorAddrReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetStakingValidatorsValidatorAddrOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetStakingValidatorsValidatorAddr: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetV1Txs gets tx list
+
+Get Tx List
+*/
+func (a *Client) GetV1Txs(params *GetV1TxsParams) (*GetV1TxsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetV1TxsParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "GetV1Txs",
 		Method:             "GET",
 		PathPattern:        "/v1/txs",
@@ -56,12 +120,7 @@ func (a *Client) GetV1Txs(params *GetV1TxsParams, opts ...ClientOption) (*GetV1T
 		Reader:             &GetV1TxsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}

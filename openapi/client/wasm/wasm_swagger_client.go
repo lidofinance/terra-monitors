@@ -9,11 +9,12 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/strfmt"
+
+	strfmt "github.com/go-openapi/strfmt"
 )
 
 // New creates a new wasm API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -25,41 +26,27 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
-type ClientOption func(*runtime.ClientOperation)
-
-// ClientService is the interface for Client methods
-type ClientService interface {
-	GetWasmContractsContractAddressStore(params *GetWasmContractsContractAddressStoreParams, opts ...ClientOption) (*GetWasmContractsContractAddressStoreOK, error)
-
-	SetTransport(transport runtime.ClientTransport)
-}
-
 /*
-  GetWasmContractsContractAddressStore gets stored information with query msg
+GetWasmContractsContractAddressStore gets stored information with query msg
 */
-func (a *Client) GetWasmContractsContractAddressStore(params *GetWasmContractsContractAddressStoreParams, opts ...ClientOption) (*GetWasmContractsContractAddressStoreOK, error) {
+func (a *Client) GetWasmContractsContractAddressStore(params *GetWasmContractsContractAddressStoreParams) (*GetWasmContractsContractAddressStoreOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetWasmContractsContractAddressStoreParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "GetWasmContractsContractAddressStore",
 		Method:             "GET",
 		PathPattern:        "/wasm/contracts/{contractAddress}/store",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"https"},
 		Params:             params,
 		Reader:             &GetWasmContractsContractAddressStoreReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}

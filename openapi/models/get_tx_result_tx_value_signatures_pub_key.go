@@ -6,16 +6,14 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxResultTxValueSignaturesPubKey get tx result tx value signatures pub key
-//
 // swagger:model getTxResult.tx.value.signatures.pubKey
 type GetTxResultTxValueSignaturesPubKey struct {
 
@@ -61,11 +59,6 @@ func (m *GetTxResultTxValueSignaturesPubKey) validateValue(formats strfmt.Regist
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this get tx result tx value signatures pub key based on context it is used
-func (m *GetTxResultTxValueSignaturesPubKey) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

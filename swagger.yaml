@@ -161,6 +161,84 @@ paths:
       description: Get Tx List
       summary: Get Tx List
 
+  /staking/validators/{validatorAddr}:
+    get:
+      parameters:
+        - in: path
+          name: validatorAddr
+          description: validator address
+          required: true
+          type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              height:
+                type: string
+              result:
+                type: object
+                $ref: '#/definitions/ValidatorInfo'
+        400:
+          description: Error
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+              code:
+                type: number
+      tags:
+        - Transactions
+      description: Get validator info
+      summary: Get Validator Info
+
+  /slashing/validators/{validatorPubKey}/signing_info:
+    get:
+      parameters:
+        - in: path
+          name: validatorPubKey
+          description: validator public key
+          required: true
+          type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              height:
+                type: string
+              result:
+                type: object
+                $ref: '#/definitions/SigningInfo'
+        400:
+          description: Error
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+              code:
+                type: number
+      tags:
+        - Transactions
+      description: Get Validator Signing Info
+      summary: Get Validator Signing Info
+
 
 definitions:
   getTxListResult:
@@ -713,3 +791,32 @@ definitions:
     required:
       - type
       - value
+  SigningInfo:
+    type: object
+    properties:
+      address:
+        type: string
+      start_height:
+        type: string
+      index_offset:
+        type: string
+      jailed_until:
+        type: string
+      tombstoned:
+        type: boolean
+      missed_blocks_counter:
+        type: string
+    required:
+      - address
+      - start_height
+      - index_offset
+      - jailed_until
+      - tombstoned
+      - missed_blocks_counter
+  ValidatorInfo:
+    type: object
+    properties:
+      consensus_pubkey:
+        type: string
+    required:
+      - consensus_pubkey

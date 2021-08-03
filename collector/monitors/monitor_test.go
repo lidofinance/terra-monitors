@@ -60,4 +60,5 @@ func (suite *MonitorTestSuite) TestConnectionRefusedRequest() {
 func TestLocales(t *testing.T) {
 	suite.Run(t, new(MonitorTestSuite))
 	suite.Run(t, new(UpdateGlobalIndexMonitorTestSuite))
+	suite.Run(t, new(SlashingMonitorTestSuite))
 }

@@ -38,7 +38,33 @@ func NewServerWithResponse(resp string) *httptest.Server {
 		w.Header().Add("Content-Type", "application/json")
 		fmt.Fprintln(w, resp)
 	}))
+
 	return ts
+}
+
+func NewServerWithRoutedResponse(routeToResponse map[string]string) *httptest.Server {
+	mux := http.NewServeMux()
+
+	for route, response := range routeToResponse {
+		responseValue := response
+
+		// A bit ugly, but gets the job done.
+		if strings.Contains(response, "error") {
+			mux.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(400)
+				_, _ = fmt.Fprintf(w, `%s`, responseValue)
+
+			})
+		} else {
+			mux.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("Content-Type", "application/json")
+				_, _ = fmt.Fprintln(w, responseValue)
+			})
+		}
+	}
+
+	return httptest.NewServer(mux)
 }
 
 func NewServerWithError(errorMessage string) *httptest.Server {
