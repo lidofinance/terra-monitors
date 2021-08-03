@@ -55,7 +55,7 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 		expectedNumMissedBlocks         float64 = 5
 	)
 	var actualMissedBlocks float64
-	for _,missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
 		actualMissedBlocks += missedBlocks
 	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])
@@ -90,7 +90,7 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 		expectedNumMissedBlocks         float64 = 0
 	)
 	var actualMissedBlocks float64
-	for _,missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
 		actualMissedBlocks += missedBlocks
 	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])

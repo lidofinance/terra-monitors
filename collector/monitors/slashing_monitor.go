@@ -124,7 +124,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 			m.metrics[SlashingNumTombstonedValidators]++
 		}
 	}
-	m.logger.Infoln("updated",m.Name())
+	m.logger.Infoln("updated", m.Name())
 	return nil
 }
 
