@@ -115,7 +115,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
 			} else {
 				if numMissedBlocks > 0 {
-					m.metricVectors[SlashingNumMissedBlocks][validatorPublicKey] += float64(numMissedBlocks)
+					m.metricVectors[SlashingNumMissedBlocks][m.validatorsRepository.DisplayName(validatorPublicKey)] += float64(numMissedBlocks)
 				}
 			}
 		}
@@ -169,6 +169,7 @@ func (m *SlashingMonitor) getValidatorsPublicKeys(ctx context.Context) ([]string
 
 type ValidatorsRepository interface {
 	GetValidatorsAddresses(ctx context.Context) ([]string, error)
+	DisplayName(string) string
 }
 
 type V1ValidatorsRepository struct {
@@ -211,4 +212,10 @@ func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]
 	}
 
 	return hubResp.Validators, nil
+}
+
+
+func (r *V1ValidatorsRepository) DisplayName(pubkey string) string {
+	// TODO: implement the real method to match pubkey with display name
+	return pubkey
 }
