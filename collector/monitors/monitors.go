@@ -10,9 +10,11 @@ type Monitor interface {
 	// Handler fetches the data to inner storage
 	Handler(ctx context.Context) error
 	// GetMetrics - provides single value metrics fetched by Handler method
-	GetMetrics() map[Metric]float64
+	GetMetrics() map[MetricName]float64
 	// GetMetricVectors - provides set of a labeled values fetched by Handler method
-	GetMetricVectors() map[Metric]map[string]float64
+	GetMetricVectors() map[MetricName]MetricVector
 }
 
-type Metric string
+type MetricName string
+
+type MetricVector map[string]float64

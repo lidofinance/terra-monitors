@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	SlashingNumJailedValidators     Metric = "slashing_num_jailed_validators"
-	SlashingNumTombstonedValidators Metric = "slashing_num_tombstoned_validators"
-	SlashingNumMissedBlocks         Metric = "slashing_num_missed_blocks" // TODO: add a "validator_address" label.
+	SlashingNumJailedValidators     MetricName = "slashing_num_jailed_validators"
+	SlashingNumTombstonedValidators MetricName = "slashing_num_tombstoned_validators"
+	SlashingNumMissedBlocks         MetricName = "slashing_num_missed_blocks" // TODO: add a "validator_address" label.
 )
 
 const (
@@ -28,8 +28,8 @@ const (
 )
 
 type SlashingMonitor struct {
-	metrics              map[Metric]float64
-	metricVectors        map[Metric]map[string]float64
+	metrics              map[MetricName]float64
+	metricVectors        map[MetricName]MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
@@ -37,8 +37,8 @@ type SlashingMonitor struct {
 
 func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *SlashingMonitor {
 	m := &SlashingMonitor{
-		metrics:              make(map[Metric]float64),
-		metricVectors:        make(map[Metric]map[string]float64),
+		metrics:              make(map[MetricName]float64),
+		metricVectors:        make(map[MetricName]MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
@@ -52,13 +52,13 @@ func (m *SlashingMonitor) Name() string {
 }
 
 func (m *SlashingMonitor) InitMetrics() {
-	m.metrics = map[Metric]float64{
+	m.metrics = map[MetricName]float64{
 		SlashingNumJailedValidators:     0,
 		SlashingNumTombstonedValidators: 0,
 	}
 
-	m.metricVectors = map[Metric]map[string]float64{
-		SlashingNumMissedBlocks: make(map[string]float64),
+	m.metricVectors = map[MetricName]MetricVector{
+		SlashingNumMissedBlocks: make(MetricVector),
 	}
 }
 
@@ -128,11 +128,11 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (m *SlashingMonitor) GetMetrics() map[Metric]float64 {
+func (m *SlashingMonitor) GetMetrics() map[MetricName]float64 {
 	return m.metrics
 }
 
-func (m SlashingMonitor) GetMetricVectors() map[Metric]map[string]float64 {
+func (m SlashingMonitor) GetMetricVectors() map[MetricName]MetricVector {
 	return m.metricVectors
 }
 

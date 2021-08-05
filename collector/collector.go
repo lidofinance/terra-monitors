@@ -11,25 +11,25 @@ import (
 )
 
 type Collector interface {
-	Get(metric monitors.Metric) (float64, error)
-	GetVector(metric monitors.Metric) (map[string]float64, error)
-	ProvidedMetrics() []monitors.Metric
-	ProvidedMetricVectors() []monitors.Metric
-	UpdateData(ctx context.Context) []error
+	Get(metric monitors.MetricName) (float64, error)
+	GetVector(metric monitors.MetricName) (monitors.MetricVector, error)
+	ProvidedMetrics() []monitors.MetricName
+	ProvidedMetricVectors() []monitors.MetricName
+	UpdateData(ctx context.Context) error
 }
 
 func NewLCDCollector(cfg config.CollectorConfig) LCDCollector {
 	return LCDCollector{
-		Metrics:       make(map[monitors.Metric]monitors.Monitor),
-		MetricVectors: make(map[monitors.Metric]monitors.Monitor),
+		Metrics:       make(map[monitors.MetricName]monitors.Monitor),
+		MetricVectors: make(map[monitors.MetricName]monitors.Monitor),
 		logger:        cfg.Logger,
 		apiClient:     cfg.GetTerraClient(),
 	}
 }
 
 type LCDCollector struct {
-	Metrics       map[monitors.Metric]monitors.Monitor
-	MetricVectors map[monitors.Metric]monitors.Monitor
+	Metrics       map[monitors.MetricName]monitors.Monitor
+	MetricVectors map[monitors.MetricName]monitors.Monitor
 	Monitors      []monitors.Monitor
 	logger        *logrus.Logger
 	apiClient     *client.TerraLiteForTerra
@@ -43,23 +43,23 @@ func (c LCDCollector) GetLogger() *logrus.Logger {
 	return c.logger
 }
 
-func (c LCDCollector) ProvidedMetrics() []monitors.Metric {
-	var metrics []monitors.Metric
+func (c LCDCollector) ProvidedMetrics() []monitors.MetricName {
+	var metrics []monitors.MetricName
 	for m := range c.Metrics {
 		metrics = append(metrics, m)
 	}
 	return metrics
 }
 
-func (c LCDCollector) ProvidedMetricVectors() []monitors.Metric {
-	var metrics []monitors.Metric
+func (c LCDCollector) ProvidedMetricVectors() []monitors.MetricName {
+	var metrics []monitors.MetricName
 	for m := range c.MetricVectors {
 		metrics = append(metrics, m)
 	}
 	return metrics
 }
 
-func (c LCDCollector) Get(metric monitors.Metric) (float64, error) {
+func (c LCDCollector) Get(metric monitors.MetricName) (float64, error) {
 	monitor, found := c.Metrics[metric]
 	if !found {
 		return 0, fmt.Errorf("monitor for metric \"%s\" not found", metric)
@@ -67,7 +67,7 @@ func (c LCDCollector) Get(metric monitors.Metric) (float64, error) {
 	return monitor.GetMetrics()[metric], nil
 }
 
-func (c LCDCollector) GetVector(metric monitors.Metric) (map[string]float64, error) {
+func (c LCDCollector) GetVector(metric monitors.MetricName) (monitors.MetricVector, error) {
 	monitor, found := c.MetricVectors[metric]
 	if !found {
 		return nil, fmt.Errorf("monitor for metric vector \"%s\" not found", metric)
@@ -88,7 +88,7 @@ func (c *LCDCollector) UpdateData(ctx context.Context) []error {
 	return errors
 }
 
-func findMaps(key monitors.Metric, maps ...map[monitors.Metric]monitors.Monitor) (monitors.Monitor, bool) {
+func findMaps(key monitors.MetricName, maps ...map[monitors.MetricName]monitors.Monitor) (monitors.Monitor, bool) {
 	for _, m := range maps {
 		if wantedMonitor, found := m[key]; found {
 			return wantedMonitor, true
