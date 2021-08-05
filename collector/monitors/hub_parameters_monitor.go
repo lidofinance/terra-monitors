@@ -88,6 +88,7 @@ func (h *HubParametersMonitor) updateMetrics() {
 }
 
 func (h *HubParametersMonitor) Handler(ctx context.Context) error {
+	h.InitMetrics()
 	hubReq, hubResp := types.HubParametersRequest{}, types.HubParameters{}
 
 	reqRaw, err := json.Marshal(&hubReq)
