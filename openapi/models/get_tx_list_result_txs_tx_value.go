@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxListResultTxsTxValue get tx list result txs tx value
+//
 // swagger:model getTxListResult.txs.tx.value
 type GetTxListResultTxsTxValue struct {
 
@@ -127,6 +128,78 @@ func (m *GetTxListResultTxsTxValue) validateSignatures(formats strfmt.Registry) 
 
 		if m.Signatures[i] != nil {
 			if err := m.Signatures[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("signatures" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get tx list result txs tx value based on the context it is used
+func (m *GetTxListResultTxsTxValue) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateMsg(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSignatures(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *GetTxListResultTxsTxValue) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *GetTxListResultTxsTxValue) contextValidateMsg(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Msg); i++ {
+
+		if m.Msg[i] != nil {
+			if err := m.Msg[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("msg" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *GetTxListResultTxsTxValue) contextValidateSignatures(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Signatures); i++ {
+
+		if m.Signatures[i] != nil {
+			if err := m.Signatures[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("signatures" + "." + strconv.Itoa(i))
 				}

@@ -6,14 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxResultTxValueFeeAmount get tx result tx value fee amount
+//
 // swagger:model getTxResult.tx.value.fee.amount
 type GetTxResultTxValueFeeAmount struct {
 
@@ -59,6 +61,11 @@ func (m *GetTxResultTxValueFeeAmount) validateDenom(formats strfmt.Registry) err
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this get tx result tx value fee amount based on context it is used
+func (m *GetTxResultTxValueFeeAmount) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

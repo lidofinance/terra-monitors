@@ -6,14 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxResultTxValueMsg get tx result tx value msg
+//
 // swagger:model getTxResult.tx.value.msg
 type GetTxResultTxValueMsg struct {
 
@@ -61,6 +63,34 @@ func (m *GetTxResultTxValueMsg) validateValue(formats strfmt.Registry) error {
 
 	if m.Value != nil {
 		if err := m.Value.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("value")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get tx result tx value msg based on the context it is used
+func (m *GetTxResultTxValueMsg) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateValue(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *GetTxResultTxValueMsg) contextValidateValue(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Value != nil {
+		if err := m.Value.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("value")
 			}

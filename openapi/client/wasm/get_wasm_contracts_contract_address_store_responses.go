@@ -6,13 +6,13 @@ package wasm
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // GetWasmContractsContractAddressStoreReader is a Reader for the GetWasmContractsContractAddressStore structure.
@@ -35,9 +35,8 @@ func (o *GetWasmContractsContractAddressStoreReader) ReadResponse(response runti
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -46,7 +45,7 @@ func NewGetWasmContractsContractAddressStoreOK() *GetWasmContractsContractAddres
 	return &GetWasmContractsContractAddressStoreOK{}
 }
 
-/*GetWasmContractsContractAddressStoreOK handles this case with default header values.
+/* GetWasmContractsContractAddressStoreOK describes a response with status code 200, with default header values.
 
 OK
 */
@@ -57,7 +56,6 @@ type GetWasmContractsContractAddressStoreOK struct {
 func (o *GetWasmContractsContractAddressStoreOK) Error() string {
 	return fmt.Sprintf("[GET /wasm/contracts/{contractAddress}/store][%d] getWasmContractsContractAddressStoreOK  %+v", 200, o.Payload)
 }
-
 func (o *GetWasmContractsContractAddressStoreOK) GetPayload() *GetWasmContractsContractAddressStoreOKBody {
 	return o.Payload
 }
@@ -79,7 +77,7 @@ func NewGetWasmContractsContractAddressStoreInternalServerError() *GetWasmContra
 	return &GetWasmContractsContractAddressStoreInternalServerError{}
 }
 
-/*GetWasmContractsContractAddressStoreInternalServerError handles this case with default header values.
+/* GetWasmContractsContractAddressStoreInternalServerError describes a response with status code 500, with default header values.
 
 Error
 */
@@ -90,7 +88,6 @@ type GetWasmContractsContractAddressStoreInternalServerError struct {
 func (o *GetWasmContractsContractAddressStoreInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /wasm/contracts/{contractAddress}/store][%d] getWasmContractsContractAddressStoreInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *GetWasmContractsContractAddressStoreInternalServerError) GetPayload() *GetWasmContractsContractAddressStoreInternalServerErrorBody {
 	return o.Payload
 }
@@ -118,6 +115,11 @@ type GetWasmContractsContractAddressStoreInternalServerErrorBody struct {
 
 // Validate validates this get wasm contracts contract address store internal server error body
 func (o *GetWasmContractsContractAddressStoreInternalServerErrorBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get wasm contracts contract address store internal server error body based on context it is used
+func (o *GetWasmContractsContractAddressStoreInternalServerErrorBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -153,6 +155,11 @@ type GetWasmContractsContractAddressStoreOKBody struct {
 
 // Validate validates this get wasm contracts contract address store o k body
 func (o *GetWasmContractsContractAddressStoreOKBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get wasm contracts contract address store o k body based on context it is used
+func (o *GetWasmContractsContractAddressStoreOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

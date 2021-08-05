@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxResultLogsEvents get tx result logs events
+//
 // swagger:model getTxResult.logs.events
 type GetTxResultLogsEvents struct {
 
@@ -75,6 +76,38 @@ func (m *GetTxResultLogsEvents) validateTypes(formats strfmt.Registry) error {
 
 	if err := validate.Required("types", "body", m.Types); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get tx result logs events based on the context it is used
+func (m *GetTxResultLogsEvents) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAttributes(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *GetTxResultLogsEvents) contextValidateAttributes(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Attributes); i++ {
+
+		if m.Attributes[i] != nil {
+			if err := m.Attributes[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("attributes" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

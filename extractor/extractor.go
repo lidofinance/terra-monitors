@@ -81,7 +81,7 @@ func (p *PromExtractor) updateGaugeVectorValue(name monitors.MetricName) error {
 
 func (p PromExtractor) UpdateMetrics(ctx context.Context) {
 	errors := p.collector.UpdateData(ctx)
-	for _,err := range errors {
+	for _, err := range errors {
 		p.log.Errorf("failed to update collector data: %v", err)
 	}
 

@@ -9,12 +9,11 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new transactions API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -26,18 +25,31 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-/*
-GetSlashingValidatorsValidatorPubKeySigningInfo gets validator signing info
+// ClientOption is the option for Client methods
+type ClientOption func(*runtime.ClientOperation)
 
-Get Validator Signing Info
+// ClientService is the interface for Client methods
+type ClientService interface {
+	GetSlashingValidatorsValidatorPubKeySigningInfo(params *GetSlashingValidatorsValidatorPubKeySigningInfoParams, opts ...ClientOption) (*GetSlashingValidatorsValidatorPubKeySigningInfoOK, error)
+
+	GetStakingValidatorsValidatorAddr(params *GetStakingValidatorsValidatorAddrParams, opts ...ClientOption) (*GetStakingValidatorsValidatorAddrOK, error)
+
+	GetV1Txs(params *GetV1TxsParams, opts ...ClientOption) (*GetV1TxsOK, error)
+
+	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+  GetSlashingValidatorsValidatorPubKeySigningInfo gets validator signing info
+
+  Get Validator Signing Info
 */
-func (a *Client) GetSlashingValidatorsValidatorPubKeySigningInfo(params *GetSlashingValidatorsValidatorPubKeySigningInfoParams) (*GetSlashingValidatorsValidatorPubKeySigningInfoOK, error) {
+func (a *Client) GetSlashingValidatorsValidatorPubKeySigningInfo(params *GetSlashingValidatorsValidatorPubKeySigningInfoParams, opts ...ClientOption) (*GetSlashingValidatorsValidatorPubKeySigningInfoOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetSlashingValidatorsValidatorPubKeySigningInfoParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetSlashingValidatorsValidatorPubKeySigningInfo",
 		Method:             "GET",
 		PathPattern:        "/slashing/validators/{validatorPubKey}/signing_info",
@@ -48,7 +60,12 @@ func (a *Client) GetSlashingValidatorsValidatorPubKeySigningInfo(params *GetSlas
 		Reader:             &GetSlashingValidatorsValidatorPubKeySigningInfoReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -63,17 +80,16 @@ func (a *Client) GetSlashingValidatorsValidatorPubKeySigningInfo(params *GetSlas
 }
 
 /*
-GetStakingValidatorsValidatorAddr gets validator info
+  GetStakingValidatorsValidatorAddr gets validator info
 
-Get validator info
+  Get validator info
 */
-func (a *Client) GetStakingValidatorsValidatorAddr(params *GetStakingValidatorsValidatorAddrParams) (*GetStakingValidatorsValidatorAddrOK, error) {
+func (a *Client) GetStakingValidatorsValidatorAddr(params *GetStakingValidatorsValidatorAddrParams, opts ...ClientOption) (*GetStakingValidatorsValidatorAddrOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetStakingValidatorsValidatorAddrParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetStakingValidatorsValidatorAddr",
 		Method:             "GET",
 		PathPattern:        "/staking/validators/{validatorAddr}",
@@ -84,7 +100,12 @@ func (a *Client) GetStakingValidatorsValidatorAddr(params *GetStakingValidatorsV
 		Reader:             &GetStakingValidatorsValidatorAddrReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -99,17 +120,16 @@ func (a *Client) GetStakingValidatorsValidatorAddr(params *GetStakingValidatorsV
 }
 
 /*
-GetV1Txs gets tx list
+  GetV1Txs gets tx list
 
-Get Tx List
+  Get Tx List
 */
-func (a *Client) GetV1Txs(params *GetV1TxsParams) (*GetV1TxsOK, error) {
+func (a *Client) GetV1Txs(params *GetV1TxsParams, opts ...ClientOption) (*GetV1TxsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetV1TxsParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetV1Txs",
 		Method:             "GET",
 		PathPattern:        "/v1/txs",
@@ -120,7 +140,12 @@ func (a *Client) GetV1Txs(params *GetV1TxsParams) (*GetV1TxsOK, error) {
 		Reader:             &GetV1TxsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}

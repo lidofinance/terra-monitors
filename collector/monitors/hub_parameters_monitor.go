@@ -109,4 +109,3 @@ func (h HubParametersMonitor) GetMetrics() map[MetricName]float64 {
 func (m HubParametersMonitor) GetMetricVectors() map[MetricName]MetricVector {
 	return nil
 }
-

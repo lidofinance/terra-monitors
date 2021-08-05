@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GetTxListResultTxs get tx list result txs
+//
 // swagger:model getTxListResult.txs
 type GetTxListResultTxs struct {
 
@@ -236,6 +237,78 @@ func (m *GetTxListResultTxs) validateTxhash(formats strfmt.Registry) error {
 
 	if err := validate.Required("txhash", "body", m.Txhash); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get tx list result txs based on the context it is used
+func (m *GetTxListResultTxs) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateEvents(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateLogs(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateTx(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *GetTxListResultTxs) contextValidateEvents(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Events); i++ {
+
+		if m.Events[i] != nil {
+			if err := m.Events[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("events" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *GetTxListResultTxs) contextValidateLogs(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Logs); i++ {
+
+		if m.Logs[i] != nil {
+			if err := m.Logs[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("logs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *GetTxListResultTxs) contextValidateTx(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Tx != nil {
+		if err := m.Tx.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("tx")
+			}
+			return err
+		}
 	}
 
 	return nil

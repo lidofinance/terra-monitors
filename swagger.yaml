@@ -818,5 +818,11 @@ definitions:
     properties:
       consensus_pubkey:
         type: string
+      description:
+        type: object
+        properties:
+          moniker:
+            type: string
     required:
       - consensus_pubkey
+      - description
