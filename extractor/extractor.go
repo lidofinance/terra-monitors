@@ -92,7 +92,7 @@ func (p PromExtractor) UpdateMetrics(ctx context.Context) {
 		}
 	}
 	for _, gaugeName := range p.GaugeMetricVectors {
-		err = p.updateGaugeVectorValue(gaugeName)
+		err := p.updateGaugeVectorValue(gaugeName)
 		if err != nil {
 			p.log.Errorf("failed to update gauge value \"%s\": %v", gaugeName, err)
 		}

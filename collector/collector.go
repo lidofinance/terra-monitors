@@ -15,7 +15,7 @@ type Collector interface {
 	GetVector(metric monitors.MetricName) (monitors.MetricVector, error)
 	ProvidedMetrics() []monitors.MetricName
 	ProvidedMetricVectors() []monitors.MetricName
-	UpdateData(ctx context.Context) error
+	UpdateData(ctx context.Context) []error
 }
 
 func NewLCDCollector(cfg config.CollectorConfig) LCDCollector {
