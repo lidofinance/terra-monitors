@@ -57,7 +57,7 @@ func (h *HubParametersMonitor) providedMetrics() []MetricName {
 func (h *HubParametersMonitor) InitMetrics() {
 	for _, metric := range h.providedMetrics() {
 		if h.metrics[metric] == nil {
-			h.metrics[metric] = &BasicMetricValue{}
+			h.metrics[metric] = &SimpleMetricValue{}
 		}
 		h.metrics[metric].Set(0)
 	}
@@ -69,7 +69,7 @@ func (h *HubParametersMonitor) setStringMetric(m MetricName, rawValue string) {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
 	if h.metrics[m] == nil {
-		h.metrics[m] = &BasicMetricValue{}
+		h.metrics[m] = &SimpleMetricValue{}
 	}
 	h.metrics[m].Set(v)
 }

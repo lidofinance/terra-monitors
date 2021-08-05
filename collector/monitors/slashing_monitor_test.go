@@ -49,8 +49,8 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	metrics := m.GetMetrics()
 	metricVectors := m.GetMetricVectors()
 	var (
-		expectedNumTombstonedValidators MetricValue = &BasicMetricValue{1}
-		expectedNumJailedValidators     MetricValue = &BasicMetricValue{1}
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{1}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{1}
 		expectedNumMissedBlocks         float64     = 5
 	)
 	var actualMissedBlocks float64
@@ -92,8 +92,8 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	metricVectors := m.GetMetricVectors()
 
 	var (
-		expectedNumTombstonedValidators MetricValue = &BasicMetricValue{0}
-		expectedNumJailedValidators     MetricValue = &BasicMetricValue{0}
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{0}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{0}
 		expectedNumMissedBlocks         float64     = 0
 	)
 	var actualMissedBlocks float64

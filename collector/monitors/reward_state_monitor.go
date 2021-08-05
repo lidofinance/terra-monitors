@@ -84,7 +84,7 @@ func (h *RewardStateMonitor) setStringMetric(m MetricName, rawValue string) {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
 	if h.metrics[m] == nil {
-		h.metrics[m] = &BasicMetricValue{}
+		h.metrics[m] = &SimpleMetricValue{}
 	}
 	h.metrics[m].Set(v)
 }

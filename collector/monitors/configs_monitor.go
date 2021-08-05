@@ -60,7 +60,7 @@ func (m ConfigsCRC32Monitor) Name() string {
 func (m *ConfigsCRC32Monitor) InitMetrics() {
 	for _, metric := range m.providedMetrics() {
 		if m.metrics[metric] == nil {
-			m.metrics[metric] = &BasicMetricValue{}
+			m.metrics[metric] = &SimpleMetricValue{}
 		}
 		m.metrics[metric].Set(0)
 	}

@@ -26,23 +26,23 @@ type MetricValue interface {
 	Init()
 }
 
-type BasicMetricValue struct {
+type SimpleMetricValue struct {
 	value float64
 }
 
-func (b *BasicMetricValue) Get() float64 {
+func (b *SimpleMetricValue) Get() float64 {
 	return b.value
 }
 
-func (b *BasicMetricValue) Set(f float64) {
+func (b *SimpleMetricValue) Set(f float64) {
 	b.value = f
 }
 
-func (b *BasicMetricValue) Add(f float64) {
+func (b *SimpleMetricValue) Add(f float64) {
 	b.value += f
 }
 
-func (b *BasicMetricValue) Init() {
+func (b *SimpleMetricValue) Init() {
 	b.value = 0
 }
 

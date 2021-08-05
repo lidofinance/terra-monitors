@@ -47,7 +47,7 @@ func (m *WhitelistedValidatorsMonitor) providedMetrics() []MetricName {
 func (m *WhitelistedValidatorsMonitor) InitMetrics() {
 	for _, metric := range m.providedMetrics() {
 		if m.metrics[metric] == nil {
-			m.metrics[metric] = &BasicMetricValue{}
+			m.metrics[metric] = &SimpleMetricValue{}
 		}
 		m.metrics[metric].Set(0)
 	}

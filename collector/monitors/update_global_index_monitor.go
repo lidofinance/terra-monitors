@@ -54,8 +54,11 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexM
 	}
 
 	if cfg.UpdateGlobalIndexInterval > 0 {
+		// the channel is being filled by "do work" flag according to the time interval
 		m.flowManager = config.FlowManager(cfg.UpdateGlobalIndexInterval)
 	} else {
+		// with a testing purpose, we are able to force worker to work
+		// by sending empty struct to the channel wherever we want
 		m.flowManager = make(chan struct{})
 	}
 

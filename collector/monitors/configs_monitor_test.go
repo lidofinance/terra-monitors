@@ -80,7 +80,7 @@ func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
 	err := m1.Handler(context.Background())
 	suite.NoError(err)
 	for metric, value := range m1.metrics {
-		savedMetrics[metric] = &BasicMetricValue{value.Get()}
+		savedMetrics[metric] = &SimpleMetricValue{value.Get()}
 	}
 	err = m1.Handler(context.Background())
 	suite.NoError(err)
