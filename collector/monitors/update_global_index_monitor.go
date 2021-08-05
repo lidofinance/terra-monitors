@@ -51,7 +51,6 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexM
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 		lock:            sync.RWMutex{},
-		flowManager:     nil,
 	}
 
 	if cfg.UpdateGlobalIndexInterval > 0 {
@@ -83,12 +82,23 @@ func (m UpdateGlobalIndexMonitor) Name() string {
 	return "UpdateGlobalIndexMonitor"
 }
 
+func (m *UpdateGlobalIndexMonitor) providedMetrics() []MetricName {
+	return []MetricName{
+		UpdateGlobalIndexSuccessfulTxSinceLastCheck,
+		UpdateGlobalIndexGasWanted,
+		UpdateGlobalIndexGasUsed,
+		UpdateGlobalIndexUUSDFee,
+		UpdateGlobalIndexFailedTxSinceLastCheck,
+	}
+}
+
 func (m *UpdateGlobalIndexMonitor) InitMetrics() {
-	m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck] = &ReadOnceMetric{}
-	m.metrics[UpdateGlobalIndexGasWanted] = &ReadOnceMetric{}
-	m.metrics[UpdateGlobalIndexGasUsed] = &ReadOnceMetric{}
-	m.metrics[UpdateGlobalIndexUUSDFee] = &ReadOnceMetric{}
-	m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck] = &ReadOnceMetric{}
+	for _, metric := range m.providedMetrics() {
+		if m.metrics[metric] == nil {
+			m.metrics[metric] = &ReadOnceMetric{}
+		}
+		m.metrics[metric].Set(0)
+	}
 }
 
 func (m *UpdateGlobalIndexMonitor) updateData(ctx context.Context) error {

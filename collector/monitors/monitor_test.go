@@ -32,7 +32,7 @@ func (suite *MonitorTestSuite) TestSuccessfulQueryRequest() {
 	err := blunaTokenInfoMonitor.Handler(context.Background())
 	suite.Require().NoError(err)
 	suite.Equal(expected, *blunaTokenInfoMonitor.State)
-	suite.Equal(totalSupply, blunaTokenInfoMonitor.GetMetrics()[BlunaTotalSupply])
+	suite.Equal(totalSupply, blunaTokenInfoMonitor.GetMetrics()[BlunaTotalSupply].Get())
 }
 
 func (suite *MonitorTestSuite) TestBadQueryRequest() {

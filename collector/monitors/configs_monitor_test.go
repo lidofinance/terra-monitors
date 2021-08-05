@@ -38,7 +38,7 @@ func (suite *DetectorChangesTestSuite) TestHubParameters() {
 	err = hubParametersMonitor.Handler(context.Background())
 	suite.NoError(err)
 	suite.Equal(hubParametersFakeResponse.Result, *hubParametersMonitor.State)
-	crc32first := hubParametersMonitor.metrics[HubParametersCRC32]
+	crc32first := hubParametersMonitor.metrics[HubParametersCRC32].Get()
 
 	//   changing response data
 	newHubParametersFakeResponse := struct {
@@ -75,12 +75,12 @@ func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
 	ts := NewServerWithRandomJson()
 	cfg := NewTestCollectorConfig(ts.URL)
 	m1 := NewConfigsCRC32Monitor(cfg)
-	savedMetrics := make(map[MetricName]float64)
+	savedMetrics := make(map[MetricName]MetricValue)
 
 	err := m1.Handler(context.Background())
 	suite.NoError(err)
 	for metric, value := range m1.metrics {
-		savedMetrics[metric] = value
+		savedMetrics[metric] = &BasicMetricValue{value.Get()}
 	}
 	err = m1.Handler(context.Background())
 	suite.NoError(err)

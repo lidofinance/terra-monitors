@@ -22,7 +22,7 @@ func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
 	m := HubStateMonitor{
 		State:      &types.HubStateResponse{},
 		HubAddress: cfg.HubContract,
-		metrics:    make(map[MetricName]float64),
+		metrics:    make(map[MetricName]MetricValue),
 		apiClient:  cfg.GetTerraClient(),
 		logger:     cfg.Logger,
 	}
@@ -33,7 +33,7 @@ func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
 type HubStateMonitor struct {
 	State      *types.HubStateResponse
 	HubAddress string
-	metrics    map[MetricName]float64
+	metrics    map[MetricName]MetricValue
 	apiClient  *client.TerraLiteForTerra
 	logger     *logrus.Logger
 }
@@ -86,10 +86,13 @@ func (h *HubStateMonitor) setStringMetric(m MetricName, rawValue string) {
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
-	h.metrics[m] = v
+	if h.metrics[m] == nil {
+		h.metrics[m] = &BasicMetricValue{}
+	}
+	h.metrics[m].Set(v)
 }
 
-func (h HubStateMonitor) GetMetrics() map[MetricName]float64 {
+func (h HubStateMonitor) GetMetrics() map[MetricName]MetricValue {
 	return h.metrics
 }
 

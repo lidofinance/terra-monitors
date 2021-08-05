@@ -3,9 +3,8 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-
 	"github.com/stretchr/testify/suite"
+	"io/ioutil"
 )
 
 const (
@@ -39,18 +38,20 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
+
 	valRepository := NewV1ValidatorsRepository(cfg)
 
 	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
+
 	metrics := m.GetMetrics()
 	metricVectors := m.GetMetricVectors()
 	var (
-		expectedNumTombstonedValidators float64 = 1
-		expectedNumJailedValidators     float64 = 1
-		expectedNumMissedBlocks         float64 = 5
+		expectedNumTombstonedValidators MetricValue = &BasicMetricValue{1}
+		expectedNumJailedValidators     MetricValue = &BasicMetricValue{1}
+		expectedNumMissedBlocks         float64     = 5
 	)
 	var actualMissedBlocks float64
 	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
@@ -79,19 +80,21 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
+
 	valRepository := NewV1ValidatorsRepository(cfg)
 
 	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
+
 	metrics := m.GetMetrics()
 	metricVectors := m.GetMetricVectors()
 
 	var (
-		expectedNumTombstonedValidators float64 = 0
-		expectedNumJailedValidators     float64 = 0
-		expectedNumMissedBlocks         float64 = 0
+		expectedNumTombstonedValidators MetricValue = &BasicMetricValue{0}
+		expectedNumJailedValidators     MetricValue = &BasicMetricValue{0}
+		expectedNumMissedBlocks         float64     = 0
 	)
 	var actualMissedBlocks float64
 	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
@@ -120,9 +123,14 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
+
 	valRepository := NewV1ValidatorsRepository(cfg)
 
 	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)
+
+	expectedErrorMessage := "failed to getValidatorsPublicKeys"
+	suite.Contains(err.Error(),expectedErrorMessage)
+
 }

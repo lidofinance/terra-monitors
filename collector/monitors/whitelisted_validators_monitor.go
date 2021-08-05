@@ -16,7 +16,7 @@ const (
 )
 
 type WhitelistedValidatorsMonitor struct {
-	metrics              map[MetricName]float64
+	metrics              map[MetricName]MetricValue
 	apiClient            *client.TerraLiteForTerra
 	logger               *logrus.Logger
 	validatorsRepository ValidatorsRepository
@@ -24,7 +24,7 @@ type WhitelistedValidatorsMonitor struct {
 
 func NewWhitelistedValidatorsMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) WhitelistedValidatorsMonitor {
 	m := WhitelistedValidatorsMonitor{
-		metrics:              make(map[MetricName]float64),
+		metrics:              make(map[MetricName]MetricValue),
 		apiClient:            cfg.GetTerraClient(),
 		logger:               cfg.Logger,
 		validatorsRepository: repository,
@@ -37,12 +37,23 @@ func (m WhitelistedValidatorsMonitor) Name() string {
 	return "WhitelistedValidatorsMonitor"
 }
 
-func (m *WhitelistedValidatorsMonitor) InitMetrics() {
-	m.metrics[WhitelistedValidatorsCRC32] = 0
-	m.metrics[WhitelistedValidatorsNum] = 0
+func (m *WhitelistedValidatorsMonitor) providedMetrics() []MetricName {
+	return []MetricName{
+		WhitelistedValidatorsCRC32,
+		WhitelistedValidatorsNum,
+	}
 }
 
-func (m WhitelistedValidatorsMonitor) GetMetrics() map[MetricName]float64 {
+func (m *WhitelistedValidatorsMonitor) InitMetrics() {
+	for _, metric := range m.providedMetrics() {
+		if m.metrics[metric] == nil {
+			m.metrics[metric] = &BasicMetricValue{}
+		}
+		m.metrics[metric].Set(0)
+	}
+}
+
+func (m WhitelistedValidatorsMonitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
@@ -57,8 +68,8 @@ func (m *WhitelistedValidatorsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to get whiltelisted validators for %s: %w", m.Name(), err)
 	}
 
-	m.metrics[WhitelistedValidatorsCRC32] = float64(crc32.ChecksumIEEE([]byte(strings.Join(validators, ""))))
-	m.metrics[WhitelistedValidatorsNum] = float64(len(validators))
+	m.metrics[WhitelistedValidatorsCRC32].Set(float64(crc32.ChecksumIEEE([]byte(strings.Join(validators, "")))))
+	m.metrics[WhitelistedValidatorsNum].Set(float64(len(validators)))
 	m.logger.Infoln("updated ", m.Name())
 	return nil
 }

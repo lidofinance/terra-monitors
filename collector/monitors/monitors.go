@@ -19,8 +19,6 @@ type MetricName string
 
 type MetricVector map[string]float64
 
-
-
 type MetricValue interface {
 	Get() float64
 	Set(float64)

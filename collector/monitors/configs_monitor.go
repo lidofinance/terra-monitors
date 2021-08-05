@@ -22,7 +22,7 @@ const (
 
 type ConfigsCRC32Monitor struct {
 	Contracts map[string]MetricName
-	metrics   map[MetricName]float64
+	metrics   map[MetricName]MetricValue
 	apiClient *client.TerraLiteForTerra
 	logger    *logrus.Logger
 }
@@ -36,7 +36,7 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig) ConfigsCRC32Monitor {
 			cfg.HubContract:              HubConfigCRC32,
 			cfg.RewardContract:           BlunaRewardConfigCRC32,
 		},
-		metrics:   make(map[MetricName]float64),
+		metrics:   make(map[MetricName]MetricValue),
 		apiClient: cfg.GetTerraClient(),
 		logger:    cfg.Logger,
 	}
@@ -44,19 +44,30 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig) ConfigsCRC32Monitor {
 	return m
 }
 
+func (m *ConfigsCRC32Monitor) providedMetrics() []MetricName {
+	return []MetricName{
+		AirDropRegistryConfigCRC32,
+		ValidatorsRegistryConfigCRC32,
+		RewardDispatcherConfigCRC32,
+		HubConfigCRC32,
+		BlunaRewardConfigCRC32}
+}
+
 func (m ConfigsCRC32Monitor) Name() string {
 	return "ConfigsCRC32Monitor"
 }
 
 func (m *ConfigsCRC32Monitor) InitMetrics() {
-	m.metrics[AirDropRegistryConfigCRC32] = 0
-	m.metrics[ValidatorsRegistryConfigCRC32] = 0
-	m.metrics[RewardDispatcherConfigCRC32] = 0
-	m.metrics[HubConfigCRC32] = 0
-	m.metrics[BlunaRewardConfigCRC32] = 0
+	for _, metric := range m.providedMetrics() {
+		if m.metrics[metric] == nil {
+			m.metrics[metric] = &BasicMetricValue{}
+		}
+		m.metrics[metric].Set(0)
+	}
+
 }
 
-func (m ConfigsCRC32Monitor) GetMetrics() map[MetricName]float64 {
+func (m ConfigsCRC32Monitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
@@ -65,6 +76,7 @@ func (m ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]MetricVector {
 }
 
 func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
+	m.InitMetrics()
 	confReq := types.CommonConfigRequest{}
 
 	reqRaw, err := json.Marshal(&confReq)
@@ -89,7 +101,7 @@ func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
 			m.logger.Errorf("failed to marshal %s: %+v", m.Name(), err)
 		}
 
-		m.metrics[metric] = float64(crc32.ChecksumIEEE(data))
+		m.metrics[metric].Set(float64(crc32.ChecksumIEEE(data)))
 	}
 	m.logger.Infoln("updated ", m.Name())
 	return nil

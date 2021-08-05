@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/lidofinance/terra-monitors/collector/types"
@@ -25,33 +26,66 @@ const (
 )
 
 type SlashingMonitor struct {
-	metrics              map[MetricName]float64
+	metrics              map[MetricName]MetricValue
 	metricVectors        map[MetricName]MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
+	lock                 sync.RWMutex
+	flowManager          chan struct{}
 }
 
 func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *SlashingMonitor {
 	m := &SlashingMonitor{
-		metrics:              make(map[MetricName]float64),
+		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
+		lock:                 sync.RWMutex{},
 	}
 
+	if cfg.SlashingMonitorUpdateInterval > 0 {
+		m.flowManager = config.FlowManager(cfg.SlashingMonitorUpdateInterval)
+	} else {
+		m.flowManager = make(chan struct{})
+	}
+
+	go m.Do()
+
 	return m
+}
+
+func (m *SlashingMonitor) Do() {
+	for range m.flowManager {
+		func() {
+			m.lock.Lock()
+			defer m.lock.Unlock()
+			err := m.updateData(context.Background())
+			if err != nil {
+				m.logger.Errorln("failed to update SlashingMonitor data:", err)
+			}
+		}()
+	}
 }
 
 func (m *SlashingMonitor) Name() string {
 	return "Slashing"
 }
 
+func (m *SlashingMonitor) providedMetrics() []MetricName {
+	return []MetricName{
+		SlashingNumJailedValidators,
+		SlashingNumTombstonedValidators,
+	}
+}
+
 func (m *SlashingMonitor) InitMetrics() {
-	m.metrics = map[MetricName]float64{
-		SlashingNumJailedValidators:     0,
-		SlashingNumTombstonedValidators: 0,
+	for _, metric := range m.providedMetrics() {
+		if m.metrics[metric] == nil {
+			m.metrics[metric] = &BasicMetricValue{}
+		}
+		m.metrics[metric].Set(0)
 	}
 
 	m.metricVectors = map[MetricName]MetricVector{
@@ -59,7 +93,7 @@ func (m *SlashingMonitor) InitMetrics() {
 	}
 }
 
-func (m *SlashingMonitor) Handler(ctx context.Context) error {
+func (m *SlashingMonitor) updateData(ctx context.Context) error {
 	m.InitMetrics()
 
 	validatorsInfo, err := m.getValidatorsInfo(ctx)
@@ -96,7 +130,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				// If the `jailed_until` property is set to a date in the future, this
 				// validator is jailed.
 				if jailedUntil.After(time.Now()) {
-					m.metrics[SlashingNumJailedValidators]++
+					m.metrics[SlashingNumJailedValidators].Add(1)
 				}
 			}
 		}
@@ -118,14 +152,18 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 		}
 
 		if *signingInfo.Tombstoned {
-			m.metrics[SlashingNumTombstonedValidators]++
+			m.metrics[SlashingNumTombstonedValidators].Add(1)
 		}
 	}
 	m.logger.Infoln("updated", m.Name())
 	return nil
 }
 
-func (m *SlashingMonitor) GetMetrics() map[MetricName]float64 {
+func (m *SlashingMonitor) Handler(ctx context.Context) error {
+	return nil
+}
+
+func (m *SlashingMonitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 

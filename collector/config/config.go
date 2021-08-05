@@ -19,17 +19,18 @@ const (
 )
 
 type CollectorConfig struct {
-	Logger                      *logrus.Logger
-	LCDEndpoint                 string
-	HubContract                 string
-	RewardContract              string
-	BlunaTokenInfoContract      string
-	UpdateGlobalIndexBotAddress string
-	ValidatorRegistryAddress    string
-	RewardDispatcherContract    string
-	AirDropRegistryContract     string
-	Schemes                     []string
-	UpdateGlobalIndexInterval   uint
+	Logger                        *logrus.Logger
+	LCDEndpoint                   string
+	HubContract                   string
+	RewardContract                string
+	BlunaTokenInfoContract        string
+	UpdateGlobalIndexBotAddress   string
+	ValidatorRegistryAddress      string
+	RewardDispatcherContract      string
+	AirDropRegistryContract       string
+	Schemes                       []string
+	UpdateGlobalIndexInterval     uint
+	SlashingMonitorUpdateInterval uint
 }
 
 func (c CollectorConfig) getSchemes() []string {
@@ -64,8 +65,9 @@ func DefaultCollectorConfig() CollectorConfig {
 		ValidatorRegistryAddress:    DefaultValidatorRegistryAddress,
 
 		// change the fields to appropriate contracts values
-		AirDropRegistryContract:   DefaultAirDropRegistryContract,
-		RewardDispatcherContract:  DefaultRewardDispatcherContract,
-		UpdateGlobalIndexInterval: 30,
+		AirDropRegistryContract:       DefaultAirDropRegistryContract,
+		RewardDispatcherContract:      DefaultRewardDispatcherContract,
+		UpdateGlobalIndexInterval:     30,
+		SlashingMonitorUpdateInterval: 30,
 	}
 }

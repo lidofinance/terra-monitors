@@ -21,7 +21,7 @@ func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor 
 	m := BlunaTokenInfoMonitor{
 		State:           &types.TokenInfoResponse{},
 		ContractAddress: cfg.BlunaTokenInfoContract,
-		metrics:         make(map[MetricName]float64),
+		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
@@ -31,7 +31,7 @@ func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor 
 type BlunaTokenInfoMonitor struct {
 	State           *types.TokenInfoResponse
 	ContractAddress string
-	metrics         map[MetricName]float64
+	metrics         map[MetricName]MetricValue
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
 }
@@ -82,10 +82,13 @@ func (h *BlunaTokenInfoMonitor) setStringMetric(m MetricName, rawValue string) {
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
-	h.metrics[m] = v
+	if h.metrics[m] == nil {
+		h.metrics[m] = &BasicMetricValue{}
+	}
+	h.metrics[m].Set(v)
 }
 
-func (h BlunaTokenInfoMonitor) GetMetrics() map[MetricName]float64 {
+func (h BlunaTokenInfoMonitor) GetMetrics() map[MetricName]MetricValue {
 	return h.metrics
 }
 

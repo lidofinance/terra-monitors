@@ -22,7 +22,7 @@ const (
 )
 
 type HubParametersMonitor struct {
-	metrics         map[MetricName]float64
+	metrics         map[MetricName]MetricValue
 	State           *types.HubParameters
 	ContractAddress string
 	apiClient       *client.TerraLiteForTerra
@@ -31,7 +31,7 @@ type HubParametersMonitor struct {
 
 func NewHubParametersMonitor(cfg config.CollectorConfig) HubParametersMonitor {
 	m := HubParametersMonitor{
-		metrics:         make(map[MetricName]float64),
+		metrics:         make(map[MetricName]MetricValue),
 		State:           &types.HubParameters{},
 		ContractAddress: cfg.HubContract,
 		apiClient:       cfg.GetTerraClient(),
@@ -44,13 +44,23 @@ func NewHubParametersMonitor(cfg config.CollectorConfig) HubParametersMonitor {
 func (h HubParametersMonitor) Name() string {
 	return "HubParameters"
 }
+func (h *HubParametersMonitor) providedMetrics() []MetricName {
+	return []MetricName{
+		HubParametersCRC32,
+		HubParametersEpochPeriod,
+		HubParametersUnbondingPeriod,
+		HubParametersPegRecoveryFee,
+		HubParametersErThreshold,
+	}
+}
 
 func (h *HubParametersMonitor) InitMetrics() {
-	h.metrics[HubParametersCRC32] = 0
-	h.metrics[HubParametersEpochPeriod] = 0
-	h.metrics[HubParametersUnbondingPeriod] = 0
-	h.metrics[HubParametersPegRecoveryFee] = 0
-	h.metrics[HubParametersErThreshold] = 0
+	for _, metric := range h.providedMetrics() {
+		if h.metrics[metric] == nil {
+			h.metrics[metric] = &BasicMetricValue{}
+		}
+		h.metrics[metric].Set(0)
+	}
 }
 
 func (h *HubParametersMonitor) setStringMetric(m MetricName, rawValue string) {
@@ -58,7 +68,10 @@ func (h *HubParametersMonitor) setStringMetric(m MetricName, rawValue string) {
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
-	h.metrics[m] = v
+	if h.metrics[m] == nil {
+		h.metrics[m] = &BasicMetricValue{}
+	}
+	h.metrics[m].Set(v)
 }
 
 func (h *HubParametersMonitor) updateMetrics() {
@@ -66,14 +79,15 @@ func (h *HubParametersMonitor) updateMetrics() {
 	if err != nil {
 		h.logger.Errorf("failed to marshal %s: %s", h.Name(), err)
 	}
-	h.metrics[HubParametersCRC32] = float64(crc32.ChecksumIEEE(data))
-	h.metrics[HubParametersEpochPeriod] = float64(h.State.EpochPeriod)
-	h.metrics[HubParametersUnbondingPeriod] = float64(h.State.UnbondingPeriod)
+	h.metrics[HubParametersCRC32].Set(float64(crc32.ChecksumIEEE(data)))
+	h.metrics[HubParametersEpochPeriod].Set(float64(h.State.EpochPeriod))
+	h.metrics[HubParametersUnbondingPeriod].Set(float64(h.State.UnbondingPeriod))
 	h.setStringMetric(HubParametersPegRecoveryFee, h.State.PegRecoveryFee)
 	h.setStringMetric(HubParametersErThreshold, h.State.ErThreshold)
 }
 
 func (h *HubParametersMonitor) Handler(ctx context.Context) error {
+	h.InitMetrics()
 	hubReq, hubResp := types.HubParametersRequest{}, types.HubParameters{}
 
 	reqRaw, err := json.Marshal(&hubReq)
@@ -102,10 +116,10 @@ func (h *HubParametersMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h HubParametersMonitor) GetMetrics() map[MetricName]float64 {
+func (h HubParametersMonitor) GetMetrics() map[MetricName]MetricValue {
 	return h.metrics
 }
 
-func (m HubParametersMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (h HubParametersMonitor) GetMetricVectors() map[MetricName]MetricVector {
 	return nil
 }
