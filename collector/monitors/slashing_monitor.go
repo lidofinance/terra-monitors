@@ -164,10 +164,14 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 }
 
 func (m *SlashingMonitor) GetMetrics() map[MetricName]MetricValue {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metrics
 }
 
 func (m SlashingMonitor) GetMetricVectors() map[MetricName]MetricVector {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metricVectors
 }
 
