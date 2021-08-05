@@ -54,6 +54,7 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexM
 	m.InitMetrics()
 
 	return &m
+
 }
 
 func (m *UpdateGlobalIndexMonitor) Name() string {

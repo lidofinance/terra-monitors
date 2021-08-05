@@ -19,6 +19,7 @@ type Monitor interface {
 
 type MetricName string
 
+
 type MetricVector struct {
 	values map[string]float64
 	lock   sync.RWMutex
@@ -57,6 +58,7 @@ func NewMetricVector() *MetricVector {
 		values: make(map[string]float64),
 	}
 }
+
 
 type MetricValue interface {
 	Get() float64
