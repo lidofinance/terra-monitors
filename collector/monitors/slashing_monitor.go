@@ -217,5 +217,6 @@ func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]
 
 func (r *V1ValidatorsRepository) DisplayName(pubkey string) string {
 	// TODO: implement the real method to match pubkey with display name
-	return pubkey
+	valName := []rune(pubkey)
+	return string(valName[len(valName)-10:])
 }
