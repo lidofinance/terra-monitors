@@ -64,7 +64,8 @@ type TokenInfoResponse struct {
 //     pub last_processed_batch: u64,
 // }
 
-//shoud be corrtced after contract migration according new response schema
+//should be corrected after contract migration according to the new response schema
+
 type HubStateResponse struct {
 	ExchangeRate          string `json:"exchange_rate"`     //decimal
 	TotalBondAmount       string `json:"total_bond_amount"` //uint128
@@ -89,4 +90,56 @@ type HubWhitelistedValidatorsResponse struct {
 
 func GetHubWhitelistedValidatorsPair() (HubWhitelistedValidatorsRequest, HubWhitelistedValidatorsResponse) {
 	return HubWhitelistedValidatorsRequest{}, HubWhitelistedValidatorsResponse{}
+}
+
+type HubConfig struct {
+	Creator                    string `json:"creator"`
+	RewardDispatcherContract   string `json:"reward_dispatcher_contract"`
+	ValidatorsRegistryContract string `json:"validators_registry_contract"`
+	BlunaTokenContract         string `json:"bluna_token_contract"`
+	StlunaTokenContract        string `json:"stluna_token_contract"`
+	AirdropRegistryContract    string `json:"airdrop_registry_contract"`
+}
+
+type CommonConfigRequest struct {
+	Config struct{} `json:"config"`
+}
+
+type HubParameters struct {
+	EpochPeriod         uint64 `json:"epoch_period"`
+	UnderlyingCoinDenom string `json:"underlying_coin_denom"`
+	UnbondingPeriod     uint64 `json:"unbonding_period"`
+	PegRecoveryFee      string `json:"peg_recovery_fee"` //Decimal128 as string
+	ErThreshold         string `json:"er_threshold"`     //Decimal128 as string
+	RewardDenom         string `json:"reward_denom"`
+}
+
+type HubParametersRequest struct {
+	Parameters struct{} `json:"parameters"`
+}
+
+type BlunaRewardConfig struct {
+	HubContract string `json:"hub_contract"`
+	RewardDenom string `json:"reward_denom"`
+}
+
+type RewardDispatcherConfig struct {
+	Owner               string `json:"owner"`
+	HubContract         string `json:"hub_contract"`
+	BlunaRewardContract string `json:"bluna_reward_contract"`
+	StlunaRewardDenom   string `json:"stluna_reward_denom"`
+	BlunaRewardDenom    string `json:"bluna_reward_denom"`
+	LidoFeeAddress      string `json:"lido_fee_address"`
+	LidoFeeRate         string `json:"lido_fee_rate"` //decimal128
+}
+
+type ValidatorsRegistryConfig struct {
+	Owner       string `json:"owner"`
+	HubContract string `json:"hub_contract"`
+}
+
+type AirDropRegistryConfig struct {
+	Owner       string `json:"owner"`
+	HubContract string `json:"hub_contract"`
+	AirDropToken []string `json:"airdrop_tokens"`
 }

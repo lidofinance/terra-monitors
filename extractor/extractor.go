@@ -50,13 +50,13 @@ func (p *PromExtractor) updateGaugeValue(name monitors.Metric) error {
 }
 
 func (p PromExtractor) UpdateMetrics(ctx context.Context) {
-	err := p.collector.UpdateData(ctx)
-	if err != nil {
+	errors := p.collector.UpdateData(ctx)
+	for _,err := range errors {
 		p.log.Errorf("failed to update collector data: %v", err)
 	}
 
 	for _, gaugeName := range p.GaugeMetrics {
-		err = p.updateGaugeValue(gaugeName)
+		err := p.updateGaugeValue(gaugeName)
 		if err != nil {
 			p.log.Errorf("failed to update gauge value \"%s\": %v", gaugeName, err)
 		}

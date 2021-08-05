@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -22,12 +23,16 @@ func NewTestCollectorConfig(urlWithScheme string) config.CollectorConfig {
 	host := strings.Split(urlWithScheme, "//")[1]
 	out := bytes.NewBuffer(nil)
 	cfg := config.CollectorConfig{
-		LCDEndpoint:            host,
-		Logger:                 logging.NewDefaultLogger(),
-		HubContract:            "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts",
-		RewardContract:         "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
-		BlunaTokenInfoContract: "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp",
-		Schemes:                []string{"http"},
+		Logger:                      logging.NewDefaultLogger(),
+		LCDEndpoint:                 host,
+		HubContract:                 "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts",
+		RewardContract:              "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
+		BlunaTokenInfoContract:      "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp",
+		UpdateGlobalIndexBotAddress: "dummy_updateglobalindexbot",
+		RewardDispatcherContract:    "dummy_rewarddispatcher",
+		ValidatorRegistryAddress:    "dummy_validatorsregistry",
+		AirDropRegistryContract:     "dummy_airdropRegistry",
+		Schemes:                     []string{"http"},
 	}
 	cfg.Logger.Out = out
 	return cfg
@@ -65,6 +70,23 @@ func NewServerWithRoutedResponse(routeToResponse map[string]string) *httptest.Se
 	}
 
 	return httptest.NewServer(mux)
+}
+
+func NewServerWithRandomJson() *httptest.Server {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		response := make(map[string]interface{})
+		response["height"] = "10000"
+		response["result"] = map[string]int{
+			"data": rand.Int(),
+		}
+		data, err := json.Marshal(response)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Fprintln(w, string(data))
+	}))
+	return ts
 }
 
 func NewServerWithError(errorMessage string) *httptest.Server {
