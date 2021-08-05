@@ -43,6 +43,7 @@ func NewTestCollectorConfig(urlWithScheme string) config.CollectorConfig {
 		ValidatorRegistryAddress:    ValidatorRegistryAddress,
 		AirDropRegistryContract:     AirDropRegistryContract,
 		Schemes:                     []string{"http"},
+		UpdateGlobalIndexInterval:   0,
 	}
 	cfg.Logger.Out = out
 	return cfg

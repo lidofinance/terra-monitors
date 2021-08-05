@@ -29,6 +29,7 @@ type CollectorConfig struct {
 	RewardDispatcherContract    string
 	AirDropRegistryContract     string
 	Schemes                     []string
+	UpdateGlobalIndexInterval   uint
 }
 
 func (c CollectorConfig) getSchemes() []string {
@@ -63,7 +64,8 @@ func DefaultCollectorConfig() CollectorConfig {
 		ValidatorRegistryAddress:    DefaultValidatorRegistryAddress,
 
 		// change the fields to appropriate contracts values
-		AirDropRegistryContract:  DefaultAirDropRegistryContract,
-		RewardDispatcherContract: DefaultRewardDispatcherContract,
+		AirDropRegistryContract:   DefaultAirDropRegistryContract,
+		RewardDispatcherContract:  DefaultRewardDispatcherContract,
+		UpdateGlobalIndexInterval: 30,
 	}
 }

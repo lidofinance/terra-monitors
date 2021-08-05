@@ -17,30 +17,31 @@ var addr = flag.String("listen-address", ":8080",
 func createCollector() collector.LCDCollector {
 	defConfig := config.DefaultCollectorConfig()
 	c := collector.NewLCDCollector(defConfig)
-	hubStateMonitor := monitors.NewHubStateMonitor(defConfig)
-	c.RegisterMonitor(&hubStateMonitor)
-
-	rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
-	c.RegisterMonitor(&rewardStateMonitor)
-
-	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
-	c.RegisterMonitor(&blunaTokenInfoMonitor)
-
-	validatorsRepository := monitors.NewV1ValidatorsRepository(defConfig)
-	slashingMonitor := monitors.NewSlashingMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(slashingMonitor)
+	//hubStateMonitor := monitors.NewHubStateMonitor(defConfig)
+	//c.RegisterMonitor(&hubStateMonitor)
+	//
+	//rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
+	//c.RegisterMonitor(&rewardStateMonitor)
+	//
+	//blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
+	//c.RegisterMonitor(&blunaTokenInfoMonitor)
+	//
+	//validatorsRepository := monitors.NewV1ValidatorsRepository(defConfig)
+	//slashingMonitor := monitors.NewSlashingMonitor(defConfig, validatorsRepository)
+	//c.RegisterMonitor(slashingMonitor)
 
 	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
-	c.RegisterMonitor(&updateGlobalIndexMonitor)
+	c.RegisterMonitor(updateGlobalIndexMonitor)
 
-	hubParameters := monitors.NewHubParametersMonitor(defConfig)
-	c.RegisterMonitor(&hubParameters)
+	//hubParameters := monitors.NewHubParametersMonitor(defConfig)
+	//c.RegisterMonitor(&hubParameters)
+	//
+	//configCRC32Monitor := monitors.NewConfigsCRC32Monitor(defConfig)
+	//c.RegisterMonitor(&configCRC32Monitor)
+	//
+	//whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(defConfig, validatorsRepository)
+	//c.RegisterMonitor(&whitelistedValidatorsMonitor)
 
-	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(defConfig)
-	c.RegisterMonitor(&configCRC32Monitor)
-
-	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(&whitelistedValidatorsMonitor)
 
 	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(defConfig, validatorsRepository)
 	c.RegisterMonitor(&validatorsFeeMonitor)

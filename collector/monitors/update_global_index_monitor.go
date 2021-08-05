@@ -3,13 +3,13 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"strconv"
-
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/lidofinance/terra-monitors/openapi/models"
 	"github.com/sirupsen/logrus"
+	"strconv"
+	"sync"
 )
 
 type UpdateGlobalIndexTxsVariants int
@@ -36,21 +36,47 @@ const UUSDDenom = "uusd"
 
 type UpdateGlobalIndexMonitor struct {
 	ContractAddress  string
-	metrics          map[MetricName]float64
+	metrics          map[MetricName]MetricValue
 	apiClient        *client.TerraLiteForTerra
 	logger           *logrus.Logger
 	lastMaxCheckedID int
+	lock             sync.RWMutex
+	flowManager      chan struct{}
 }
 
-func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) UpdateGlobalIndexMonitor {
+func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
 		ContractAddress: cfg.UpdateGlobalIndexBotAddress,
-		metrics:         make(map[MetricName]float64),
+		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
+		lock:            sync.RWMutex{},
+		flowManager:     nil,
 	}
 
-	return m
+	if cfg.UpdateGlobalIndexInterval > 0 {
+		m.flowManager = config.FlowManager(cfg.UpdateGlobalIndexInterval)
+	} else {
+		m.flowManager = make(chan struct{})
+	}
+
+	go m.Do()
+	m.InitMetrics()
+
+	return &m
+}
+
+func (m *UpdateGlobalIndexMonitor) Do() {
+	for range m.flowManager {
+		func() {
+			m.lock.Lock()
+			defer m.lock.Unlock()
+			err := m.updateData(context.Background())
+			if err != nil {
+				m.logger.Errorln("failed to update UpdateGlobalIndexBotContract data:", err)
+			}
+		}()
+	}
 }
 
 func (m UpdateGlobalIndexMonitor) Name() string {
@@ -58,14 +84,14 @@ func (m UpdateGlobalIndexMonitor) Name() string {
 }
 
 func (m *UpdateGlobalIndexMonitor) InitMetrics() {
-	m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck] = 0
-	m.metrics[UpdateGlobalIndexGasWanted] = 0
-	m.metrics[UpdateGlobalIndexGasUsed] = 0
-	m.metrics[UpdateGlobalIndexUUSDFee] = 0
-	m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck] = 0
+	m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck] = &ReadOnceMetric{}
+	m.metrics[UpdateGlobalIndexGasWanted] = &ReadOnceMetric{}
+	m.metrics[UpdateGlobalIndexGasUsed] = &ReadOnceMetric{}
+	m.metrics[UpdateGlobalIndexUUSDFee] = &ReadOnceMetric{}
+	m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck] = &ReadOnceMetric{}
 }
 
-func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
+func (m *UpdateGlobalIndexMonitor) updateData(ctx context.Context) error {
 	var offset *float64
 	var fetchedTxs int
 	var firstCheck bool
@@ -77,7 +103,6 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	var maxProcessedID int
 	var maxProcessedIDPerRequest int
 	var alreadyProcessedFound bool
-	m.InitMetrics()
 	for iterations < threshold {
 		p := transactions.GetV1TxsParams{}
 		p.SetAccount(&m.ContractAddress)
@@ -107,6 +132,12 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
+func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
+	// the method is needed to update data on demand
+	// but since we are updating data in a goroutine, the method is empty and do nothing
+	return nil
+}
+
 func maxInt(a, b int) int {
 	if a > b {
 		return a
@@ -131,20 +162,22 @@ func (m *UpdateGlobalIndexMonitor) processTransactions(
 		}
 		switch isTxUpdateGlobalIndex(tx) {
 		case SuccessfulUpdateGlobalIndexTX:
-			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck]++
+			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck].Add(1)
 		case FailedUpdateGlobalIndexTx:
-			m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck]++
+			m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck].Add(1)
 			m.logger.Warning("failed tx detected: ", getTxRawLog(tx))
 		case NonUpdateGlobalIndexTX:
 		}
-		m.metrics[UpdateGlobalIndexGasUsed] += gasUsed(m.logger, tx)
-		m.metrics[UpdateGlobalIndexGasWanted] += gasWanted(m.logger, tx)
-		m.metrics[UpdateGlobalIndexUUSDFee] += uusdFee(m.logger, tx)
+		m.metrics[UpdateGlobalIndexGasUsed].Add(gasUsed(m.logger, tx))
+		m.metrics[UpdateGlobalIndexGasWanted].Add(gasWanted(m.logger, tx))
+		m.metrics[UpdateGlobalIndexUUSDFee].Add(uusdFee(m.logger, tx))
 	}
 	return newMaxCheckedID, alreadyProcessedFound
 }
 
-func (m UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]float64 {
+func (m UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]MetricValue {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metrics
 }
 

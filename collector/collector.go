@@ -64,7 +64,7 @@ func (c LCDCollector) Get(metric monitors.MetricName) (float64, error) {
 	if !found {
 		return 0, fmt.Errorf("monitor for metric \"%s\" not found", metric)
 	}
-	return monitor.GetMetrics()[metric], nil
+	return monitor.GetMetrics()[metric].Get(), nil
 }
 
 func (c LCDCollector) GetVector(metric monitors.MetricName) (monitors.MetricVector, error) {
