@@ -133,4 +133,5 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 	expectedErrorMessage := "failed to getValidatorsPublicKeys"
 	suite.Contains(err.Error(),expectedErrorMessage)
 
+
 }
