@@ -1601,7 +1601,14 @@
           "exemplar": true,
           "expr": "bluna_exchange_rate{}",
           "interval": "",
-          "legendFormat": "exchange rate",
+          "legendFormat": "bluna exchange rate",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "stluna_exchange_rate{}",
+          "interval": "",
+          "legendFormat": "stluna exchange rate",
           "refId": "A"
         }
       ],

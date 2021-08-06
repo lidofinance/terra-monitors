@@ -13,7 +13,8 @@ const (
 	DefaultUpdateGlobalIndexBotAddress = "terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy"
 
 	// TODO: use an actual address after validators_registry deployment.
-	DefaultValidatorRegistryAddress = "terra1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	DefaultStlunaTokenInfoContract  = "terra_dummy_stluna_contract"
+	DefaultValidatorRegistryAddress = "terra_dummy_validators_registry"
 	DefaultAirDropRegistryContract  = "terra_dummy_airdrop"
 	DefaultRewardDispatcherContract = "terra_dummy_rewarddispatcher"
 )
@@ -24,6 +25,7 @@ type CollectorConfig struct {
 	HubContract                 string
 	RewardContract              string
 	BlunaTokenInfoContract      string
+	StlunaTokenInfoContract     string
 	UpdateGlobalIndexBotAddress string
 	ValidatorRegistryAddress    string
 	RewardDispatcherContract    string
@@ -60,10 +62,11 @@ func DefaultCollectorConfig() CollectorConfig {
 		RewardContract:              DefaultRewardContract,
 		BlunaTokenInfoContract:      DefaultBlunaTokenInfoContract,
 		UpdateGlobalIndexBotAddress: DefaultUpdateGlobalIndexBotAddress,
-		ValidatorRegistryAddress:    DefaultValidatorRegistryAddress,
 
 		// change the fields to appropriate contracts values
+		ValidatorRegistryAddress: DefaultValidatorRegistryAddress,
 		AirDropRegistryContract:  DefaultAirDropRegistryContract,
 		RewardDispatcherContract: DefaultRewardDispatcherContract,
+		StlunaTokenInfoContract:  DefaultStlunaTokenInfoContract,
 	}
 }

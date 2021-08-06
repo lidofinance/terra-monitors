@@ -67,11 +67,13 @@ type TokenInfoResponse struct {
 //should be corrected after contract migration according to the new response schema
 
 type HubStateResponse struct {
-	ExchangeRate          string `json:"exchange_rate"`     //decimal
-	TotalBondAmount       string `json:"total_bond_amount"` //uint128
+	BlunaExchangeRate     string `json:"bluna_exchange_rate"`      // decimal
+	StlunaExchangeRate    string `json:"stluna_exchange_rate"`     // decimal
+	TotalBondBlunaAmount  string `json:"total_bond_bluna_amount"`  // uint128
+	TotalBondStlunaAmount string `json:"total_bond_stluna_amount"` // uint128
 	LastIndexModification uint64 `json:"last_index_modification"`
-	PrevHubBalance        string `json:"prev_hub_balance"`       //uint128
-	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` //uint128
+	PrevHubBalance        string `json:"prev_hub_balance"`       // uint128
+	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` // uint128
 	LastUnbondedTime      uint64 `json:"last_unbonded_time"`
 	LastProcessedBatch    uint64 `json:"last_processed_batch"`
 }

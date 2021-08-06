@@ -14,8 +14,10 @@ import (
 )
 
 var (
-	BlunaBondedAmount MetricName = "bluna_bonded_amount"
-	BlunaExchangeRate MetricName = "bluna_exchange_rate"
+	BlunaBondedAmount  MetricName = "bluna_bonded_amount"
+	BlunaExchangeRate  MetricName = "bluna_exchange_rate"
+	StlunaBondedAmount MetricName = "stluna_bonded_amount"
+	StlunaExchangeRate MetricName = "stluna_exchange_rate"
 )
 
 func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
@@ -45,11 +47,15 @@ func (h HubStateMonitor) Name() string {
 func (h *HubStateMonitor) InitMetrics() {
 	h.setStringMetric(BlunaBondedAmount, "0")
 	h.setStringMetric(BlunaExchangeRate, "0")
+	h.setStringMetric(StlunaBondedAmount, "0")
+	h.setStringMetric(StlunaExchangeRate, "0")
 }
 
 func (h *HubStateMonitor) updateMetrics() {
-	h.setStringMetric(BlunaBondedAmount, h.State.TotalBondAmount)
-	h.setStringMetric(BlunaExchangeRate, h.State.ExchangeRate)
+	h.setStringMetric(BlunaBondedAmount, h.State.TotalBondBlunaAmount)
+	h.setStringMetric(BlunaExchangeRate, h.State.BlunaExchangeRate)
+	h.setStringMetric(StlunaBondedAmount, h.State.TotalBondBlunaAmount)
+	h.setStringMetric(StlunaExchangeRate, h.State.BlunaExchangeRate)
 }
 
 func (h *HubStateMonitor) Handler(ctx context.Context) error {

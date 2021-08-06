@@ -26,6 +26,9 @@ func createCollector() collector.LCDCollector {
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
 	c.RegisterMonitor(&blunaTokenInfoMonitor)
 
+	stlunaTokenInfoMonitor := monitors.NewStlunaTokenInfoMonitor(defConfig)
+	c.RegisterMonitor(&stlunaTokenInfoMonitor)
+
 	validatorsRepository := monitors.NewV1ValidatorsRepository(defConfig)
 	slashingMonitor := monitors.NewSlashingMonitor(defConfig, validatorsRepository)
 	c.RegisterMonitor(slashingMonitor)
