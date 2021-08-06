@@ -23,11 +23,11 @@ const (
 const UpdateGlobalIndexBase64Encoded = "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0="
 
 const (
-	UpdateGlobalIndexSuccessfulTxSinceLastCheck Metric = "update_global_index_successful_tx_since_last_check"
-	UpdateGlobalIndexFailedTxSinceLastCheck     Metric = "update_global_index_failed_tx_since_last_check"
-	UpdateGlobalIndexGasWanted                  Metric = "update_global_index_gas_wanted"
-	UpdateGlobalIndexGasUsed                    Metric = "update_global_index_gas_used"
-	UpdateGlobalIndexUUSDFee                    Metric = "update_global_index_uusd_fee"
+	UpdateGlobalIndexSuccessfulTxSinceLastCheck MetricName = "update_global_index_successful_tx_since_last_check"
+	UpdateGlobalIndexFailedTxSinceLastCheck     MetricName = "update_global_index_failed_tx_since_last_check"
+	UpdateGlobalIndexGasWanted                  MetricName = "update_global_index_gas_wanted"
+	UpdateGlobalIndexGasUsed                    MetricName = "update_global_index_gas_used"
+	UpdateGlobalIndexUUSDFee                    MetricName = "update_global_index_uusd_fee"
 )
 
 const threshold int = 10
@@ -36,7 +36,7 @@ const UUSDDenom = "uusd"
 
 type UpdateGlobalIndexMonitor struct {
 	ContractAddress  string
-	metrics          map[Metric]float64
+	metrics          map[MetricName]float64
 	apiClient        *client.TerraLiteForTerra
 	logger           *logrus.Logger
 	lastMaxCheckedID int
@@ -45,7 +45,7 @@ type UpdateGlobalIndexMonitor struct {
 func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
 		ContractAddress: cfg.UpdateGlobalIndexBotAddress,
-		metrics:         make(map[Metric]float64),
+		metrics:         make(map[MetricName]float64),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
@@ -144,8 +144,12 @@ func (m *UpdateGlobalIndexMonitor) processTransactions(
 	return newMaxCheckedID, alreadyProcessedFound
 }
 
-func (m UpdateGlobalIndexMonitor) GetMetrics() map[Metric]float64 {
+func (m UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]float64 {
 	return m.metrics
+}
+
+func (m UpdateGlobalIndexMonitor) GetMetricVectors() map[MetricName]MetricVector {
+	return nil
 }
 
 func getTxRawLog(tx *models.GetTxListResultTxs) string {

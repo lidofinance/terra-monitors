@@ -48,14 +48,19 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	suite.NoError(err)
 
 	metrics := m.GetMetrics()
+	metricVectors := m.GetMetricVectors()
 	var (
 		expectedNumTombstonedValidators float64 = 1
 		expectedNumJailedValidators     float64 = 1
 		expectedNumMissedBlocks         float64 = 5
 	)
+	var actualMissedBlocks float64
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
+		actualMissedBlocks += missedBlocks
+	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])
 	suite.Equal(expectedNumJailedValidators, metrics[SlashingNumJailedValidators])
-	suite.Equal(expectedNumMissedBlocks, metrics[SlashingNumMissedBlocks])
+	suite.Equal(expectedNumMissedBlocks, actualMissedBlocks)
 }
 
 func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
@@ -77,14 +82,20 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	suite.NoError(err)
 
 	metrics := m.GetMetrics()
+	metricVectors := m.GetMetricVectors()
+
 	var (
 		expectedNumTombstonedValidators float64 = 0
 		expectedNumJailedValidators     float64 = 0
 		expectedNumMissedBlocks         float64 = 0
 	)
+	var actualMissedBlocks float64
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
+		actualMissedBlocks += missedBlocks
+	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])
 	suite.Equal(expectedNumJailedValidators, metrics[SlashingNumJailedValidators])
-	suite.Equal(expectedNumMissedBlocks, metrics[SlashingNumMissedBlocks])
+	suite.Equal(expectedNumMissedBlocks, actualMissedBlocks)
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {

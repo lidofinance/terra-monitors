@@ -13,63 +13,76 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetSlashingValidatorsValidatorPubKeySigningInfoParams creates a new GetSlashingValidatorsValidatorPubKeySigningInfoParams object
-// with the default values initialized.
+// NewGetSlashingValidatorsValidatorPubKeySigningInfoParams creates a new GetSlashingValidatorsValidatorPubKeySigningInfoParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetSlashingValidatorsValidatorPubKeySigningInfoParams() *GetSlashingValidatorsValidatorPubKeySigningInfoParams {
-	var ()
 	return &GetSlashingValidatorsValidatorPubKeySigningInfoParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetSlashingValidatorsValidatorPubKeySigningInfoParamsWithTimeout creates a new GetSlashingValidatorsValidatorPubKeySigningInfoParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetSlashingValidatorsValidatorPubKeySigningInfoParamsWithTimeout(timeout time.Duration) *GetSlashingValidatorsValidatorPubKeySigningInfoParams {
-	var ()
 	return &GetSlashingValidatorsValidatorPubKeySigningInfoParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetSlashingValidatorsValidatorPubKeySigningInfoParamsWithContext creates a new GetSlashingValidatorsValidatorPubKeySigningInfoParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetSlashingValidatorsValidatorPubKeySigningInfoParamsWithContext(ctx context.Context) *GetSlashingValidatorsValidatorPubKeySigningInfoParams {
-	var ()
 	return &GetSlashingValidatorsValidatorPubKeySigningInfoParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetSlashingValidatorsValidatorPubKeySigningInfoParamsWithHTTPClient creates a new GetSlashingValidatorsValidatorPubKeySigningInfoParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetSlashingValidatorsValidatorPubKeySigningInfoParamsWithHTTPClient(client *http.Client) *GetSlashingValidatorsValidatorPubKeySigningInfoParams {
-	var ()
 	return &GetSlashingValidatorsValidatorPubKeySigningInfoParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetSlashingValidatorsValidatorPubKeySigningInfoParams contains all the parameters to send to the API endpoint
-for the get slashing validators validator pub key signing info operation typically these are written to a http.Request
+/* GetSlashingValidatorsValidatorPubKeySigningInfoParams contains all the parameters to send to the API endpoint
+   for the get slashing validators validator pub key signing info operation.
+
+   Typically these are written to a http.Request.
 */
 type GetSlashingValidatorsValidatorPubKeySigningInfoParams struct {
 
-	/*ValidatorPubKey
-	  validator public key
+	/* ValidatorPubKey.
 
+	   validator public key
 	*/
 	ValidatorPubKey string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get slashing validators validator pub key signing info params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetSlashingValidatorsValidatorPubKeySigningInfoParams) WithDefaults() *GetSlashingValidatorsValidatorPubKeySigningInfoParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get slashing validators validator pub key signing info params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetSlashingValidatorsValidatorPubKeySigningInfoParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get slashing validators validator pub key signing info params

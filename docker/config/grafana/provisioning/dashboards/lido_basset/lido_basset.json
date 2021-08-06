@@ -1131,7 +1131,7 @@
           "expr": "slashing_num_missed_blocks{}",
           "hide": false,
           "interval": "",
-          "legendFormat": "number of missed blocks (all validators)",
+          "legendFormat": "{{label}}",
           "refId": "C"
         }
       ],

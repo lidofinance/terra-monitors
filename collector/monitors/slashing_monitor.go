@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	SlashingNumJailedValidators     Metric = "slashing_num_jailed_validators"
-	SlashingNumTombstonedValidators Metric = "slashing_num_tombstoned_validators"
-	SlashingNumMissedBlocks         Metric = "slashing_num_missed_blocks" // TODO: add a "validator_address" label.
+	SlashingNumJailedValidators     MetricName = "slashing_num_jailed_validators"
+	SlashingNumTombstonedValidators MetricName = "slashing_num_tombstoned_validators"
+	SlashingNumMissedBlocks         MetricName = "slashing_num_missed_blocks" // TODO: add a "validator_address" label.
 )
 
 const (
@@ -28,7 +28,8 @@ const (
 )
 
 type SlashingMonitor struct {
-	metrics              map[Metric]float64
+	metrics              map[MetricName]float64
+	metricVectors        map[MetricName]MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
@@ -36,7 +37,8 @@ type SlashingMonitor struct {
 
 func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *SlashingMonitor {
 	m := &SlashingMonitor{
-		metrics:              make(map[Metric]float64),
+		metrics:              make(map[MetricName]float64),
+		metricVectors:        make(map[MetricName]MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
@@ -50,34 +52,37 @@ func (m *SlashingMonitor) Name() string {
 }
 
 func (m *SlashingMonitor) InitMetrics() {
-	m.metrics = map[Metric]float64{
+	m.metrics = map[MetricName]float64{
 		SlashingNumJailedValidators:     0,
 		SlashingNumTombstonedValidators: 0,
-		SlashingNumMissedBlocks:         0,
+	}
+
+	m.metricVectors = map[MetricName]MetricVector{
+		SlashingNumMissedBlocks: make(MetricVector),
 	}
 }
 
 func (m *SlashingMonitor) Handler(ctx context.Context) error {
 	m.InitMetrics()
 
-	validatorPublicKeys, err := m.getValidatorsPublicKeys(ctx)
+	validatorsInfo, err := m.getValidatorsInfo(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to getValidatorsPublicKeys: %w", err)
+		return fmt.Errorf("failed to getValidatorsInfo: %w", err)
 	}
 
-	for _, validatorPublicKey := range validatorPublicKeys {
+	for _, validatorInfo := range validatorsInfo {
 		signingInfoResponse, err := m.apiClient.Transactions.GetSlashingValidatorsValidatorPubKeySigningInfo(
 			&transactions.GetSlashingValidatorsValidatorPubKeySigningInfoParams{
-				ValidatorPubKey: validatorPublicKey,
+				ValidatorPubKey: validatorInfo.PubKey,
 				Context:         ctx,
 			},
 		)
 		if err != nil {
-			m.logger.Errorf("failed to GetSlashingSigningInfos for validator %s: %s", validatorPublicKey, err)
+			m.logger.Errorf("failed to GetSlashingSigningInfos for validator %s: %s", validatorInfo.Address, err)
 			continue
 		}
 		if err := signingInfoResponse.GetPayload().Validate(nil); err != nil {
-			m.logger.Errorf("failed to validate SignInfo for validator %s: %s", validatorPublicKey, err)
+			m.logger.Errorf("failed to validate SignInfo for validator %s: %s", validatorInfo.Address, err)
 			continue
 		}
 
@@ -110,7 +115,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
 			} else {
 				if numMissedBlocks > 0 {
-					m.metrics[SlashingNumMissedBlocks] += float64(numMissedBlocks)
+					m.metricVectors[SlashingNumMissedBlocks][validatorInfo.Moniker] += float64(numMissedBlocks)
 				}
 			}
 		}
@@ -119,15 +124,25 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 			m.metrics[SlashingNumTombstonedValidators]++
 		}
 	}
-
+	m.logger.Infoln("updated", m.Name())
 	return nil
 }
 
-func (m *SlashingMonitor) GetMetrics() map[Metric]float64 {
+func (m *SlashingMonitor) GetMetrics() map[MetricName]float64 {
 	return m.metrics
 }
 
-func (m *SlashingMonitor) getValidatorsPublicKeys(ctx context.Context) ([]string, error) {
+func (m SlashingMonitor) GetMetricVectors() map[MetricName]MetricVector {
+	return m.metricVectors
+}
+
+type ValidatorInfo struct {
+	Address string
+	PubKey  string
+	Moniker string
+}
+
+func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]ValidatorInfo, error) {
 	validatorsAddresses, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to getWhitelistedValidatorsAddresses: %w", err)
@@ -135,7 +150,7 @@ func (m *SlashingMonitor) getValidatorsPublicKeys(ctx context.Context) ([]string
 
 	// For each validator address, get the consensus public key (which is required to
 	// later get the signing info).
-	var validatorConsensusPublicKeys []string
+	var validatorsInfo []ValidatorInfo
 	for _, validatorAddress := range validatorsAddresses {
 		validatorInfoResponse, err := m.apiClient.Transactions.GetStakingValidatorsValidatorAddr(
 			&transactions.GetStakingValidatorsValidatorAddrParams{
@@ -151,11 +166,15 @@ func (m *SlashingMonitor) getValidatorsPublicKeys(ctx context.Context) ([]string
 			continue
 		}
 
-		validatorConsensusPublicKeys = append(validatorConsensusPublicKeys,
-			*validatorInfoResponse.GetPayload().Result.ConsensusPubkey)
+		validatorsInfo = append(validatorsInfo,
+			ValidatorInfo{
+				Address: validatorAddress,
+				Moniker: validatorInfoResponse.GetPayload().Result.Description.Moniker,
+				PubKey:  *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
+			})
 	}
 
-	return validatorConsensusPublicKeys, nil
+	return validatorsInfo, nil
 }
 
 type ValidatorsRepository interface {

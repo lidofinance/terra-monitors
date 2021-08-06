@@ -14,14 +14,14 @@ import (
 )
 
 var (
-	GlobalIndex Metric = "global_index"
+	GlobalIndex MetricName = "global_index"
 )
 
 func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 	m := RewardStateMonitor{
 		State:           &types.RewardStateResponse{},
 		ContractAddress: cfg.RewardContract,
-		metrics:         make(map[Metric]float64),
+		metrics:         make(map[MetricName]float64),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
@@ -32,7 +32,7 @@ func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 type RewardStateMonitor struct {
 	State           *types.RewardStateResponse
 	ContractAddress string
-	metrics         map[Metric]float64
+	metrics         map[MetricName]float64
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
 }
@@ -78,7 +78,7 @@ func (h *RewardStateMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h *RewardStateMonitor) setStringMetric(m Metric, rawValue string) {
+func (h *RewardStateMonitor) setStringMetric(m MetricName, rawValue string) {
 	v, err := strconv.ParseFloat(rawValue, 64)
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
@@ -86,8 +86,12 @@ func (h *RewardStateMonitor) setStringMetric(m Metric, rawValue string) {
 	h.metrics[m] = v
 }
 
-func (h RewardStateMonitor) GetMetrics() map[Metric]float64 {
+func (h RewardStateMonitor) GetMetrics() map[MetricName]float64 {
 	return h.metrics
+}
+
+func (h RewardStateMonitor) GetMetricVectors() map[MetricName]MetricVector {
+	return nil
 }
 
 func (h *RewardStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {

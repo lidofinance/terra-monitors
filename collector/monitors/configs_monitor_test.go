@@ -75,7 +75,7 @@ func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
 	ts := NewServerWithRandomJson()
 	cfg := NewTestCollectorConfig(ts.URL)
 	m1 := NewConfigsCRC32Monitor(cfg)
-	savedMetrics := make(map[Metric]float64)
+	savedMetrics := make(map[MetricName]float64)
 
 	err := m1.Handler(context.Background())
 	suite.NoError(err)

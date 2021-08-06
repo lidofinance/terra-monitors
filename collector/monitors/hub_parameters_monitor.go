@@ -14,15 +14,15 @@ import (
 )
 
 const (
-	HubParametersEpochPeriod     Metric = "hub_parameters_epoch_period"
-	HubParametersUnbondingPeriod Metric = "hub_parameters_unbonding_period"
-	HubParametersPegRecoveryFee  Metric = "hub_parameters_peg_recovery_fee"
-	HubParametersErThreshold     Metric = "hub_parameters_er_threshold"
-	HubParametersCRC32           Metric = "hub_parameters_crc32"
+	HubParametersEpochPeriod     MetricName = "hub_parameters_epoch_period"
+	HubParametersUnbondingPeriod MetricName = "hub_parameters_unbonding_period"
+	HubParametersPegRecoveryFee  MetricName = "hub_parameters_peg_recovery_fee"
+	HubParametersErThreshold     MetricName = "hub_parameters_er_threshold"
+	HubParametersCRC32           MetricName = "hub_parameters_crc32"
 )
 
 type HubParametersMonitor struct {
-	metrics         map[Metric]float64
+	metrics         map[MetricName]float64
 	State           *types.HubParameters
 	ContractAddress string
 	apiClient       *client.TerraLiteForTerra
@@ -31,7 +31,7 @@ type HubParametersMonitor struct {
 
 func NewHubParametersMonitor(cfg config.CollectorConfig) HubParametersMonitor {
 	m := HubParametersMonitor{
-		metrics:         make(map[Metric]float64),
+		metrics:         make(map[MetricName]float64),
 		State:           &types.HubParameters{},
 		ContractAddress: cfg.HubContract,
 		apiClient:       cfg.GetTerraClient(),
@@ -53,7 +53,7 @@ func (h *HubParametersMonitor) InitMetrics() {
 	h.metrics[HubParametersErThreshold] = 0
 }
 
-func (h *HubParametersMonitor) setStringMetric(m Metric, rawValue string) {
+func (h *HubParametersMonitor) setStringMetric(m MetricName, rawValue string) {
 	v, err := strconv.ParseFloat(rawValue, 64)
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
@@ -102,6 +102,10 @@ func (h *HubParametersMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h HubParametersMonitor) GetMetrics() map[Metric]float64 {
+func (h HubParametersMonitor) GetMetrics() map[MetricName]float64 {
 	return h.metrics
+}
+
+func (m HubParametersMonitor) GetMetricVectors() map[MetricName]MetricVector {
+	return nil
 }

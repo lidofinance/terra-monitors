@@ -13,23 +13,30 @@ import (
 func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtractor {
 	p := PromExtractor{}
 	p.collector = c
-	p.Gauges = make(map[monitors.Metric]prometheus.Gauge)
-	p.GaugeMetrics = []monitors.Metric{}
+	p.Gauges = make(map[monitors.MetricName]prometheus.Gauge)
+	p.GaugeVectors = make(map[monitors.MetricName]*prometheus.GaugeVec)
+	p.GaugeMetrics = []monitors.MetricName{}
+	p.GaugeMetricVectors = []monitors.MetricName{}
 	p.log = logger
 	for _, m := range p.collector.ProvidedMetrics() {
 		p.addGauge(m)
+	}
+	for _, m := range p.collector.ProvidedMetricVectors() {
+		p.addGaugeVector(m)
 	}
 	return p
 }
 
 type PromExtractor struct {
-	collector    collector.Collector
-	Gauges       map[monitors.Metric]prometheus.Gauge
-	GaugeMetrics []monitors.Metric
-	log          *logrus.Logger
+	collector          collector.Collector
+	Gauges             map[monitors.MetricName]prometheus.Gauge
+	GaugeVectors       map[monitors.MetricName]*prometheus.GaugeVec
+	GaugeMetrics       []monitors.MetricName
+	GaugeMetricVectors []monitors.MetricName
+	log                *logrus.Logger
 }
 
-func (p *PromExtractor) addGauge(name monitors.Metric) {
+func (p *PromExtractor) addGauge(name monitors.MetricName) {
 	p.Gauges[name] = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: string(name),
@@ -39,7 +46,19 @@ func (p *PromExtractor) addGauge(name monitors.Metric) {
 	p.GaugeMetrics = append(p.GaugeMetrics, name)
 }
 
-func (p *PromExtractor) updateGaugeValue(name monitors.Metric) error {
+func (p *PromExtractor) addGaugeVector(name monitors.MetricName) {
+	p.GaugeVectors[name] = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: string(name),
+		},
+		[]string{"label"},
+	)
+
+	prometheus.MustRegister(p.GaugeVectors[name])
+	p.GaugeMetricVectors = append(p.GaugeMetricVectors, name)
+}
+
+func (p *PromExtractor) updateGaugeValue(name monitors.MetricName) error {
 	value, err := p.collector.Get(name)
 	if err != nil {
 		return fmt.Errorf("failed to update metric \"%s\": %w", name, err)
@@ -49,14 +68,31 @@ func (p *PromExtractor) updateGaugeValue(name monitors.Metric) error {
 	return nil
 }
 
+func (p *PromExtractor) updateGaugeVectorValue(name monitors.MetricName) error {
+	vector, err := p.collector.GetVector(name)
+	if err != nil {
+		return fmt.Errorf("failed to update metric \"%s\": %w", name, err)
+	}
+	for label := range vector {
+		p.GaugeVectors[name].With(prometheus.Labels{"label": label}).Set(vector[label])
+	}
+	return nil
+}
+
 func (p PromExtractor) UpdateMetrics(ctx context.Context) {
 	errors := p.collector.UpdateData(ctx)
-	for _,err := range errors {
+	for _, err := range errors {
 		p.log.Errorf("failed to update collector data: %v", err)
 	}
 
 	for _, gaugeName := range p.GaugeMetrics {
 		err := p.updateGaugeValue(gaugeName)
+		if err != nil {
+			p.log.Errorf("failed to update gauge value \"%s\": %v", gaugeName, err)
+		}
+	}
+	for _, gaugeName := range p.GaugeMetricVectors {
+		err := p.updateGaugeVectorValue(gaugeName)
 		if err != nil {
 			p.log.Errorf("failed to update gauge value \"%s\": %v", gaugeName, err)
 		}

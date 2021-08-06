@@ -139,7 +139,7 @@ type ValidatorsRegistryConfig struct {
 }
 
 type AirDropRegistryConfig struct {
-	Owner       string `json:"owner"`
-	HubContract string `json:"hub_contract"`
+	Owner        string   `json:"owner"`
+	HubContract  string   `json:"hub_contract"`
 	AirDropToken []string `json:"airdrop_tokens"`
 }

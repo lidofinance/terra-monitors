@@ -6,16 +6,16 @@ package transactions
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/lidofinance/terra-monitors/openapi/models"
+	"github.com/lidofinance/terra-monitors/openapi/models"
 )
 
 // GetStakingValidatorsValidatorAddrReader is a Reader for the GetStakingValidatorsValidatorAddr structure.
@@ -38,9 +38,8 @@ func (o *GetStakingValidatorsValidatorAddrReader) ReadResponse(response runtime.
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +48,7 @@ func NewGetStakingValidatorsValidatorAddrOK() *GetStakingValidatorsValidatorAddr
 	return &GetStakingValidatorsValidatorAddrOK{}
 }
 
-/*GetStakingValidatorsValidatorAddrOK handles this case with default header values.
+/* GetStakingValidatorsValidatorAddrOK describes a response with status code 200, with default header values.
 
 Success
 */
@@ -60,7 +59,6 @@ type GetStakingValidatorsValidatorAddrOK struct {
 func (o *GetStakingValidatorsValidatorAddrOK) Error() string {
 	return fmt.Sprintf("[GET /staking/validators/{validatorAddr}][%d] getStakingValidatorsValidatorAddrOK  %+v", 200, o.Payload)
 }
-
 func (o *GetStakingValidatorsValidatorAddrOK) GetPayload() *GetStakingValidatorsValidatorAddrOKBody {
 	return o.Payload
 }
@@ -82,7 +80,7 @@ func NewGetStakingValidatorsValidatorAddrBadRequest() *GetStakingValidatorsValid
 	return &GetStakingValidatorsValidatorAddrBadRequest{}
 }
 
-/*GetStakingValidatorsValidatorAddrBadRequest handles this case with default header values.
+/* GetStakingValidatorsValidatorAddrBadRequest describes a response with status code 400, with default header values.
 
 Error
 */
@@ -93,7 +91,6 @@ type GetStakingValidatorsValidatorAddrBadRequest struct {
 func (o *GetStakingValidatorsValidatorAddrBadRequest) Error() string {
 	return fmt.Sprintf("[GET /staking/validators/{validatorAddr}][%d] getStakingValidatorsValidatorAddrBadRequest  %+v", 400, o.Payload)
 }
-
 func (o *GetStakingValidatorsValidatorAddrBadRequest) GetPayload() *GetStakingValidatorsValidatorAddrBadRequestBody {
 	return o.Payload
 }
@@ -127,6 +124,11 @@ type GetStakingValidatorsValidatorAddrBadRequestBody struct {
 
 // Validate validates this get staking validators validator addr bad request body
 func (o *GetStakingValidatorsValidatorAddrBadRequestBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get staking validators validator addr bad request body based on context it is used
+func (o *GetStakingValidatorsValidatorAddrBadRequestBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -175,13 +177,40 @@ func (o *GetStakingValidatorsValidatorAddrOKBody) Validate(formats strfmt.Regist
 }
 
 func (o *GetStakingValidatorsValidatorAddrOKBody) validateResult(formats strfmt.Registry) error {
-
 	if swag.IsZero(o.Result) { // not required
 		return nil
 	}
 
 	if o.Result != nil {
 		if err := o.Result.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("getStakingValidatorsValidatorAddrOK" + "." + "result")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get staking validators validator addr o k body based on the context it is used
+func (o *GetStakingValidatorsValidatorAddrOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateResult(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetStakingValidatorsValidatorAddrOKBody) contextValidateResult(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Result != nil {
+		if err := o.Result.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getStakingValidatorsValidatorAddrOK" + "." + "result")
 			}

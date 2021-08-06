@@ -6,16 +6,16 @@ package transactions
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/lidofinance/terra-monitors/openapi/models"
+	"github.com/lidofinance/terra-monitors/openapi/models"
 )
 
 // GetSlashingValidatorsValidatorPubKeySigningInfoReader is a Reader for the GetSlashingValidatorsValidatorPubKeySigningInfo structure.
@@ -38,9 +38,8 @@ func (o *GetSlashingValidatorsValidatorPubKeySigningInfoReader) ReadResponse(res
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +48,7 @@ func NewGetSlashingValidatorsValidatorPubKeySigningInfoOK() *GetSlashingValidato
 	return &GetSlashingValidatorsValidatorPubKeySigningInfoOK{}
 }
 
-/*GetSlashingValidatorsValidatorPubKeySigningInfoOK handles this case with default header values.
+/* GetSlashingValidatorsValidatorPubKeySigningInfoOK describes a response with status code 200, with default header values.
 
 Success
 */
@@ -60,7 +59,6 @@ type GetSlashingValidatorsValidatorPubKeySigningInfoOK struct {
 func (o *GetSlashingValidatorsValidatorPubKeySigningInfoOK) Error() string {
 	return fmt.Sprintf("[GET /slashing/validators/{validatorPubKey}/signing_info][%d] getSlashingValidatorsValidatorPubKeySigningInfoOK  %+v", 200, o.Payload)
 }
-
 func (o *GetSlashingValidatorsValidatorPubKeySigningInfoOK) GetPayload() *GetSlashingValidatorsValidatorPubKeySigningInfoOKBody {
 	return o.Payload
 }
@@ -82,7 +80,7 @@ func NewGetSlashingValidatorsValidatorPubKeySigningInfoBadRequest() *GetSlashing
 	return &GetSlashingValidatorsValidatorPubKeySigningInfoBadRequest{}
 }
 
-/*GetSlashingValidatorsValidatorPubKeySigningInfoBadRequest handles this case with default header values.
+/* GetSlashingValidatorsValidatorPubKeySigningInfoBadRequest describes a response with status code 400, with default header values.
 
 Error
 */
@@ -93,7 +91,6 @@ type GetSlashingValidatorsValidatorPubKeySigningInfoBadRequest struct {
 func (o *GetSlashingValidatorsValidatorPubKeySigningInfoBadRequest) Error() string {
 	return fmt.Sprintf("[GET /slashing/validators/{validatorPubKey}/signing_info][%d] getSlashingValidatorsValidatorPubKeySigningInfoBadRequest  %+v", 400, o.Payload)
 }
-
 func (o *GetSlashingValidatorsValidatorPubKeySigningInfoBadRequest) GetPayload() *GetSlashingValidatorsValidatorPubKeySigningInfoBadRequestBody {
 	return o.Payload
 }
@@ -127,6 +124,11 @@ type GetSlashingValidatorsValidatorPubKeySigningInfoBadRequestBody struct {
 
 // Validate validates this get slashing validators validator pub key signing info bad request body
 func (o *GetSlashingValidatorsValidatorPubKeySigningInfoBadRequestBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get slashing validators validator pub key signing info bad request body based on context it is used
+func (o *GetSlashingValidatorsValidatorPubKeySigningInfoBadRequestBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -175,13 +177,40 @@ func (o *GetSlashingValidatorsValidatorPubKeySigningInfoOKBody) Validate(formats
 }
 
 func (o *GetSlashingValidatorsValidatorPubKeySigningInfoOKBody) validateResult(formats strfmt.Registry) error {
-
 	if swag.IsZero(o.Result) { // not required
 		return nil
 	}
 
 	if o.Result != nil {
 		if err := o.Result.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("getSlashingValidatorsValidatorPubKeySigningInfoOK" + "." + "result")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get slashing validators validator pub key signing info o k body based on the context it is used
+func (o *GetSlashingValidatorsValidatorPubKeySigningInfoOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateResult(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetSlashingValidatorsValidatorPubKeySigningInfoOKBody) contextValidateResult(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Result != nil {
+		if err := o.Result.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getSlashingValidatorsValidatorPubKeySigningInfoOK" + "." + "result")
 			}

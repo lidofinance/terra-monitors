@@ -11,22 +11,22 @@ import (
 )
 
 const (
-	WhitelistedValidatorsCRC32 = "whitelisted_validators_crc32"
-	WhitelistedValidatorsNum   = "whitelisted_validators_num"
+	WhitelistedValidatorsCRC32 MetricName = "whitelisted_validators_crc32"
+	WhitelistedValidatorsNum   MetricName = "whitelisted_validators_num"
 )
 
 type WhitelistedValidatorsMonitor struct {
-	metrics   map[Metric]float64
-	apiClient *client.TerraLiteForTerra
-	logger    *logrus.Logger
+	metrics              map[MetricName]float64
+	apiClient            *client.TerraLiteForTerra
+	logger               *logrus.Logger
 	validatorsRepository ValidatorsRepository
 }
 
 func NewWhitelistedValidatorsMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) WhitelistedValidatorsMonitor {
 	m := WhitelistedValidatorsMonitor{
-		metrics:   make(map[Metric]float64),
-		apiClient: cfg.GetTerraClient(),
-		logger:    cfg.Logger,
+		metrics:              make(map[MetricName]float64),
+		apiClient:            cfg.GetTerraClient(),
+		logger:               cfg.Logger,
 		validatorsRepository: repository,
 	}
 
@@ -42,19 +42,22 @@ func (m *WhitelistedValidatorsMonitor) InitMetrics() {
 	m.metrics[WhitelistedValidatorsNum] = 0
 }
 
-func (m WhitelistedValidatorsMonitor) GetMetrics() map[Metric]float64 {
+func (m WhitelistedValidatorsMonitor) GetMetrics() map[MetricName]float64 {
 	return m.metrics
+}
+
+func (m WhitelistedValidatorsMonitor) GetMetricVectors() map[MetricName]MetricVector {
+	return nil
 }
 
 func (m *WhitelistedValidatorsMonitor) Handler(ctx context.Context) error {
 
-	validators,err := m.validatorsRepository.GetValidatorsAddresses(ctx)
+	validators, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to get whiltelisted validators for %s: %w",m.Name(), err)
+		return fmt.Errorf("failed to get whiltelisted validators for %s: %w", m.Name(), err)
 	}
 
-
-	m.metrics[WhitelistedValidatorsCRC32] = float64(crc32.ChecksumIEEE([]byte(strings.Join(validators,""))))
+	m.metrics[WhitelistedValidatorsCRC32] = float64(crc32.ChecksumIEEE([]byte(strings.Join(validators, ""))))
 	m.metrics[WhitelistedValidatorsNum] = float64(len(validators))
 	m.logger.Infoln("updated ", m.Name())
 	return nil

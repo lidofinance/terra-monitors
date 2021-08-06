@@ -14,15 +14,15 @@ import (
 )
 
 var (
-	BlunaBondedAmount Metric = "bluna_bonded_amount"
-	BlunaExchangeRate Metric = "bluna_exchange_rate"
+	BlunaBondedAmount MetricName = "bluna_bonded_amount"
+	BlunaExchangeRate MetricName = "bluna_exchange_rate"
 )
 
 func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
 	m := HubStateMonitor{
 		State:      &types.HubStateResponse{},
 		HubAddress: cfg.HubContract,
-		metrics:    make(map[Metric]float64),
+		metrics:    make(map[MetricName]float64),
 		apiClient:  cfg.GetTerraClient(),
 		logger:     cfg.Logger,
 	}
@@ -33,7 +33,7 @@ func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
 type HubStateMonitor struct {
 	State      *types.HubStateResponse
 	HubAddress string
-	metrics    map[Metric]float64
+	metrics    map[MetricName]float64
 	apiClient  *client.TerraLiteForTerra
 	logger     *logrus.Logger
 }
@@ -81,7 +81,7 @@ func (h *HubStateMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h *HubStateMonitor) setStringMetric(m Metric, rawValue string) {
+func (h *HubStateMonitor) setStringMetric(m MetricName, rawValue string) {
 	v, err := strconv.ParseFloat(rawValue, 64)
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
@@ -89,8 +89,12 @@ func (h *HubStateMonitor) setStringMetric(m Metric, rawValue string) {
 	h.metrics[m] = v
 }
 
-func (h HubStateMonitor) GetMetrics() map[Metric]float64 {
+func (h HubStateMonitor) GetMetrics() map[MetricName]float64 {
 	return h.metrics
+}
+
+func (h HubStateMonitor) GetMetricVectors() map[MetricName]MetricVector {
+	return nil
 }
 
 func (h *HubStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {

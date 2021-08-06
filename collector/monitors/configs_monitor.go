@@ -13,30 +13,30 @@ import (
 )
 
 const (
-	AirDropRegistryConfigCRC32    Metric = "airdrop_registry_config_crc32"
-	BlunaRewardConfigCRC32        Metric = "bluna_reward_config_crc32"
-	HubConfigCRC32                Metric = "hub_config_crc32"
-	RewardDispatcherConfigCRC32   Metric = "reward_dispatcher_config_crc32"
-	ValidatorsRegistryConfigCRC32 Metric = "validators_registry_config_crc32"
+	AirDropRegistryConfigCRC32    MetricName = "airdrop_registry_config_crc32"
+	BlunaRewardConfigCRC32        MetricName = "bluna_reward_config_crc32"
+	HubConfigCRC32                MetricName = "hub_config_crc32"
+	RewardDispatcherConfigCRC32   MetricName = "reward_dispatcher_config_crc32"
+	ValidatorsRegistryConfigCRC32 MetricName = "validators_registry_config_crc32"
 )
 
 type ConfigsCRC32Monitor struct {
-	Contracts map[string]Metric
-	metrics   map[Metric]float64
+	Contracts map[string]MetricName
+	metrics   map[MetricName]float64
 	apiClient *client.TerraLiteForTerra
 	logger    *logrus.Logger
 }
 
 func NewConfigsCRC32Monitor(cfg config.CollectorConfig) ConfigsCRC32Monitor {
 	m := ConfigsCRC32Monitor{
-		Contracts: map[string]Metric{
+		Contracts: map[string]MetricName{
 			cfg.AirDropRegistryContract:  AirDropRegistryConfigCRC32,
 			cfg.ValidatorRegistryAddress: ValidatorsRegistryConfigCRC32,
 			cfg.RewardDispatcherContract: RewardDispatcherConfigCRC32,
 			cfg.HubContract:              HubConfigCRC32,
 			cfg.RewardContract:           BlunaRewardConfigCRC32,
 		},
-		metrics:   make(map[Metric]float64),
+		metrics:   make(map[MetricName]float64),
 		apiClient: cfg.GetTerraClient(),
 		logger:    cfg.Logger,
 	}
@@ -56,8 +56,12 @@ func (m *ConfigsCRC32Monitor) InitMetrics() {
 	m.metrics[BlunaRewardConfigCRC32] = 0
 }
 
-func (m ConfigsCRC32Monitor) GetMetrics() map[Metric]float64 {
+func (m ConfigsCRC32Monitor) GetMetrics() map[MetricName]float64 {
 	return m.metrics
+}
+
+func (m ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]MetricVector {
+	return nil
 }
 
 func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
