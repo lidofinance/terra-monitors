@@ -58,7 +58,7 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexM
 		m.flowManager = config.FlowManager(cfg.UpdateGlobalIndexInterval)
 	} else {
 		// with a testing purpose, we are able to force worker to work
-		// by sending empty struct to the channel wherever we want
+		// by sending empty struct to the channel whenever we want
 		m.flowManager = make(chan struct{})
 	}
 
@@ -219,7 +219,7 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 			// https://fcd.terra.dev/v1/txs?offset=126987824
 			// tx with id = 126987823 is a failed tx due to out of gas
 			// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.
-			// The second one - "raw_log" contains human readable message with error
+			// The second one - "raw_log" contains human-readable message with error
 			return FailedUpdateGlobalIndexTx
 		}
 	}

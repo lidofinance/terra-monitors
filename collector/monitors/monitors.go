@@ -47,6 +47,8 @@ func (b *SimpleMetricValue) Init() {
 }
 
 // ReadOnceMetric once value is read its sets to zero value
+// implemented specially for update global index bot monitor. We need to accumulate data in interval (last_check,current_check)
+// once value are read we set the value to zero value
 type ReadOnceMetric struct {
 	value float64
 }
