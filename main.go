@@ -42,6 +42,9 @@ func createCollector() collector.LCDCollector {
 	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(defConfig, validatorsRepository)
 	c.RegisterMonitor(&whitelistedValidatorsMonitor)
 
+	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(defConfig, validatorsRepository)
+	c.RegisterMonitor(&validatorsFeeMonitor)
+
 	return c
 }
 

@@ -137,9 +137,10 @@ func (m SlashingMonitor) GetMetricVectors() map[MetricName]MetricVector {
 }
 
 type ValidatorInfo struct {
-	Address string
-	PubKey  string
-	Moniker string
+	Address        string
+	PubKey         string
+	Moniker        string
+	CommissionRate float64
 }
 
 func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]ValidatorInfo, error) {
@@ -152,26 +153,12 @@ func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]ValidatorInf
 	// later get the signing info).
 	var validatorsInfo []ValidatorInfo
 	for _, validatorAddress := range validatorsAddresses {
-		validatorInfoResponse, err := m.apiClient.Transactions.GetStakingValidatorsValidatorAddr(
-			&transactions.GetStakingValidatorsValidatorAddrParams{
-				ValidatorAddr: validatorAddress,
-				Context:       ctx,
-			},
-		)
+		validatorInfo, err := m.validatorsRepository.GetValidatorInfo(ctx, validatorAddress)
 		if err != nil {
-			return nil, fmt.Errorf("failed to GetStakingValidatorsValidatorAddr: %w", err)
-		}
-		if err := validatorInfoResponse.GetPayload().Validate(nil); err != nil {
-			m.logger.Errorf("failed to validate ValidatorInfo for validator %s: %s", validatorAddress, err)
-			continue
+			return nil, fmt.Errorf("failed to get validator info: %w", err)
 		}
 
-		validatorsInfo = append(validatorsInfo,
-			ValidatorInfo{
-				Address: validatorAddress,
-				Moniker: validatorInfoResponse.GetPayload().Result.Description.Moniker,
-				PubKey:  *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
-			})
+		validatorsInfo = append(validatorsInfo, validatorInfo)
 	}
 
 	return validatorsInfo, nil
@@ -179,6 +166,7 @@ func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]ValidatorInf
 
 type ValidatorsRepository interface {
 	GetValidatorsAddresses(ctx context.Context) ([]string, error)
+	GetValidatorInfo(ctx context.Context, address string) (ValidatorInfo, error)
 }
 
 type V1ValidatorsRepository struct {
@@ -221,4 +209,32 @@ func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]
 	}
 
 	return hubResp.Validators, nil
+}
+
+func (r *V1ValidatorsRepository) GetValidatorInfo(ctx context.Context, address string) (ValidatorInfo, error) {
+	validatorInfoResponse, err := r.apiClient.Transactions.GetStakingValidatorsValidatorAddr(
+		&transactions.GetStakingValidatorsValidatorAddrParams{
+			ValidatorAddr: address,
+			Context:       ctx,
+		},
+	)
+	if err != nil {
+		return ValidatorInfo{}, fmt.Errorf("failed to GetStakingValidatorsValidatorAddr: %w", err)
+	}
+
+	if err := validatorInfoResponse.GetPayload().Validate(nil); err != nil {
+		return ValidatorInfo{}, fmt.Errorf("failed to validate ValidatorInfo for validator %s: %w", address, err)
+	}
+
+	comissionRate, err := strconv.ParseFloat(validatorInfoResponse.GetPayload().Result.Commission.CommissionRates.Rate, 64)
+	if err != nil {
+		return ValidatorInfo{}, fmt.Errorf("failed to parse validator's comission rate: %w", err)
+	}
+
+	return ValidatorInfo{
+		Address:        address,
+		Moniker:        validatorInfoResponse.GetPayload().Result.Description.Moniker,
+		PubKey:         *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
+		CommissionRate: comissionRate,
+	}, nil
 }

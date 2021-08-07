@@ -29,6 +29,10 @@ func (r *MockV1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context)
 	}, nil
 }
 
+func (r *MockV1ValidatorsRepository) GetValidatorInfo(ctx context.Context, validatorAddress string) (ValidatorInfo, error) {
+	return ValidatorInfo{}, nil
+}
+
 func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info.json")
 	suite.NoError(err)

@@ -823,6 +823,14 @@ definitions:
         properties:
           moniker:
             type: string
+      commission:
+        type: object
+        properties:
+          commission_rates:
+            type: object
+            properties:
+              rate:
+                type: string
     required:
       - consensus_pubkey
       - description
