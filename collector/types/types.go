@@ -143,3 +143,10 @@ type AirDropRegistryConfig struct {
 	HubContract  string   `json:"hub_contract"`
 	AirDropToken []string `json:"airdrop_tokens"`
 }
+
+type ValidatorInfo struct {
+	Address        string
+	PubKey         string
+	Moniker        string
+	CommissionRate float64
+}

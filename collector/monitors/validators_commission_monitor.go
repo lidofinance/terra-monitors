@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	ValidatorsFee MetricName = "validators_fee"
+	ValidatorsCommission MetricName = "validators_commission"
 )
 
-type ValidatorsFeeMonitor struct {
+type ValidatorsCommissionMonitor struct {
 	metrics              map[MetricName]float64
 	metricVectors        map[MetricName]MetricVector
 	apiClient            *client.TerraLiteForTerra
@@ -20,8 +20,8 @@ type ValidatorsFeeMonitor struct {
 	logger               *logrus.Logger
 }
 
-func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) ValidatorsFeeMonitor {
-	m := ValidatorsFeeMonitor{
+func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) ValidatorsCommissionMonitor {
+	m := ValidatorsCommissionMonitor{
 		metrics:              make(map[MetricName]float64),
 		metricVectors:        make(map[MetricName]MetricVector),
 		apiClient:            cfg.GetTerraClient(),
@@ -32,17 +32,17 @@ func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRe
 	return m
 }
 
-func (m *ValidatorsFeeMonitor) Name() string {
-	return "ValidatorsFee"
+func (m *ValidatorsCommissionMonitor) Name() string {
+	return "ValidatorsCommission"
 }
 
-func (m *ValidatorsFeeMonitor) InitMetrics() {
+func (m *ValidatorsCommissionMonitor) InitMetrics() {
 	m.metricVectors = map[MetricName]MetricVector{
-		ValidatorsFee: make(MetricVector),
+		ValidatorsCommission: make(MetricVector),
 	}
 }
 
-func (m *ValidatorsFeeMonitor) Handler(ctx context.Context) error {
+func (m *ValidatorsCommissionMonitor) Handler(ctx context.Context) error {
 	m.InitMetrics()
 
 	validatorsAddress, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
@@ -56,16 +56,16 @@ func (m *ValidatorsFeeMonitor) Handler(ctx context.Context) error {
 			return fmt.Errorf("failed to GetValidatorInfo: %w", err)
 		}
 
-		m.metricVectors[ValidatorsFee][validatorInfo.Moniker] = validatorInfo.CommissionRate
+		m.metricVectors[ValidatorsCommission][validatorInfo.Moniker] = validatorInfo.CommissionRate
 	}
-	m.logger.Infoln("validators fee updated", m.Name())
+	m.logger.Infoln("validators commission updated", m.Name())
 	return nil
 }
 
-func (m *ValidatorsFeeMonitor) GetMetrics() map[MetricName]float64 {
+func (m *ValidatorsCommissionMonitor) GetMetrics() map[MetricName]float64 {
 	return m.metrics
 }
 
-func (m ValidatorsFeeMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m ValidatorsCommissionMonitor) GetMetricVectors() map[MetricName]MetricVector {
 	return m.metricVectors
 }

@@ -19,19 +19,29 @@ const BlunaTokenInfo = `{"height":"3754668","result":{"name":"Bonded Luna","symb
 
 const BadQuery = "{\"error\":\"contract query failed: parsing anchor_basset_hub::msg::QueryMsg: unknown variant `config1`, expected one of `config`, `state`, `whitelisted_validators`, `current_batch`, `withdrawable_unbonded`, `parameters`, `unbond_requests`, `all_history`\"}"
 
+const (
+	HubContract                 = "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts"
+	RewardContract              = "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0"
+	BlunaTokenInfoContract      = "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp"
+	UpdateGlobalIndexBotAddress = "dummy_updateglobalindexbot"
+	RewardDispatcherContract    = "dummy_rewarddispatcher"
+	ValidatorRegistryAddress    = "dummy_validatorsregistry"
+	AirDropRegistryContract     = "dummy_airdropRegistry"
+)
+
 func NewTestCollectorConfig(urlWithScheme string) config.CollectorConfig {
 	host := strings.Split(urlWithScheme, "//")[1]
 	out := bytes.NewBuffer(nil)
 	cfg := config.CollectorConfig{
 		Logger:                      logging.NewDefaultLogger(),
 		LCDEndpoint:                 host,
-		HubContract:                 "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts",
-		RewardContract:              "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0",
-		BlunaTokenInfoContract:      "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp",
-		UpdateGlobalIndexBotAddress: "dummy_updateglobalindexbot",
-		RewardDispatcherContract:    "dummy_rewarddispatcher",
-		ValidatorRegistryAddress:    "dummy_validatorsregistry",
-		AirDropRegistryContract:     "dummy_airdropRegistry",
+		HubContract:                 HubContract,
+		RewardContract:              RewardContract,
+		BlunaTokenInfoContract:      BlunaTokenInfoContract,
+		UpdateGlobalIndexBotAddress: UpdateGlobalIndexBotAddress,
+		RewardDispatcherContract:    RewardDispatcherContract,
+		ValidatorRegistryAddress:    ValidatorRegistryAddress,
+		AirDropRegistryContract:     AirDropRegistryContract,
 		Schemes:                     []string{"http"},
 	}
 	cfg.Logger.Out = out

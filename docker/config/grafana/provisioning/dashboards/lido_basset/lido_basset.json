@@ -25,6 +25,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -88,7 +89,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "validators_fee * 100",
+          "expr": "validators_commission * 100",
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "A"

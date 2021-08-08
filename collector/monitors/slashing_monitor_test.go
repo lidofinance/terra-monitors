@@ -21,18 +21,6 @@ func (suite *SlashingMonitorTestSuite) SetupTest() {
 
 }
 
-type MockV1ValidatorsRepository struct{}
-
-func (r *MockV1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {
-	return []string{
-		testValAddress,
-	}, nil
-}
-
-func (r *MockV1ValidatorsRepository) GetValidatorInfo(ctx context.Context, validatorAddress string) (ValidatorInfo, error) {
-	return ValidatorInfo{}, nil
-}
-
 func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info.json")
 	suite.NoError(err)
@@ -41,13 +29,19 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 		"./test_data/slashing_success_response_blocks_jailed_tombstoned.json")
 	suite.NoError(err)
 
+	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")
+	suite.NoError(err)
+
 	testServer := NewServerWithRoutedResponse(map[string]string{
 		fmt.Sprintf("/staking/validators/%s", testValAddress):                 string(validatorInfoData),
 		fmt.Sprintf("/slashing/validators/%s/signing_info", testValPublicKey): string(validatorSigningInfoData),
+		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
-	m := NewSlashingMonitor(cfg, &MockV1ValidatorsRepository{})
+	valRepository := NewV1ValidatorsRepository(cfg)
+
+	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
@@ -75,13 +69,19 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 		"./test_data/slashing_success_response_no_slashing.json")
 	suite.NoError(err)
 
+	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")
+	suite.NoError(err)
+
 	testServer := NewServerWithRoutedResponse(map[string]string{
 		fmt.Sprintf("/staking/validators/%s", testValAddress):                 string(validatorInfoData),
 		fmt.Sprintf("/slashing/validators/%s/signing_info", testValPublicKey): string(validatorSigningInfoData),
+		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
-	m := NewSlashingMonitor(cfg, &MockV1ValidatorsRepository{})
+	valRepository := NewV1ValidatorsRepository(cfg)
+
+	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
@@ -110,13 +110,19 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 		"./test_data/slashing_success_response_blocks_jailed_tombstoned.json")
 	suite.NoError(err)
 
+	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")
+	suite.NoError(err)
+
 	testServer := NewServerWithRoutedResponse(map[string]string{
 		fmt.Sprintf("/staking/validators/%s", testValAddress):                 string(validatorInfoData),
 		fmt.Sprintf("/slashing/validators/%s/signing_info", testValPublicKey): string(validatorSigningInfoData),
+		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
-	m := NewSlashingMonitor(cfg, &MockV1ValidatorsRepository{})
+	valRepository := NewV1ValidatorsRepository(cfg)
+
+	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)
 }
