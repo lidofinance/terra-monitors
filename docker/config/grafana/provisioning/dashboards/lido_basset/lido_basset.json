@@ -18,6 +18,42 @@
   "links": [],
   "panels": [
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                10
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "keep_state",
+        "for": "2m",
+        "frequency": "30s",
+        "handler": 1,
+        "message": "Commission of ${label} is greater than 10%!",
+        "name": "Validators Commission Rate alert",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -93,6 +129,14 @@
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 10,
+          "visible": true
         }
       ],
       "title": "Validators Commission Rate",
