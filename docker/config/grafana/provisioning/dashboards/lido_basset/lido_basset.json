@@ -208,7 +208,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub parameters epoch/unbonding period has been changed",
@@ -340,7 +340,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub er threshold has been changed",
@@ -464,7 +464,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub peg recovery has been changed",
@@ -703,7 +703,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "one of the configs has been changed",
@@ -867,7 +867,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Whitelisted validators set has been changed",
@@ -991,7 +991,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Number of whitelisted is changed",
@@ -1129,7 +1129,7 @@
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "2m",
+        "for": "",
         "frequency": "30s",
         "handler": 1,
         "name": "Some validators were jailed.",
@@ -1378,7 +1378,7 @@
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "2m",
+        "for": "",
         "frequency": "30s",
         "handler": 1,
         "name": "Found tombstoned validators",
@@ -1600,7 +1600,7 @@
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "update global index bot failed transactions",
@@ -1801,7 +1801,7 @@
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Bluna/luna exchange rate out of range",
