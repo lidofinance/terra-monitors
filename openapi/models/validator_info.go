@@ -20,7 +20,8 @@ import (
 type ValidatorInfo struct {
 
 	// commission
-	Commission *ValidatorInfoCommission `json:"commission,omitempty"`
+	// Required: true
+	Commission *ValidatorInfoCommission `json:"commission"`
 
 	// consensus pubkey
 	// Required: true
@@ -54,8 +55,9 @@ func (m *ValidatorInfo) Validate(formats strfmt.Registry) error {
 }
 
 func (m *ValidatorInfo) validateCommission(formats strfmt.Registry) error {
-	if swag.IsZero(m.Commission) { // not required
-		return nil
+
+	if err := validate.Required("commission", "body", m.Commission); err != nil {
+		return err
 	}
 
 	if m.Commission != nil {
@@ -167,7 +169,8 @@ func (m *ValidatorInfo) UnmarshalBinary(b []byte) error {
 type ValidatorInfoCommission struct {
 
 	// commission rates
-	CommissionRates *ValidatorInfoCommissionCommissionRates `json:"commission_rates,omitempty"`
+	// Required: true
+	CommissionRates *ValidatorInfoCommissionCommissionRates `json:"commission_rates"`
 }
 
 // Validate validates this validator info commission
@@ -185,8 +188,9 @@ func (m *ValidatorInfoCommission) Validate(formats strfmt.Registry) error {
 }
 
 func (m *ValidatorInfoCommission) validateCommissionRates(formats strfmt.Registry) error {
-	if swag.IsZero(m.CommissionRates) { // not required
-		return nil
+
+	if err := validate.Required("commission"+"."+"commission_rates", "body", m.CommissionRates); err != nil {
+		return err
 	}
 
 	if m.CommissionRates != nil {
@@ -253,11 +257,30 @@ func (m *ValidatorInfoCommission) UnmarshalBinary(b []byte) error {
 type ValidatorInfoCommissionCommissionRates struct {
 
 	// rate
-	Rate string `json:"rate,omitempty"`
+	// Required: true
+	Rate *string `json:"rate"`
 }
 
 // Validate validates this validator info commission commission rates
 func (m *ValidatorInfoCommissionCommissionRates) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateRate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ValidatorInfoCommissionCommissionRates) validateRate(formats strfmt.Registry) error {
+
+	if err := validate.Required("commission"+"."+"commission_rates"+"."+"rate", "body", m.Rate); err != nil {
+		return err
+	}
+
 	return nil
 }
 

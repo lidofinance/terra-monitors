@@ -831,6 +831,11 @@ definitions:
             properties:
               rate:
                 type: string
+            required:
+              - rate
+        required:
+          - commission_rates
     required:
       - consensus_pubkey
       - description
+      - commission

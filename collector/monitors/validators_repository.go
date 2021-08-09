@@ -74,7 +74,7 @@ func (r *V1ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 		return types.ValidatorInfo{}, fmt.Errorf("failed to validate ValidatorInfo for validator %s: %w", address, err)
 	}
 
-	commissionRate, err := strconv.ParseFloat(validatorInfoResponse.GetPayload().Result.Commission.CommissionRates.Rate, 64)
+	commissionRate, err := strconv.ParseFloat(*validatorInfoResponse.GetPayload().Result.Commission.CommissionRates.Rate, 64)
 	if err != nil {
 		return types.ValidatorInfo{}, fmt.Errorf("failed to parse validator's comission rate: %w", err)
 	}
