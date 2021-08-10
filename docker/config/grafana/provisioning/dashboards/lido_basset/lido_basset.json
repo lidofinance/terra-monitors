@@ -51,7 +51,7 @@
         "handler": 1,
         "message": "Commission of ${label} is greater than 10%!",
         "name": "Validators Commission Rate alert",
-        "noDataState": "no_data",
+        "noDataState": "keep_state",
         "notifications": []
       },
       "datasource": null,
@@ -107,7 +107,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 0
       },
@@ -211,7 +211,7 @@
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
-        "name": "Hub parameters epoch/unbinding period has been changed",
+        "name": "Hub parameters epoch/unbonding period has been changed",
         "noDataState": "no_data",
         "notifications": []
       },
