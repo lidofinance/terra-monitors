@@ -19,6 +19,10 @@ import (
 // swagger:model ValidatorInfo
 type ValidatorInfo struct {
 
+	// commission
+	// Required: true
+	Commission *ValidatorInfoCommission `json:"commission"`
+
 	// consensus pubkey
 	// Required: true
 	ConsensusPubkey *string `json:"consensus_pubkey"`
@@ -32,6 +36,10 @@ type ValidatorInfo struct {
 func (m *ValidatorInfo) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateCommission(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateConsensusPubkey(formats); err != nil {
 		res = append(res, err)
 	}
@@ -43,6 +51,24 @@ func (m *ValidatorInfo) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ValidatorInfo) validateCommission(formats strfmt.Registry) error {
+
+	if err := validate.Required("commission", "body", m.Commission); err != nil {
+		return err
+	}
+
+	if m.Commission != nil {
+		if err := m.Commission.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("commission")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -77,6 +103,10 @@ func (m *ValidatorInfo) validateDescription(formats strfmt.Registry) error {
 func (m *ValidatorInfo) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateCommission(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateDescription(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -84,6 +114,20 @@ func (m *ValidatorInfo) ContextValidate(ctx context.Context, formats strfmt.Regi
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ValidatorInfo) contextValidateCommission(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Commission != nil {
+		if err := m.Commission.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("commission")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -112,6 +156,150 @@ func (m *ValidatorInfo) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *ValidatorInfo) UnmarshalBinary(b []byte) error {
 	var res ValidatorInfo
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// ValidatorInfoCommission validator info commission
+//
+// swagger:model ValidatorInfoCommission
+type ValidatorInfoCommission struct {
+
+	// commission rates
+	// Required: true
+	CommissionRates *ValidatorInfoCommissionCommissionRates `json:"commission_rates"`
+}
+
+// Validate validates this validator info commission
+func (m *ValidatorInfoCommission) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateCommissionRates(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ValidatorInfoCommission) validateCommissionRates(formats strfmt.Registry) error {
+
+	if err := validate.Required("commission"+"."+"commission_rates", "body", m.CommissionRates); err != nil {
+		return err
+	}
+
+	if m.CommissionRates != nil {
+		if err := m.CommissionRates.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("commission" + "." + "commission_rates")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this validator info commission based on the context it is used
+func (m *ValidatorInfoCommission) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCommissionRates(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ValidatorInfoCommission) contextValidateCommissionRates(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.CommissionRates != nil {
+		if err := m.CommissionRates.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("commission" + "." + "commission_rates")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *ValidatorInfoCommission) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *ValidatorInfoCommission) UnmarshalBinary(b []byte) error {
+	var res ValidatorInfoCommission
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// ValidatorInfoCommissionCommissionRates validator info commission commission rates
+//
+// swagger:model ValidatorInfoCommissionCommissionRates
+type ValidatorInfoCommissionCommissionRates struct {
+
+	// rate
+	// Required: true
+	Rate *string `json:"rate"`
+}
+
+// Validate validates this validator info commission commission rates
+func (m *ValidatorInfoCommissionCommissionRates) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateRate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ValidatorInfoCommissionCommissionRates) validateRate(formats strfmt.Registry) error {
+
+	if err := validate.Required("commission"+"."+"commission_rates"+"."+"rate", "body", m.Rate); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validates this validator info commission commission rates based on context it is used
+func (m *ValidatorInfoCommissionCommissionRates) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *ValidatorInfoCommissionCommissionRates) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *ValidatorInfoCommissionCommissionRates) UnmarshalBinary(b []byte) error {
+	var res ValidatorInfoCommissionCommissionRates
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

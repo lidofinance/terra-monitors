@@ -62,4 +62,6 @@ func TestLocales(t *testing.T) {
 	suite.Run(t, new(UpdateGlobalIndexMonitorTestSuite))
 	suite.Run(t, new(SlashingMonitorTestSuite))
 	suite.Run(t, new(DetectorChangesTestSuite))
+	suite.Run(t, new(ValidatorsCommissionTestSuite))
+	suite.Run(t, new(ValidatorsRepositoryTestSuite))
 }

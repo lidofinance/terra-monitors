@@ -2,14 +2,11 @@ package monitors
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
-
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
@@ -20,7 +17,7 @@ import (
 const (
 	SlashingNumJailedValidators     MetricName = "slashing_num_jailed_validators"
 	SlashingNumTombstonedValidators MetricName = "slashing_num_tombstoned_validators"
-	SlashingNumMissedBlocks         MetricName = "slashing_num_missed_blocks" // TODO: add a "validator_address" label.
+	SlashingNumMissedBlocks         MetricName = "slashing_num_missed_blocks"
 )
 
 const (
@@ -136,13 +133,7 @@ func (m SlashingMonitor) GetMetricVectors() map[MetricName]MetricVector {
 	return m.metricVectors
 }
 
-type ValidatorInfo struct {
-	Address string
-	PubKey  string
-	Moniker string
-}
-
-func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]ValidatorInfo, error) {
+func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]types.ValidatorInfo, error) {
 	validatorsAddresses, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to getWhitelistedValidatorsAddresses: %w", err)
@@ -150,75 +141,15 @@ func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]ValidatorInf
 
 	// For each validator address, get the consensus public key (which is required to
 	// later get the signing info).
-	var validatorsInfo []ValidatorInfo
+	var validatorsInfo []types.ValidatorInfo
 	for _, validatorAddress := range validatorsAddresses {
-		validatorInfoResponse, err := m.apiClient.Transactions.GetStakingValidatorsValidatorAddr(
-			&transactions.GetStakingValidatorsValidatorAddrParams{
-				ValidatorAddr: validatorAddress,
-				Context:       ctx,
-			},
-		)
+		validatorInfo, err := m.validatorsRepository.GetValidatorInfo(ctx, validatorAddress)
 		if err != nil {
-			return nil, fmt.Errorf("failed to GetStakingValidatorsValidatorAddr: %w", err)
-		}
-		if err := validatorInfoResponse.GetPayload().Validate(nil); err != nil {
-			m.logger.Errorf("failed to validate ValidatorInfo for validator %s: %s", validatorAddress, err)
-			continue
+			return nil, fmt.Errorf("failed to get validator info: %w", err)
 		}
 
-		validatorsInfo = append(validatorsInfo,
-			ValidatorInfo{
-				Address: validatorAddress,
-				Moniker: validatorInfoResponse.GetPayload().Result.Description.Moniker,
-				PubKey:  *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
-			})
+		validatorsInfo = append(validatorsInfo, validatorInfo)
 	}
 
 	return validatorsInfo, nil
-}
-
-type ValidatorsRepository interface {
-	GetValidatorsAddresses(ctx context.Context) ([]string, error)
-}
-
-type V1ValidatorsRepository struct {
-	hubContract string
-	apiClient   *client.TerraLiteForTerra
-}
-
-func NewV1ValidatorsRepository(cfg config.CollectorConfig) *V1ValidatorsRepository {
-	return &V1ValidatorsRepository{
-		hubContract: cfg.HubContract,
-		apiClient:   cfg.GetTerraClient(),
-	}
-}
-
-func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {
-	hubReq, hubResp := types.GetHubWhitelistedValidatorsPair()
-
-	reqRaw, err := json.Marshal(&hubReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal HubWhitelistedValidators request: %w", err)
-	}
-
-	p := wasm.GetWasmContractsContractAddressStoreParams{}
-	p.SetContext(ctx)
-	p.SetContractAddress(r.hubContract)
-	p.SetQueryMsg(string(reqRaw))
-
-	resp, err := r.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
-	if err != nil {
-		return nil, fmt.Errorf("failed to process HubWhitelistedValidators request: %w", err)
-	}
-
-	if err := resp.GetPayload().Validate(nil); err != nil {
-		return nil, fmt.Errorf("failed to validate ValidatorsWhitelist: %w", err)
-	}
-
-	err = types.CastMapToStruct(resp.Payload.Result, &hubResp)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse HubWhitelistedValidators body interface: %w", err)
-	}
-
-	return hubResp.Validators, nil
 }
