@@ -54,8 +54,8 @@ func (h *HubStateMonitor) InitMetrics() {
 func (h *HubStateMonitor) updateMetrics() {
 	h.setStringMetric(BlunaBondedAmount, h.State.TotalBondBlunaAmount)
 	h.setStringMetric(BlunaExchangeRate, h.State.BlunaExchangeRate)
-	h.setStringMetric(StlunaBondedAmount, h.State.TotalBondBlunaAmount)
-	h.setStringMetric(StlunaExchangeRate, h.State.BlunaExchangeRate)
+	h.setStringMetric(StlunaBondedAmount, h.State.TotalBondStlunaAmount)
+	h.setStringMetric(StlunaExchangeRate, h.State.StlunaExchangeRate)
 }
 
 func (h *HubStateMonitor) Handler(ctx context.Context) error {

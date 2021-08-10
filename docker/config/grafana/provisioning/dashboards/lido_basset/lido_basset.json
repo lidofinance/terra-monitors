@@ -1524,7 +1524,7 @@
         "for": "2m",
         "frequency": "30s",
         "handler": 1,
-        "name": "Bluna/luna exchange rate out of range",
+        "name": "Exchange rate out of range",
         "noDataState": "no_data",
         "notifications": []
       },
@@ -1626,7 +1626,7 @@
           "visible": true
         }
       ],
-      "title": "bLuna Exchange Rate",
+      "title": "Exchange Rates",
       "type": "timeseries"
     }
   ],
