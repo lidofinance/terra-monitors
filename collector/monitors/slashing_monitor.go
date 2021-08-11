@@ -154,7 +154,7 @@ func (m *SlashingMonitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
-func (m SlashingMonitor) GetMetricVectors() map[MetricName]*MetricVector {
+func (m *SlashingMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	return m.metricVectors

@@ -22,10 +22,10 @@ type ValidatorsCommissionMonitor struct {
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
-	lock                 sync.Mutex
+	lock                 sync.RWMutex
 }
 
-func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) ValidatorsCommissionMonitor {
+func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *ValidatorsCommissionMonitor {
 	m := ValidatorsCommissionMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
@@ -37,7 +37,7 @@ func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRe
 	}
 	m.InitMetrics()
 	initMetrics([]MetricName{}, []MetricName{ValidatorsCommission}, m.tmpMetrics, m.tmpMetricVectors)
-	return m
+	return &m
 }
 
 func (m *ValidatorsCommissionMonitor) Name() string {
@@ -49,7 +49,6 @@ func (m *ValidatorsCommissionMonitor) InitMetrics() {
 }
 
 func (m *ValidatorsCommissionMonitor) Handler(ctx context.Context) error {
-	//m.InitMetrics()
 	initMetrics([]MetricName{}, []MetricName{ValidatorsCommission}, m.tmpMetrics, m.tmpMetricVectors)
 
 	validatorsAddress, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
@@ -75,9 +74,13 @@ func (m *ValidatorsCommissionMonitor) Handler(ctx context.Context) error {
 }
 
 func (m *ValidatorsCommissionMonitor) GetMetrics() map[MetricName]MetricValue {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metrics
 }
 
-func (m ValidatorsCommissionMonitor) GetMetricVectors() map[MetricName]*MetricVector {
+func (m *ValidatorsCommissionMonitor) GetMetricVectors() map[MetricName]*MetricVector {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metricVectors
 }

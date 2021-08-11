@@ -56,7 +56,7 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexM
 	return &m
 }
 
-func (m UpdateGlobalIndexMonitor) Name() string {
+func (m *UpdateGlobalIndexMonitor) Name() string {
 	return "UpdateGlobalIndexMonitor"
 }
 
@@ -157,13 +157,13 @@ func (m *UpdateGlobalIndexMonitor) processTransactions(
 	return newMaxCheckedID, alreadyProcessedFound
 }
 
-func (m UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]MetricValue {
+func (m *UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]MetricValue {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	return m.metrics
 }
 
-func (m UpdateGlobalIndexMonitor) GetMetricVectors() map[MetricName]*MetricVector {
+func (m *UpdateGlobalIndexMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 

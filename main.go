@@ -26,7 +26,7 @@ func createCollector() collector.LCDCollector {
 	c.RegisterMonitor(ctx, &rewardStateMonitor)
 
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
-	c.RegisterMonitor(ctx, &blunaTokenInfoMonitor)
+	c.RegisterMonitor(ctx, blunaTokenInfoMonitor)
 
 	validatorsRepository := monitors.NewV1ValidatorsRepository(defConfig)
 	slashingMonitor := monitors.NewSlashingMonitor(defConfig, validatorsRepository)
@@ -45,7 +45,7 @@ func createCollector() collector.LCDCollector {
 	c.RegisterMonitor(ctx, &whitelistedValidatorsMonitor)
 
 	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(ctx, &validatorsFeeMonitor)
+	c.RegisterMonitor(ctx, validatorsFeeMonitor)
 
 	return c
 }

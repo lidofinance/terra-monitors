@@ -42,7 +42,7 @@ func (mv *MetricVector) Add(label string, delta float64) {
 	mv.values[label] += delta
 }
 
-func (mv MetricVector) Labels() []string {
+func (mv *MetricVector) Labels() []string {
 	labels := make([]string, len(mv.values))
 	c := 0
 	for label := range mv.values {

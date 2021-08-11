@@ -18,7 +18,7 @@ var (
 	BlunaTotalSupply MetricName = "bluna_total_supply"
 )
 
-func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor {
+func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) *BlunaTokenInfoMonitor {
 	m := BlunaTokenInfoMonitor{
 		State:           &types.TokenInfoResponse{},
 		ContractAddress: cfg.BlunaTokenInfoContract,
@@ -28,7 +28,7 @@ func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor 
 		lock:            sync.RWMutex{},
 	}
 	m.InitMetrics()
-	return m
+	return &m
 }
 
 type BlunaTokenInfoMonitor struct {
@@ -40,7 +40,7 @@ type BlunaTokenInfoMonitor struct {
 	lock            sync.RWMutex
 }
 
-func (h BlunaTokenInfoMonitor) Name() string {
+func (h *BlunaTokenInfoMonitor) Name() string {
 	return "BlunaTokenInfo"
 }
 
@@ -94,13 +94,13 @@ func (h *BlunaTokenInfoMonitor) setStringMetric(m MetricName, rawValue string) {
 	h.metrics[m].Set(v)
 }
 
-func (h BlunaTokenInfoMonitor) GetMetrics() map[MetricName]MetricValue {
+func (h *BlunaTokenInfoMonitor) GetMetrics() map[MetricName]MetricValue {
 	h.lock.RLock()
 	defer h.lock.RUnlock()
 	return h.metrics
 }
 
-func (h BlunaTokenInfoMonitor) GetMetricVectors() map[MetricName]*MetricVector {
+func (h *BlunaTokenInfoMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 
