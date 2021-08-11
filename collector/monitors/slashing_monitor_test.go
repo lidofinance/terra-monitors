@@ -38,24 +38,22 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
-
 	valRepository := NewV1ValidatorsRepository(cfg)
 
 	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
-
 	metrics := m.GetMetrics()
 	metricVectors := m.GetMetricVectors()
 	var (
-		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{1}
-		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{1}
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value:1}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value:1}
 		expectedNumMissedBlocks         float64     = 5
 	)
 	var actualMissedBlocks float64
-	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
-		actualMissedBlocks += missedBlocks
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks].Labels() {
+		actualMissedBlocks += metricVectors[SlashingNumMissedBlocks].Get(missedBlocks)
 	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])
 	suite.Equal(expectedNumJailedValidators, metrics[SlashingNumJailedValidators])
@@ -92,13 +90,13 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	metricVectors := m.GetMetricVectors()
 
 	var (
-		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{0}
-		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{0}
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value:0}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value:0}
 		expectedNumMissedBlocks         float64     = 0
 	)
 	var actualMissedBlocks float64
-	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
-		actualMissedBlocks += missedBlocks
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks].Labels() {
+		actualMissedBlocks += metricVectors[SlashingNumMissedBlocks].Get(missedBlocks)
 	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])
 	suite.Equal(expectedNumJailedValidators, metrics[SlashingNumJailedValidators])

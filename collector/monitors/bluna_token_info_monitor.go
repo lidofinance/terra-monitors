@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"sync"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
@@ -24,6 +25,7 @@ func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor 
 		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
+		lock:             sync.RWMutex{},
 	}
 	return m
 }
@@ -34,6 +36,8 @@ type BlunaTokenInfoMonitor struct {
 	metrics         map[MetricName]MetricValue
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
+	lock             sync.RWMutex
+
 }
 
 func (h BlunaTokenInfoMonitor) Name() string {
@@ -45,6 +49,8 @@ func (h *BlunaTokenInfoMonitor) InitMetrics() {
 }
 
 func (h *BlunaTokenInfoMonitor) updateMetrics() {
+	h.lock.Lock()
+	defer h.lock.Unlock()
 	h.setStringMetric(BlunaTotalSupply, h.State.TotalSupply)
 }
 
@@ -89,10 +95,12 @@ func (h *BlunaTokenInfoMonitor) setStringMetric(m MetricName, rawValue string) {
 }
 
 func (h BlunaTokenInfoMonitor) GetMetrics() map[MetricName]MetricValue {
+	h.lock.RLock()
+	defer h.lock.RUnlock()
 	return h.metrics
 }
 
-func (h BlunaTokenInfoMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (h BlunaTokenInfoMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 

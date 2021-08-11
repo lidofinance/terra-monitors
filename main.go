@@ -1,47 +1,48 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"net/http"
-
 	"github.com/lidofinance/terra-monitors/app"
 	"github.com/lidofinance/terra-monitors/collector"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/extractor"
+	"net/http"
 )
 
 var addr = flag.String("listen-address", ":8080",
 	"The address to listen on for HTTP requests.")
 
 func createCollector() collector.LCDCollector {
+	ctx := context.Background()
 	defConfig := config.DefaultCollectorConfig()
 	c := collector.NewLCDCollector(defConfig)
+
 	hubStateMonitor := monitors.NewHubStateMonitor(defConfig)
-	c.RegisterMonitor(&hubStateMonitor)
+	c.RegisterMonitor(ctx, &hubStateMonitor)
 
 	rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
-	c.RegisterMonitor(&rewardStateMonitor)
+	c.RegisterMonitor(ctx, &rewardStateMonitor)
 
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
-	c.RegisterMonitor(&blunaTokenInfoMonitor)
+	c.RegisterMonitor(ctx, &blunaTokenInfoMonitor)
 
 	validatorsRepository := monitors.NewV1ValidatorsRepository(defConfig)
 	slashingMonitor := monitors.NewSlashingMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(slashingMonitor)
+	c.RegisterMonitor(ctx, slashingMonitor)
 
 	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
-	c.RegisterMonitor(updateGlobalIndexMonitor)
+	c.RegisterMonitor(ctx, updateGlobalIndexMonitor)
 
 	hubParameters := monitors.NewHubParametersMonitor(defConfig)
-	c.RegisterMonitor(&hubParameters)
+	c.RegisterMonitor(ctx, &hubParameters)
 
 	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(defConfig)
-	c.RegisterMonitor(&configCRC32Monitor)
+	c.RegisterMonitor(ctx, &configCRC32Monitor)
 
 	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(&whitelistedValidatorsMonitor)
-
+	c.RegisterMonitor(ctx, &whitelistedValidatorsMonitor)
 
 	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(defConfig, validatorsRepository)
 	c.RegisterMonitor(&validatorsFeeMonitor)

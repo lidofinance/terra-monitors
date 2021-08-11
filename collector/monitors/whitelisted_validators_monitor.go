@@ -57,7 +57,7 @@ func (m WhitelistedValidatorsMonitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
-func (m WhitelistedValidatorsMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m WhitelistedValidatorsMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 

@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -80,7 +81,7 @@ func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
 	err := m1.Handler(context.Background())
 	suite.NoError(err)
 	for metric, value := range m1.metrics {
-		savedMetrics[metric] = &SimpleMetricValue{value.Get()}
+		savedMetrics[metric] = &SimpleMetricValue{value:value.Get()}
 	}
 	err = m1.Handler(context.Background())
 	suite.NoError(err)
@@ -93,5 +94,30 @@ func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
 		_, found := savedMetrics[metric]
 		suite.True(found)
 		suite.NotEqual(m1.metrics[metric], savedMetrics[metric])
+	}
+}
+
+
+func (suite *DetectorChangesTestSuite) TestRace() {
+	ts := NewServerWithRandomJson()
+	cfg := NewTestCollectorConfig(ts.URL)
+	m1 := NewConfigsCRC32Monitor(cfg)
+
+	func() {
+		c:=0
+		for {
+			m1.Handler(context.Background())
+			c++
+			if c==100 {
+				fmt.Println(c,"handlers")
+			}
+		}
+	}()
+	i:=0
+	for {
+		bl := m1.metrics[BlunaRewardConfigCRC32].Get()
+		suite.NotEqual(0,bl)
+		i++
+		fmt.Println(i,"metrics")
 	}
 }

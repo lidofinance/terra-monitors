@@ -3,19 +3,18 @@ package collector
 import (
 	"context"
 	"fmt"
-
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type Collector interface {
 	Get(metric monitors.MetricName) (float64, error)
-	GetVector(metric monitors.MetricName) (monitors.MetricVector, error)
+	GetVector(metric monitors.MetricName) (*monitors.MetricVector, error)
 	ProvidedMetrics() []monitors.MetricName
 	ProvidedMetricVectors() []monitors.MetricName
-	UpdateData(ctx context.Context) []error
 }
 
 func NewLCDCollector(cfg config.CollectorConfig) LCDCollector {
@@ -67,25 +66,12 @@ func (c LCDCollector) Get(metric monitors.MetricName) (float64, error) {
 	return monitor.GetMetrics()[metric].Get(), nil
 }
 
-func (c LCDCollector) GetVector(metric monitors.MetricName) (monitors.MetricVector, error) {
+func (c LCDCollector) GetVector(metric monitors.MetricName) (*monitors.MetricVector, error) {
 	monitor, found := c.MetricVectors[metric]
 	if !found {
 		return nil, fmt.Errorf("monitor for metric vector \"%s\" not found", metric)
 	}
 	return monitor.GetMetricVectors()[metric], nil
-}
-
-func (c *LCDCollector) UpdateData(ctx context.Context) []error {
-	var errors []error
-	for _, monitor := range c.Monitors {
-		err := monitor.Handler(ctx)
-		if err != nil {
-			// one error is not a reason to stop collecting data
-			// collecting monitors errors to return them to calling code
-			errors = append(errors, fmt.Errorf("failed to update data: %w", err))
-		}
-	}
-	return errors
 }
 
 func findMaps(key monitors.MetricName, maps ...map[monitors.MetricName]monitors.Monitor) (monitors.Monitor, bool) {
@@ -97,7 +83,9 @@ func findMaps(key monitors.MetricName, maps ...map[monitors.MetricName]monitors.
 	return nil, false
 }
 
-func (c *LCDCollector) RegisterMonitor(m monitors.Monitor) {
+
+
+func (c *LCDCollector) RegisterMonitor(ctx context.Context, m monitors.Monitor) {
 	m.InitMetrics()
 	for metric := range m.GetMetrics() {
 		if wantedMonitor, found := findMaps(metric, c.Metrics, c.MetricVectors); found {
@@ -114,4 +102,15 @@ func (c *LCDCollector) RegisterMonitor(m monitors.Monitor) {
 		c.MetricVectors[metric] = m
 	}
 	c.Monitors = append(c.Monitors, m)
+
+	// first initial data fetching
+	err := m.Handler(ctx)
+	if err != nil {
+		c.logger.Errorf("failed to update %s data: %+v\n", m.Name(), err)
+	}
+
+	// running fetching data in background
+	tk := time.NewTicker(30 * time.Second)
+	go monitors.MustRunMonitor(ctx, m, tk, c.logger)
+
 }

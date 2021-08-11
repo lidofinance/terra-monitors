@@ -27,46 +27,31 @@ const (
 
 type SlashingMonitor struct {
 	metrics              map[MetricName]MetricValue
-	metricVectors        map[MetricName]MetricVector
+	metricVectors        map[MetricName]*MetricVector
+	// tmp* for 2stage nonblocking update data
+	tmpMetrics           map[MetricName]MetricValue
+	tmpMetricVectors     map[MetricName]*MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
 	lock                 sync.RWMutex
-	flowManager          chan struct{}
 }
 
 func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *SlashingMonitor {
 	m := &SlashingMonitor{
 		metrics:              make(map[MetricName]MetricValue),
-		metricVectors:        make(map[MetricName]MetricVector),
+		metricVectors:        make(map[MetricName]*MetricVector),
+		tmpMetrics:              make(map[MetricName]MetricValue),
+		tmpMetricVectors:        make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
 		lock:                 sync.RWMutex{},
 	}
 
-	if cfg.SlashingMonitorUpdateInterval > 0 {
-		m.flowManager = config.FlowManager(cfg.SlashingMonitorUpdateInterval)
-	} else {
-		m.flowManager = make(chan struct{})
-	}
-
-	go m.Do()
+	m.initMetrics(m.tmpMetrics,m.tmpMetricVectors)
 
 	return m
-}
-
-func (m *SlashingMonitor) Do() {
-	for range m.flowManager {
-		func() {
-			m.lock.Lock()
-			defer m.lock.Unlock()
-			err := m.updateData(context.Background())
-			if err != nil {
-				m.logger.Errorln("failed to update SlashingMonitor data:", err)
-			}
-		}()
-	}
 }
 
 func (m *SlashingMonitor) Name() string {
@@ -80,21 +65,38 @@ func (m *SlashingMonitor) providedMetrics() []MetricName {
 	}
 }
 
-func (m *SlashingMonitor) InitMetrics() {
+func (m *SlashingMonitor) initMetrics(metrics map[MetricName]MetricValue,vectors map[MetricName]*MetricVector) {
 	for _, metric := range m.providedMetrics() {
-		if m.metrics[metric] == nil {
-			m.metrics[metric] = &SimpleMetricValue{}
+		if metrics[metric] == nil {
+			metrics[metric] = &SimpleMetricValue{}
 		}
-		m.metrics[metric].Set(0)
+		metrics[metric].Set(0)
 	}
 
-	m.metricVectors = map[MetricName]MetricVector{
-		SlashingNumMissedBlocks: make(MetricVector),
+	vectors[SlashingNumMissedBlocks] = NewMetricVector()
+}
+
+func (m *SlashingMonitor) InitMetrics() {
+	m.initMetrics(m.metrics,m.metricVectors)
+}
+
+func copyMetrics(src,dst map[MetricName]MetricValue) {
+	for k,v := range src {
+		dst[k].Set(v.Get())
 	}
 }
 
-func (m *SlashingMonitor) updateData(ctx context.Context) error {
-	m.InitMetrics()
+func copyVectors(src,dst map[MetricName]*MetricVector) {
+	for metricVector,vector := range src {
+		dst[metricVector] = NewMetricVector()
+		for _,label := range vector.Labels() {
+			dst[metricVector].Set(label,vector.Get(label))
+		}
+	}
+}
+
+func (m *SlashingMonitor) Handler(ctx context.Context) error {
+	m.initMetrics(m.tmpMetrics,m.tmpMetricVectors)
 
 	validatorsInfo, err := m.getValidatorsInfo(ctx)
 	if err != nil {
@@ -130,7 +132,7 @@ func (m *SlashingMonitor) updateData(ctx context.Context) error {
 				// If the `jailed_until` property is set to a date in the future, this
 				// validator is jailed.
 				if jailedUntil.After(time.Now()) {
-					m.metrics[SlashingNumJailedValidators].Add(1)
+					m.tmpMetrics[SlashingNumJailedValidators].Add(1)
 				}
 			}
 		}
@@ -146,20 +148,22 @@ func (m *SlashingMonitor) updateData(ctx context.Context) error {
 				m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
 			} else {
 				if numMissedBlocks > 0 {
-					m.metricVectors[SlashingNumMissedBlocks][validatorInfo.Moniker] += float64(numMissedBlocks)
+					m.tmpMetricVectors[SlashingNumMissedBlocks].Add(validatorInfo.Moniker, float64(numMissedBlocks))
 				}
 			}
 		}
 
 		if *signingInfo.Tombstoned {
-			m.metrics[SlashingNumTombstonedValidators].Add(1)
+			m.tmpMetrics[SlashingNumTombstonedValidators].Add(1)
 		}
 	}
-	m.logger.Infoln("updated", m.Name())
-	return nil
-}
 
-func (m *SlashingMonitor) Handler(ctx context.Context) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	copyMetrics(m.tmpMetrics,m.metrics)
+	copyVectors(m.tmpMetricVectors,m.metricVectors)
+
+	m.logger.Infoln("updated", m.Name())
 	return nil
 }
 
@@ -169,7 +173,7 @@ func (m *SlashingMonitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
-func (m SlashingMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m SlashingMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	return m.metricVectors

@@ -71,12 +71,12 @@ func (m ConfigsCRC32Monitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
-func (m ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 
 func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
-	m.InitMetrics()
+	//m.InitMetrics()
 	confReq := types.CommonConfigRequest{}
 
 	reqRaw, err := json.Marshal(&confReq)

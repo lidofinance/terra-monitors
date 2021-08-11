@@ -41,7 +41,6 @@ type UpdateGlobalIndexMonitor struct {
 	logger           *logrus.Logger
 	lastMaxCheckedID int
 	lock             sync.RWMutex
-	flowManager      chan struct{}
 }
 
 func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexMonitor {
@@ -53,32 +52,7 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexM
 		lock:            sync.RWMutex{},
 	}
 
-	if cfg.UpdateGlobalIndexInterval > 0 {
-		// the channel is being filled by "do work" flag according to the time interval
-		m.flowManager = config.FlowManager(cfg.UpdateGlobalIndexInterval)
-	} else {
-		// with a testing purpose, we are able to force worker to work
-		// by sending empty struct to the channel whenever we want
-		m.flowManager = make(chan struct{})
-	}
-
-	go m.Do()
-	m.InitMetrics()
-
 	return &m
-}
-
-func (m *UpdateGlobalIndexMonitor) Do() {
-	for range m.flowManager {
-		func() {
-			m.lock.Lock()
-			defer m.lock.Unlock()
-			err := m.updateData(context.Background())
-			if err != nil {
-				m.logger.Errorln("failed to update UpdateGlobalIndexBotContract data:", err)
-			}
-		}()
-	}
 }
 
 func (m UpdateGlobalIndexMonitor) Name() string {
@@ -104,7 +78,7 @@ func (m *UpdateGlobalIndexMonitor) InitMetrics() {
 	}
 }
 
-func (m *UpdateGlobalIndexMonitor) updateData(ctx context.Context) error {
+func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	var offset *float64
 	var fetchedTxs int
 	var firstCheck bool
@@ -142,12 +116,6 @@ func (m *UpdateGlobalIndexMonitor) updateData(ctx context.Context) error {
 	}
 	m.logger.Infoln("update global index txs fetched:", fetchedTxs)
 	m.logger.Infoln("update global index state:", m.metrics)
-	return nil
-}
-
-func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
-	// the method is needed to update data on demand
-	// but since we are updating data in a goroutine, the method is empty and do nothing
 	return nil
 }
 
@@ -194,7 +162,7 @@ func (m UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
-func (m UpdateGlobalIndexMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m UpdateGlobalIndexMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 

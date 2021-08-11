@@ -93,7 +93,7 @@ func (h RewardStateMonitor) GetMetrics() map[MetricName]MetricValue {
 	return h.metrics
 }
 
-func (h RewardStateMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (h RewardStateMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 

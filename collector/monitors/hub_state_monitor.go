@@ -96,7 +96,7 @@ func (h HubStateMonitor) GetMetrics() map[MetricName]MetricValue {
 	return h.metrics
 }
 
-func (h HubStateMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (h HubStateMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 
