@@ -16,6 +16,8 @@ const (
 	DefaultValidatorRegistryAddress = "terra1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	DefaultAirDropRegistryContract  = "terra_dummy_airdrop"
 	DefaultRewardDispatcherContract = "terra_dummy_rewarddispatcher"
+
+	DefaultUpdateDataInterval = 30
 )
 
 type CollectorConfig struct {

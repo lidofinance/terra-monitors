@@ -107,7 +107,7 @@ func (c *LCDCollector) RegisterMonitor(ctx context.Context, m monitors.Monitor) 
 	}
 
 	// running fetching data in background
-	tk := time.NewTicker(30 * time.Second)
+	tk := time.NewTicker(config.DefaultUpdateDataInterval * time.Second)
 	go monitors.MustRunMonitor(ctx, m, tk, c.logger)
 
 }

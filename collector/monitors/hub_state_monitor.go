@@ -26,6 +26,7 @@ func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
 		apiClient:  cfg.GetTerraClient(),
 		logger:     cfg.Logger,
 	}
+	m.InitMetrics()
 
 	return m
 }
