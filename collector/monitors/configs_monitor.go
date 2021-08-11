@@ -40,6 +40,7 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig) ConfigsCRC32Monitor {
 		apiClient: cfg.GetTerraClient(),
 		logger:    cfg.Logger,
 	}
+	m.InitMetrics()
 
 	return m
 }

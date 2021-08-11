@@ -73,7 +73,7 @@ func (p *PromExtractor) updateGaugeVectorValue(name monitors.MetricName) error {
 		return fmt.Errorf("failed to update metric \"%s\": %w", name, err)
 	}
 	p.GaugeVectors[name].Reset()
-	for _,label := range vector.Labels() {
+	for _, label := range vector.Labels() {
 		p.GaugeVectors[name].With(prometheus.Labels{"label": label}).Set(vector.Get(label))
 	}
 	return nil

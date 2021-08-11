@@ -15,14 +15,14 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) SetupTest() {
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestSuccessfulRequest() {
-	expectedFailedTx := &ReadOnceMetric{value:0.0}
-	expectedSuccessTxs := &ReadOnceMetric{value:10.0}
+	expectedFailedTx := &ReadOnceMetric{value: 0.0}
+	expectedSuccessTxs := &ReadOnceMetric{value: 10.0}
 	// 1878948+1879023+1971021+1968141+1969755+1968301+1865889+1966868+1332487+1966896
-	expectedGasUsed := &ReadOnceMetric{value:18767329.0}
+	expectedGasUsed := &ReadOnceMetric{value: 18767329.0}
 	// 2609420+2608384+2737567+2734520+2734575+2733759+2590159+2731335+2731705+2732807
-	expectedGasWanted := &ReadOnceMetric{value:26944231.0}
+	expectedGasWanted := &ReadOnceMetric{value: 26944231.0}
 	// 391413+391258+410636+410178+410187+410064+388524+409701+409756+409922
-	expectedUUSDUsed := &ReadOnceMetric{value:4041639.0}
+	expectedUUSDUsed := &ReadOnceMetric{value: 4041639.0}
 
 	data, err := ioutil.ReadFile("./test_data/update_global_index_success_response.json")
 	suite.NoError(err)
@@ -44,11 +44,11 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestSuccessfulRequest() {
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedTxRequest() {
-	expectedFailedTx := &ReadOnceMetric{value:1.0}
-	expectedSuccessTxs := &ReadOnceMetric{value:0.0}
-	expectedGasUsed := &ReadOnceMetric{value:1854478.0}
-	expectedGasWanted := &ReadOnceMetric{value:1842713.0}
-	expectedUUSDUsed := &ReadOnceMetric{value:276407.0}
+	expectedFailedTx := &ReadOnceMetric{value: 1.0}
+	expectedSuccessTxs := &ReadOnceMetric{value: 0.0}
+	expectedGasUsed := &ReadOnceMetric{value: 1854478.0}
+	expectedGasWanted := &ReadOnceMetric{value: 1842713.0}
+	expectedUUSDUsed := &ReadOnceMetric{value: 276407.0}
 	expectedErrorMessagePattern := "failed tx detected: out of gas: out of gas in location"
 
 	data, err := ioutil.ReadFile("./test_data/update_global_index_error.json")
@@ -73,12 +73,12 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedTxRequest() {
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
-	expectedFailedTx := &ReadOnceMetric{value:0.0}
+	expectedFailedTx := &ReadOnceMetric{value: 0.0}
 	// tx counter is limited by threshold, 10 iteration, 10 tx each
-	expectedSuccessTxs := &ReadOnceMetric{value:100.0}
-	expectedGasUsedPerTX := &ReadOnceMetric{value:1000.0}
-	expectedGasWantedPerTX := &ReadOnceMetric{value:10000.0}
-	expectedUUSDUsedPerTX := &ReadOnceMetric{value:100000.0}
+	expectedSuccessTxs := &ReadOnceMetric{value: 100.0}
+	expectedGasUsedPerTX := &ReadOnceMetric{value: 1000.0}
+	expectedGasWantedPerTX := &ReadOnceMetric{value: 10000.0}
+	expectedUUSDUsedPerTX := &ReadOnceMetric{value: 100000.0}
 	expectedErrorMessagePattern := "update global index processing stopped due to requests threshold"
 
 	testServer := NewServerForUpdateGlobalIndex()
@@ -105,11 +105,11 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
-	expectedFailedTx := &ReadOnceMetric{value:0.0}
-	expectedSuccessTxs := &ReadOnceMetric{value:19.0}
-	expectedGasUsedPerTX := &ReadOnceMetric{value:1000.0}
-	expectedGasWantedPerTX := &ReadOnceMetric{value:10000.0}
-	expectedUUSDUsedPerTX := &ReadOnceMetric{value:100000.0}
+	expectedFailedTx := &ReadOnceMetric{value: 0.0}
+	expectedSuccessTxs := &ReadOnceMetric{value: 19.0}
+	expectedGasUsedPerTX := &ReadOnceMetric{value: 1000.0}
+	expectedGasWantedPerTX := &ReadOnceMetric{value: 10000.0}
+	expectedUUSDUsedPerTX := &ReadOnceMetric{value: 100000.0}
 	expectedErrorMessagePattern := "stopping processing, last checked transaction is found"
 
 	testServer := NewServerForUpdateGlobalIndex()

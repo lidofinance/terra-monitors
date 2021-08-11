@@ -47,8 +47,8 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	metrics := m.GetMetrics()
 	metricVectors := m.GetMetricVectors()
 	var (
-		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value:1}
-		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value:1}
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value: 1}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value: 1}
 		expectedNumMissedBlocks         float64     = 5
 	)
 	var actualMissedBlocks float64
@@ -78,20 +78,18 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
-
 	valRepository := NewV1ValidatorsRepository(cfg)
 
 	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
-
 	metrics := m.GetMetrics()
 	metricVectors := m.GetMetricVectors()
 
 	var (
-		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value:0}
-		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value:0}
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value: 0}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value: 0}
 		expectedNumMissedBlocks         float64     = 0
 	)
 	var actualMissedBlocks float64
@@ -121,15 +119,13 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 
-
 	valRepository := NewV1ValidatorsRepository(cfg)
 
 	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)
 
-	expectedErrorMessage := "failed to getValidatorsPublicKeys"
-	suite.Contains(err.Error(),expectedErrorMessage)
-
+	expectedErrorMessage := "failed to getValidatorsInfo"
+	suite.Contains(err.Error(), expectedErrorMessage)
 
 }

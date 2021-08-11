@@ -6,6 +6,7 @@ import (
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
+	"sync"
 )
 
 const (
@@ -13,22 +14,29 @@ const (
 )
 
 type ValidatorsCommissionMonitor struct {
-	metrics              map[MetricName]float64
-	metricVectors        map[MetricName]MetricVector
+	metrics       map[MetricName]MetricValue
+	metricVectors map[MetricName]*MetricVector
+	// tmp* for 2stage nonblocking update data
+	tmpMetrics           map[MetricName]MetricValue
+	tmpMetricVectors     map[MetricName]*MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
+	lock                 sync.Mutex
 }
 
 func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) ValidatorsCommissionMonitor {
 	m := ValidatorsCommissionMonitor{
-		metrics:              make(map[MetricName]float64),
-		metricVectors:        make(map[MetricName]MetricVector),
+		metrics:              make(map[MetricName]MetricValue),
+		metricVectors:        make(map[MetricName]*MetricVector),
+		tmpMetrics:           make(map[MetricName]MetricValue),
+		tmpMetricVectors:     make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
 	}
-
+	m.InitMetrics()
+	initMetrics([]MetricName{}, []MetricName{ValidatorsCommission}, m.tmpMetrics, m.tmpMetricVectors)
 	return m
 }
 
@@ -37,13 +45,12 @@ func (m *ValidatorsCommissionMonitor) Name() string {
 }
 
 func (m *ValidatorsCommissionMonitor) InitMetrics() {
-	m.metricVectors = map[MetricName]MetricVector{
-		ValidatorsCommission: make(MetricVector),
-	}
+	initMetrics([]MetricName{}, []MetricName{ValidatorsCommission}, m.metrics, m.metricVectors)
 }
 
 func (m *ValidatorsCommissionMonitor) Handler(ctx context.Context) error {
-	m.InitMetrics()
+	//m.InitMetrics()
+	initMetrics([]MetricName{}, []MetricName{ValidatorsCommission}, m.tmpMetrics, m.tmpMetricVectors)
 
 	validatorsAddress, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
 	if err != nil {
@@ -56,16 +63,21 @@ func (m *ValidatorsCommissionMonitor) Handler(ctx context.Context) error {
 			return fmt.Errorf("failed to GetValidatorInfo: %w", err)
 		}
 
-		m.metricVectors[ValidatorsCommission][validatorInfo.Moniker] = validatorInfo.CommissionRate
+		m.tmpMetricVectors[ValidatorsCommission].Set(validatorInfo.Moniker, validatorInfo.CommissionRate)
 	}
 	m.logger.Infoln("validators commission updated", m.Name())
+
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	copyVectors(m.tmpMetricVectors, m.metricVectors)
+
 	return nil
 }
 
-func (m *ValidatorsCommissionMonitor) GetMetrics() map[MetricName]float64 {
+func (m *ValidatorsCommissionMonitor) GetMetrics() map[MetricName]MetricValue {
 	return m.metrics
 }
 
-func (m ValidatorsCommissionMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m ValidatorsCommissionMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return m.metricVectors
 }

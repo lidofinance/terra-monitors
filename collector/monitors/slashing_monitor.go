@@ -26,8 +26,8 @@ const (
 )
 
 type SlashingMonitor struct {
-	metrics              map[MetricName]MetricValue
-	metricVectors        map[MetricName]*MetricVector
+	metrics       map[MetricName]MetricValue
+	metricVectors map[MetricName]*MetricVector
 	// tmp* for 2stage nonblocking update data
 	tmpMetrics           map[MetricName]MetricValue
 	tmpMetricVectors     map[MetricName]*MetricVector
@@ -41,15 +41,16 @@ func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsReposit
 	m := &SlashingMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		tmpMetrics:              make(map[MetricName]MetricValue),
-		tmpMetricVectors:        make(map[MetricName]*MetricVector),
+		tmpMetrics:           make(map[MetricName]MetricValue),
+		tmpMetricVectors:     make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
 		lock:                 sync.RWMutex{},
 	}
 
-	m.initMetrics(m.tmpMetrics,m.tmpMetricVectors)
+	m.InitMetrics()
+	initMetrics(m.providedMetrics(), m.providedMetricVectors(), m.tmpMetrics, m.tmpMetricVectors)
 
 	return m
 }
@@ -65,38 +66,18 @@ func (m *SlashingMonitor) providedMetrics() []MetricName {
 	}
 }
 
-func (m *SlashingMonitor) initMetrics(metrics map[MetricName]MetricValue,vectors map[MetricName]*MetricVector) {
-	for _, metric := range m.providedMetrics() {
-		if metrics[metric] == nil {
-			metrics[metric] = &SimpleMetricValue{}
-		}
-		metrics[metric].Set(0)
+func (m *SlashingMonitor) providedMetricVectors() []MetricName {
+	return []MetricName{
+		SlashingNumMissedBlocks,
 	}
-
-	vectors[SlashingNumMissedBlocks] = NewMetricVector()
 }
 
 func (m *SlashingMonitor) InitMetrics() {
-	m.initMetrics(m.metrics,m.metricVectors)
-}
-
-func copyMetrics(src,dst map[MetricName]MetricValue) {
-	for k,v := range src {
-		dst[k].Set(v.Get())
-	}
-}
-
-func copyVectors(src,dst map[MetricName]*MetricVector) {
-	for metricVector,vector := range src {
-		dst[metricVector] = NewMetricVector()
-		for _,label := range vector.Labels() {
-			dst[metricVector].Set(label,vector.Get(label))
-		}
-	}
+	initMetrics(m.providedMetrics(), m.providedMetricVectors(), m.metrics, m.metricVectors)
 }
 
 func (m *SlashingMonitor) Handler(ctx context.Context) error {
-	m.initMetrics(m.tmpMetrics,m.tmpMetricVectors)
+	initMetrics(m.providedMetrics(), m.providedMetricVectors(), m.tmpMetrics, m.tmpMetricVectors)
 
 	validatorsInfo, err := m.getValidatorsInfo(ctx)
 	if err != nil {
@@ -160,8 +141,8 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	copyMetrics(m.tmpMetrics,m.metrics)
-	copyVectors(m.tmpMetricVectors,m.metricVectors)
+	copyMetrics(m.tmpMetrics, m.metrics)
+	copyVectors(m.tmpMetricVectors, m.metricVectors)
 
 	m.logger.Infoln("updated", m.Name())
 	return nil

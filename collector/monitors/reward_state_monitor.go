@@ -25,6 +25,7 @@ func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
+	m.InitMetrics()
 
 	return m
 }

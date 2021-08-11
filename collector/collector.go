@@ -83,10 +83,7 @@ func findMaps(key monitors.MetricName, maps ...map[monitors.MetricName]monitors.
 	return nil, false
 }
 
-
-
 func (c *LCDCollector) RegisterMonitor(ctx context.Context, m monitors.Monitor) {
-	m.InitMetrics()
 	for metric := range m.GetMetrics() {
 		if wantedMonitor, found := findMaps(metric, c.Metrics, c.MetricVectors); found {
 			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), wantedMonitor.Name(), metric))

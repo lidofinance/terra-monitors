@@ -29,6 +29,7 @@ func NewWhitelistedValidatorsMonitor(cfg config.CollectorConfig, repository Vali
 		logger:               cfg.Logger,
 		validatorsRepository: repository,
 	}
+	m.InitMetrics()
 
 	return m
 }

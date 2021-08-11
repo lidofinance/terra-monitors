@@ -25,8 +25,9 @@ func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor 
 		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
-		lock:             sync.RWMutex{},
+		lock:            sync.RWMutex{},
 	}
+	m.InitMetrics()
 	return m
 }
 
@@ -36,8 +37,7 @@ type BlunaTokenInfoMonitor struct {
 	metrics         map[MetricName]MetricValue
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
-	lock             sync.RWMutex
-
+	lock            sync.RWMutex
 }
 
 func (h BlunaTokenInfoMonitor) Name() string {

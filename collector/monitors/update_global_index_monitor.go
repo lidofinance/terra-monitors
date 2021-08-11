@@ -51,6 +51,7 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexM
 		logger:          cfg.Logger,
 		lock:            sync.RWMutex{},
 	}
+	m.InitMetrics()
 
 	return &m
 }

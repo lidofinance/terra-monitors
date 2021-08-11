@@ -9,7 +9,6 @@ import (
 
 type Monitor interface {
 	Name() string
-	InitMetrics()
 	// Handler fetches the data to inner storage
 	Handler(ctx context.Context) error
 	// GetMetrics - provides single value metrics fetched by Handler method
@@ -88,7 +87,6 @@ func (b *SimpleMetricValue) Add(f float64) {
 	b.value += f
 }
 
-
 // ReadOnceMetric once value is read its sets to zero value
 // implemented specially for update global index bot monitor. We need to accumulate data in interval (last_check,current_check)
 // once value are read we set the value to zero value
@@ -117,7 +115,6 @@ func (a *ReadOnceMetric) Add(f float64) {
 	a.value += f
 }
 
-
 func MustRunMonitor(ctx context.Context, m Monitor, tk *time.Ticker, logger *logrus.Logger) {
 	if tk == nil {
 		panic("you must to initialize ticker first")
@@ -131,6 +128,33 @@ func MustRunMonitor(ctx context.Context, m Monitor, tk *time.Ticker, logger *log
 			}
 		case <-ctx.Done():
 			return
+		}
+	}
+}
+
+func initMetrics(providedMetrics []MetricName, providedMetricVectors []MetricName, metrics map[MetricName]MetricValue, vectors map[MetricName]*MetricVector) {
+	for _, metric := range providedMetrics {
+		if metrics[metric] == nil {
+			metrics[metric] = &SimpleMetricValue{}
+		}
+		metrics[metric].Set(0)
+	}
+	for _, metric := range providedMetricVectors {
+		vectors[metric] = NewMetricVector()
+	}
+}
+
+func copyMetrics(src, dst map[MetricName]MetricValue) {
+	for k, v := range src {
+		dst[k].Set(v.Get())
+	}
+}
+
+func copyVectors(src, dst map[MetricName]*MetricVector) {
+	for metricVector, vector := range src {
+		dst[metricVector] = NewMetricVector()
+		for _, label := range vector.Labels() {
+			dst[metricVector].Set(label, vector.Get(label))
 		}
 	}
 }
