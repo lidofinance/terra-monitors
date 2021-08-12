@@ -14,11 +14,8 @@ const (
 )
 
 type ValidatorsCommissionMonitor struct {
-	metrics       map[MetricName]MetricValue
-	metricVectors map[MetricName]*MetricVector
-	// tmp* for 2stage nonblocking update data
-	tmpMetrics           map[MetricName]MetricValue
-	tmpMetricVectors     map[MetricName]*MetricVector
+	metrics              map[MetricName]MetricValue
+	metricVectors        map[MetricName]*MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
@@ -29,14 +26,11 @@ func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRe
 	m := ValidatorsCommissionMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		tmpMetrics:           make(map[MetricName]MetricValue),
-		tmpMetricVectors:     make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
 	}
 	m.InitMetrics()
-	initMetrics([]MetricName{}, []MetricName{ValidatorsCommission}, m.tmpMetrics, m.tmpMetricVectors)
 	return &m
 }
 
@@ -49,7 +43,9 @@ func (m *ValidatorsCommissionMonitor) InitMetrics() {
 }
 
 func (m *ValidatorsCommissionMonitor) Handler(ctx context.Context) error {
-	initMetrics([]MetricName{}, []MetricName{ValidatorsCommission}, m.tmpMetrics, m.tmpMetricVectors)
+	// tmp* for 2stage nonblocking update data
+	tmpMetricVectors := make(map[MetricName]*MetricVector)
+	initMetrics(nil, []MetricName{ValidatorsCommission}, nil, tmpMetricVectors)
 
 	validatorsAddress, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
 	if err != nil {
@@ -62,13 +58,13 @@ func (m *ValidatorsCommissionMonitor) Handler(ctx context.Context) error {
 			return fmt.Errorf("failed to GetValidatorInfo: %w", err)
 		}
 
-		m.tmpMetricVectors[ValidatorsCommission].Set(validatorInfo.Moniker, validatorInfo.CommissionRate)
+		tmpMetricVectors[ValidatorsCommission].Set(validatorInfo.Moniker, validatorInfo.CommissionRate)
 	}
 	m.logger.Infoln("validators commission updated", m.Name())
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	copyVectors(m.tmpMetricVectors, m.metricVectors)
+	copyVectors(tmpMetricVectors, m.metricVectors)
 
 	return nil
 }

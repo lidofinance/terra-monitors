@@ -28,9 +28,6 @@ const (
 type SlashingMonitor struct {
 	metrics       map[MetricName]MetricValue
 	metricVectors map[MetricName]*MetricVector
-	// tmp* for 2stage nonblocking update data
-	tmpMetrics           map[MetricName]MetricValue
-	tmpMetricVectors     map[MetricName]*MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
@@ -41,8 +38,6 @@ func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsReposit
 	m := &SlashingMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		tmpMetrics:           make(map[MetricName]MetricValue),
-		tmpMetricVectors:     make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
@@ -50,7 +45,6 @@ func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsReposit
 	}
 
 	m.InitMetrics()
-	initMetrics(m.providedMetrics(), m.providedMetricVectors(), m.tmpMetrics, m.tmpMetricVectors)
 
 	return m
 }
@@ -77,7 +71,10 @@ func (m *SlashingMonitor) InitMetrics() {
 }
 
 func (m *SlashingMonitor) Handler(ctx context.Context) error {
-	initMetrics(m.providedMetrics(), m.providedMetricVectors(), m.tmpMetrics, m.tmpMetricVectors)
+	// tmp* for 2stage nonblocking update data
+	tmpMetrics          := make(map[MetricName]MetricValue)
+	tmpMetricVectors     :=make(map[MetricName]*MetricVector)
+	initMetrics(m.providedMetrics(), m.providedMetricVectors(), tmpMetrics, tmpMetricVectors)
 
 	validatorsInfo, err := m.getValidatorsInfo(ctx)
 	if err != nil {
@@ -113,7 +110,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				// If the `jailed_until` property is set to a date in the future, this
 				// validator is jailed.
 				if jailedUntil.After(time.Now()) {
-					m.tmpMetrics[SlashingNumJailedValidators].Add(1)
+					tmpMetrics[SlashingNumJailedValidators].Add(1)
 				}
 			}
 		}
@@ -129,20 +126,20 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
 			} else {
 				if numMissedBlocks > 0 {
-					m.tmpMetricVectors[SlashingNumMissedBlocks].Add(validatorInfo.Moniker, float64(numMissedBlocks))
+					tmpMetricVectors[SlashingNumMissedBlocks].Add(validatorInfo.Moniker, float64(numMissedBlocks))
 				}
 			}
 		}
 
 		if *signingInfo.Tombstoned {
-			m.tmpMetrics[SlashingNumTombstonedValidators].Add(1)
+			tmpMetrics[SlashingNumTombstonedValidators].Add(1)
 		}
 	}
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	copyMetrics(m.tmpMetrics, m.metrics)
-	copyVectors(m.tmpMetricVectors, m.metricVectors)
+	copyMetrics(tmpMetrics, m.metrics)
+	copyVectors(tmpMetricVectors, m.metricVectors)
 
 	m.logger.Infoln("updated", m.Name())
 	return nil

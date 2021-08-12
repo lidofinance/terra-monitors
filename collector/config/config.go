@@ -4,6 +4,7 @@ import (
 	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 	DefaultAirDropRegistryContract  = "terra_dummy_airdrop"
 	DefaultRewardDispatcherContract = "terra_dummy_rewarddispatcher"
 
-	DefaultUpdateDataInterval = 30
+	DefaultUpdateDataInterval = 30 * time.Second
 )
 
 type CollectorConfig struct {
