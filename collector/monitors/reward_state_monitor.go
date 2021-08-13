@@ -21,10 +21,11 @@ func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 	m := RewardStateMonitor{
 		State:           &types.RewardStateResponse{},
 		ContractAddress: cfg.RewardContract,
-		metrics:         make(map[MetricName]float64),
+		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
 	}
+	m.InitMetrics()
 
 	return m
 }
@@ -32,7 +33,7 @@ func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
 type RewardStateMonitor struct {
 	State           *types.RewardStateResponse
 	ContractAddress string
-	metrics         map[MetricName]float64
+	metrics         map[MetricName]MetricValue
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
 }
@@ -83,14 +84,17 @@ func (h *RewardStateMonitor) setStringMetric(m MetricName, rawValue string) {
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
-	h.metrics[m] = v
+	if h.metrics[m] == nil {
+		h.metrics[m] = &SimpleMetricValue{}
+	}
+	h.metrics[m].Set(v)
 }
 
-func (h RewardStateMonitor) GetMetrics() map[MetricName]float64 {
+func (h RewardStateMonitor) GetMetrics() map[MetricName]MetricValue {
 	return h.metrics
 }
 
-func (h RewardStateMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (h RewardStateMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 

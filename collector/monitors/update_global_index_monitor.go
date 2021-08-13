@@ -3,13 +3,13 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"strconv"
-
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/lidofinance/terra-monitors/openapi/models"
 	"github.com/sirupsen/logrus"
+	"strconv"
+	"sync"
 )
 
 type UpdateGlobalIndexTxsVariants int
@@ -36,33 +36,47 @@ const UUSDDenom = "uusd"
 
 type UpdateGlobalIndexMonitor struct {
 	ContractAddress  string
-	metrics          map[MetricName]float64
+	metrics          map[MetricName]MetricValue
 	apiClient        *client.TerraLiteForTerra
 	logger           *logrus.Logger
 	lastMaxCheckedID int
+	lock             sync.RWMutex
 }
 
-func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) UpdateGlobalIndexMonitor {
+func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
 		ContractAddress: cfg.UpdateGlobalIndexBotAddress,
-		metrics:         make(map[MetricName]float64),
+		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
+		lock:            sync.RWMutex{},
 	}
+	m.InitMetrics()
 
-	return m
+	return &m
 }
 
-func (m UpdateGlobalIndexMonitor) Name() string {
+func (m *UpdateGlobalIndexMonitor) Name() string {
 	return "UpdateGlobalIndexMonitor"
 }
 
+func (m *UpdateGlobalIndexMonitor) providedMetrics() []MetricName {
+	return []MetricName{
+		UpdateGlobalIndexSuccessfulTxSinceLastCheck,
+		UpdateGlobalIndexGasWanted,
+		UpdateGlobalIndexGasUsed,
+		UpdateGlobalIndexUUSDFee,
+		UpdateGlobalIndexFailedTxSinceLastCheck,
+	}
+}
+
 func (m *UpdateGlobalIndexMonitor) InitMetrics() {
-	m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck] = 0
-	m.metrics[UpdateGlobalIndexGasWanted] = 0
-	m.metrics[UpdateGlobalIndexGasUsed] = 0
-	m.metrics[UpdateGlobalIndexUUSDFee] = 0
-	m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck] = 0
+	for _, metric := range m.providedMetrics() {
+		if m.metrics[metric] == nil {
+			m.metrics[metric] = &ReadOnceMetric{}
+		}
+		m.metrics[metric].Set(0)
+	}
 }
 
 func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
@@ -77,7 +91,6 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	var maxProcessedID int
 	var maxProcessedIDPerRequest int
 	var alreadyProcessedFound bool
-	m.InitMetrics()
 	for iterations < threshold {
 		p := transactions.GetV1TxsParams{}
 		p.SetAccount(&m.ContractAddress)
@@ -131,24 +144,26 @@ func (m *UpdateGlobalIndexMonitor) processTransactions(
 		}
 		switch isTxUpdateGlobalIndex(tx) {
 		case SuccessfulUpdateGlobalIndexTX:
-			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck]++
+			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck].Add(1)
 		case FailedUpdateGlobalIndexTx:
-			m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck]++
+			m.metrics[UpdateGlobalIndexFailedTxSinceLastCheck].Add(1)
 			m.logger.Warning("failed tx detected: ", getTxRawLog(tx))
 		case NonUpdateGlobalIndexTX:
 		}
-		m.metrics[UpdateGlobalIndexGasUsed] += gasUsed(m.logger, tx)
-		m.metrics[UpdateGlobalIndexGasWanted] += gasWanted(m.logger, tx)
-		m.metrics[UpdateGlobalIndexUUSDFee] += uusdFee(m.logger, tx)
+		m.metrics[UpdateGlobalIndexGasUsed].Add(gasUsed(m.logger, tx))
+		m.metrics[UpdateGlobalIndexGasWanted].Add(gasWanted(m.logger, tx))
+		m.metrics[UpdateGlobalIndexUUSDFee].Add(uusdFee(m.logger, tx))
 	}
 	return newMaxCheckedID, alreadyProcessedFound
 }
 
-func (m UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]float64 {
+func (m *UpdateGlobalIndexMonitor) GetMetrics() map[MetricName]MetricValue {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metrics
 }
 
-func (m UpdateGlobalIndexMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m *UpdateGlobalIndexMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 
@@ -173,7 +188,7 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 			// https://fcd.terra.dev/v1/txs?offset=126987824
 			// tx with id = 126987823 is a failed tx due to out of gas
 			// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.
-			// The second one - "raw_log" contains human readable message with error
+			// The second one - "raw_log" contains human-readable message with error
 			return FailedUpdateGlobalIndexTx
 		}
 	}

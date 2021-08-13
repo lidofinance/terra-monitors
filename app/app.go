@@ -12,7 +12,7 @@ type AppHTTP struct {
 }
 
 func (a AppHTTP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	a.prom.UpdateMetrics(r.Context())
+	a.prom.UpdateMetrics()
 	promhttp.Handler().ServeHTTP(w, r)
 }
 

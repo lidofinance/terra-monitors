@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/lidofinance/terra-monitors/collector/types"
@@ -25,21 +26,25 @@ const (
 )
 
 type SlashingMonitor struct {
-	metrics              map[MetricName]float64
-	metricVectors        map[MetricName]MetricVector
+	metrics       map[MetricName]MetricValue
+	metricVectors map[MetricName]*MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
+	lock                 sync.RWMutex
 }
 
 func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *SlashingMonitor {
 	m := &SlashingMonitor{
-		metrics:              make(map[MetricName]float64),
-		metricVectors:        make(map[MetricName]MetricVector),
+		metrics:              make(map[MetricName]MetricValue),
+		metricVectors:        make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
 		logger:               cfg.Logger,
+		lock:                 sync.RWMutex{},
 	}
+
+	m.InitMetrics()
 
 	return m
 }
@@ -48,19 +53,28 @@ func (m *SlashingMonitor) Name() string {
 	return "Slashing"
 }
 
-func (m *SlashingMonitor) InitMetrics() {
-	m.metrics = map[MetricName]float64{
-		SlashingNumJailedValidators:     0,
-		SlashingNumTombstonedValidators: 0,
-	}
-
-	m.metricVectors = map[MetricName]MetricVector{
-		SlashingNumMissedBlocks: make(MetricVector),
+func (m *SlashingMonitor) providedMetrics() []MetricName {
+	return []MetricName{
+		SlashingNumJailedValidators,
+		SlashingNumTombstonedValidators,
 	}
 }
 
+func (m *SlashingMonitor) providedMetricVectors() []MetricName {
+	return []MetricName{
+		SlashingNumMissedBlocks,
+	}
+}
+
+func (m *SlashingMonitor) InitMetrics() {
+	initMetrics(m.providedMetrics(), m.providedMetricVectors(), m.metrics, m.metricVectors)
+}
+
 func (m *SlashingMonitor) Handler(ctx context.Context) error {
-	m.InitMetrics()
+	// tmp* for 2stage nonblocking update data
+	tmpMetrics          := make(map[MetricName]MetricValue)
+	tmpMetricVectors     :=make(map[MetricName]*MetricVector)
+	initMetrics(m.providedMetrics(), m.providedMetricVectors(), tmpMetrics, tmpMetricVectors)
 
 	validatorsInfo, err := m.getValidatorsInfo(ctx)
 	if err != nil {
@@ -96,7 +110,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				// If the `jailed_until` property is set to a date in the future, this
 				// validator is jailed.
 				if jailedUntil.After(time.Now()) {
-					m.metrics[SlashingNumJailedValidators]++
+					tmpMetrics[SlashingNumJailedValidators].Add(1)
 				}
 			}
 		}
@@ -112,24 +126,34 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 				m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
 			} else {
 				if numMissedBlocks > 0 {
-					m.metricVectors[SlashingNumMissedBlocks][validatorInfo.Moniker] += float64(numMissedBlocks)
+					tmpMetricVectors[SlashingNumMissedBlocks].Add(validatorInfo.Moniker, float64(numMissedBlocks))
 				}
 			}
 		}
 
 		if *signingInfo.Tombstoned {
-			m.metrics[SlashingNumTombstonedValidators]++
+			tmpMetrics[SlashingNumTombstonedValidators].Add(1)
 		}
 	}
+
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	copyMetrics(tmpMetrics, m.metrics)
+	copyVectors(tmpMetricVectors, m.metricVectors)
+
 	m.logger.Infoln("updated", m.Name())
 	return nil
 }
 
-func (m *SlashingMonitor) GetMetrics() map[MetricName]float64 {
+func (m *SlashingMonitor) GetMetrics() map[MetricName]MetricValue {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metrics
 }
 
-func (m SlashingMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (m *SlashingMonitor) GetMetricVectors() map[MetricName]*MetricVector {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
 	return m.metricVectors
 }
 

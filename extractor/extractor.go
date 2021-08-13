@@ -1,7 +1,6 @@
 package extractor
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/lidofinance/terra-monitors/collector"
@@ -73,17 +72,14 @@ func (p *PromExtractor) updateGaugeVectorValue(name monitors.MetricName) error {
 	if err != nil {
 		return fmt.Errorf("failed to update metric \"%s\": %w", name, err)
 	}
-	for label := range vector {
-		p.GaugeVectors[name].With(prometheus.Labels{"label": label}).Set(vector[label])
+	p.GaugeVectors[name].Reset()
+	for _, label := range vector.Labels() {
+		p.GaugeVectors[name].With(prometheus.Labels{"label": label}).Set(vector.Get(label))
 	}
 	return nil
 }
 
-func (p PromExtractor) UpdateMetrics(ctx context.Context) {
-	errors := p.collector.UpdateData(ctx)
-	for _, err := range errors {
-		p.log.Errorf("failed to update collector data: %v", err)
-	}
+func (p PromExtractor) UpdateMetrics() {
 
 	for _, gaugeName := range p.GaugeMetrics {
 		err := p.updateGaugeValue(gaugeName)

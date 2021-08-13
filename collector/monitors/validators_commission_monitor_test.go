@@ -43,7 +43,7 @@ func (suite *ValidatorsCommissionTestSuite) TestSuccessfulRequest() {
 	metricVectors := m.GetMetricVectors()
 
 	expectedValidatorsCommission := 0.08
-	actualValidatorsCommission := metricVectors[ValidatorsCommission][TestMoniker]
+	actualValidatorsCommission := metricVectors[ValidatorsCommission].Get(TestMoniker)
 
 	suite.Equal(expectedValidatorsCommission, actualValidatorsCommission)
 }

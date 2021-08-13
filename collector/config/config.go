@@ -4,6 +4,7 @@ import (
 	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 const (
@@ -16,19 +17,23 @@ const (
 	DefaultValidatorRegistryAddress = "terra1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	DefaultAirDropRegistryContract  = "terra_dummy_airdrop"
 	DefaultRewardDispatcherContract = "terra_dummy_rewarddispatcher"
+
+	DefaultUpdateDataInterval = 30 * time.Second
 )
 
 type CollectorConfig struct {
-	Logger                      *logrus.Logger
-	LCDEndpoint                 string
-	HubContract                 string
-	RewardContract              string
-	BlunaTokenInfoContract      string
-	UpdateGlobalIndexBotAddress string
-	ValidatorRegistryAddress    string
-	RewardDispatcherContract    string
-	AirDropRegistryContract     string
-	Schemes                     []string
+	Logger                        *logrus.Logger
+	LCDEndpoint                   string
+	HubContract                   string
+	RewardContract                string
+	BlunaTokenInfoContract        string
+	UpdateGlobalIndexBotAddress   string
+	ValidatorRegistryAddress      string
+	RewardDispatcherContract      string
+	AirDropRegistryContract       string
+	Schemes                       []string
+	UpdateGlobalIndexInterval     uint
+	SlashingMonitorUpdateInterval uint
 }
 
 func (c CollectorConfig) getSchemes() []string {
@@ -63,7 +68,9 @@ func DefaultCollectorConfig() CollectorConfig {
 		ValidatorRegistryAddress:    DefaultValidatorRegistryAddress,
 
 		// change the fields to appropriate contracts values
-		AirDropRegistryContract:  DefaultAirDropRegistryContract,
-		RewardDispatcherContract: DefaultRewardDispatcherContract,
+		AirDropRegistryContract:       DefaultAirDropRegistryContract,
+		RewardDispatcherContract:      DefaultRewardDispatcherContract,
+		UpdateGlobalIndexInterval:     30,
+		SlashingMonitorUpdateInterval: 30,
 	}
 }

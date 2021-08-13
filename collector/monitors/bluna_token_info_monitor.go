@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"sync"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
@@ -17,26 +18,29 @@ var (
 	BlunaTotalSupply MetricName = "bluna_total_supply"
 )
 
-func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) BlunaTokenInfoMonitor {
+func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) *BlunaTokenInfoMonitor {
 	m := BlunaTokenInfoMonitor{
 		State:           &types.TokenInfoResponse{},
 		ContractAddress: cfg.BlunaTokenInfoContract,
-		metrics:         make(map[MetricName]float64),
+		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
 		logger:          cfg.Logger,
+		lock:            sync.RWMutex{},
 	}
-	return m
+	m.InitMetrics()
+	return &m
 }
 
 type BlunaTokenInfoMonitor struct {
 	State           *types.TokenInfoResponse
 	ContractAddress string
-	metrics         map[MetricName]float64
+	metrics         map[MetricName]MetricValue
 	apiClient       *client.TerraLiteForTerra
 	logger          *logrus.Logger
+	lock            sync.RWMutex
 }
 
-func (h BlunaTokenInfoMonitor) Name() string {
+func (h *BlunaTokenInfoMonitor) Name() string {
 	return "BlunaTokenInfo"
 }
 
@@ -45,6 +49,8 @@ func (h *BlunaTokenInfoMonitor) InitMetrics() {
 }
 
 func (h *BlunaTokenInfoMonitor) updateMetrics() {
+	h.lock.Lock()
+	defer h.lock.Unlock()
 	h.setStringMetric(BlunaTotalSupply, h.State.TotalSupply)
 }
 
@@ -82,14 +88,19 @@ func (h *BlunaTokenInfoMonitor) setStringMetric(m MetricName, rawValue string) {
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
-	h.metrics[m] = v
+	if h.metrics[m] == nil {
+		h.metrics[m] = &SimpleMetricValue{}
+	}
+	h.metrics[m].Set(v)
 }
 
-func (h BlunaTokenInfoMonitor) GetMetrics() map[MetricName]float64 {
+func (h *BlunaTokenInfoMonitor) GetMetrics() map[MetricName]MetricValue {
+	h.lock.RLock()
+	defer h.lock.RUnlock()
 	return h.metrics
 }
 
-func (h BlunaTokenInfoMonitor) GetMetricVectors() map[MetricName]MetricVector {
+func (h *BlunaTokenInfoMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
 }
 

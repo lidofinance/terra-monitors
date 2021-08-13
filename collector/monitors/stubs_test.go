@@ -4,15 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/lidofinance/terra-monitors/collector/config"
+	"github.com/lidofinance/terra-monitors/internal/logging"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
-
-	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/internal/logging"
 )
 
 const BlunaTokenInfo = `{"height":"3754668","result":{"name":"Bonded Luna","symbol":"BLUNA","decimals":6,"total_supply":"79178685320809"}}`
@@ -43,6 +42,7 @@ func NewTestCollectorConfig(urlWithScheme string) config.CollectorConfig {
 		ValidatorRegistryAddress:    ValidatorRegistryAddress,
 		AirDropRegistryContract:     AirDropRegistryContract,
 		Schemes:                     []string{"http"},
+		UpdateGlobalIndexInterval:   0,
 	}
 	cfg.Logger.Out = out
 	return cfg

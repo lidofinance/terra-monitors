@@ -3,9 +3,8 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-
 	"github.com/stretchr/testify/suite"
+	"io/ioutil"
 )
 
 const (
@@ -48,13 +47,13 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	metrics := m.GetMetrics()
 	metricVectors := m.GetMetricVectors()
 	var (
-		expectedNumTombstonedValidators float64 = 1
-		expectedNumJailedValidators     float64 = 1
-		expectedNumMissedBlocks         float64 = 5
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value: 1}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value: 1}
+		expectedNumMissedBlocks         float64     = 5
 	)
 	var actualMissedBlocks float64
-	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
-		actualMissedBlocks += missedBlocks
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks].Labels() {
+		actualMissedBlocks += metricVectors[SlashingNumMissedBlocks].Get(missedBlocks)
 	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])
 	suite.Equal(expectedNumJailedValidators, metrics[SlashingNumJailedValidators])
@@ -89,13 +88,13 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	metricVectors := m.GetMetricVectors()
 
 	var (
-		expectedNumTombstonedValidators float64 = 0
-		expectedNumJailedValidators     float64 = 0
-		expectedNumMissedBlocks         float64 = 0
+		expectedNumTombstonedValidators MetricValue = &SimpleMetricValue{value: 0}
+		expectedNumJailedValidators     MetricValue = &SimpleMetricValue{value: 0}
+		expectedNumMissedBlocks         float64     = 0
 	)
 	var actualMissedBlocks float64
-	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks] {
-		actualMissedBlocks += missedBlocks
+	for _, missedBlocks := range metricVectors[SlashingNumMissedBlocks].Labels() {
+		actualMissedBlocks += metricVectors[SlashingNumMissedBlocks].Get(missedBlocks)
 	}
 	suite.Equal(expectedNumTombstonedValidators, metrics[SlashingNumTombstonedValidators])
 	suite.Equal(expectedNumJailedValidators, metrics[SlashingNumJailedValidators])
@@ -125,4 +124,8 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 	m := NewSlashingMonitor(cfg, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)
+
+	expectedErrorMessage := "failed to getValidatorsInfo"
+	suite.Contains(err.Error(), expectedErrorMessage)
+
 }
