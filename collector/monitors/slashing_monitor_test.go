@@ -3,8 +3,9 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/suite"
 	"io/ioutil"
+
+	"github.com/stretchr/testify/suite"
 )
 
 const (
@@ -39,8 +40,8 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 
 	valRepository := NewV1ValidatorsRepository(cfg)
-
-	m := NewSlashingMonitor(cfg, valRepository)
+	logger := NewTestLogger()
+	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
@@ -79,8 +80,8 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 
 	valRepository := NewV1ValidatorsRepository(cfg)
-
-	m := NewSlashingMonitor(cfg, valRepository)
+	logger := NewTestLogger()
+	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
@@ -120,8 +121,8 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 
 	valRepository := NewV1ValidatorsRepository(cfg)
-
-	m := NewSlashingMonitor(cfg, valRepository)
+	logger := NewTestLogger()
+	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)
 

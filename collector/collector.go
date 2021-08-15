@@ -3,11 +3,12 @@ package collector
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type Collector interface {
@@ -17,11 +18,11 @@ type Collector interface {
 	ProvidedMetricVectors() []monitors.MetricName
 }
 
-func NewLCDCollector(cfg config.CollectorConfig) LCDCollector {
+func NewLCDCollector(cfg config.CollectorConfig, logger *logrus.Logger) LCDCollector {
 	return LCDCollector{
 		Metrics:       make(map[monitors.MetricName]monitors.Monitor),
 		MetricVectors: make(map[monitors.MetricName]monitors.Monitor),
-		logger:        cfg.Logger,
+		logger:        logger,
 		apiClient:     cfg.GetTerraClient(),
 	}
 }
@@ -83,7 +84,7 @@ func findMaps(key monitors.MetricName, maps ...map[monitors.MetricName]monitors.
 	return nil, false
 }
 
-func (c *LCDCollector) RegisterMonitor(ctx context.Context, m monitors.Monitor) {
+func (c *LCDCollector) RegisterMonitor(cfg config.CollectorConfig, ctx context.Context, m monitors.Monitor) {
 	for metric := range m.GetMetrics() {
 		if wantedMonitor, found := findMaps(metric, c.Metrics, c.MetricVectors); found {
 			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), wantedMonitor.Name(), metric))
@@ -107,7 +108,7 @@ func (c *LCDCollector) RegisterMonitor(ctx context.Context, m monitors.Monitor) 
 	}
 
 	// running fetching data in background
-	tk := time.NewTicker(config.DefaultUpdateDataInterval)
-	go monitors.MustRunMonitor(ctx, m, tk, c.logger)
+	tk := time.NewTicker(cfg.UpdateDataInterval)
 
+	go monitors.MustRunMonitor(ctx, m, tk, c.logger)
 }

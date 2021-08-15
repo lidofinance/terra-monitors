@@ -35,8 +35,8 @@ func (suite *ValidatorsCommissionTestSuite) TestSuccessfulRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 
 	valRepository := NewV1ValidatorsRepository(cfg)
-
-	m := NewValidatorsFeeMonitor(cfg, valRepository)
+	logger := NewTestLogger()
+	m := NewValidatorsFeeMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
@@ -62,8 +62,8 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedValidatorsFeeRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 
 	valRepository := NewV1ValidatorsRepository(cfg)
-
-	m := NewValidatorsFeeMonitor(cfg, valRepository)
+	logger := NewTestLogger()
+	m := NewValidatorsFeeMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)
 }

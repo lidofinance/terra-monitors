@@ -4,14 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/internal/logging"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/lidofinance/terra-monitors/collector/config"
+	"github.com/lidofinance/terra-monitors/internal/logging"
 )
 
 const BlunaTokenInfo = `{"height":"3754668","result":{"name":"Bonded Luna","symbol":"BLUNA","decimals":6,"total_supply":"79178685320809"}}`
@@ -24,28 +27,37 @@ const (
 	BlunaTokenInfoContract      = "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp"
 	UpdateGlobalIndexBotAddress = "dummy_updateglobalindexbot"
 	RewardDispatcherContract    = "dummy_rewarddispatcher"
-	ValidatorRegistryAddress    = "dummy_validatorsregistry"
+	ValidatorsRegistryContract  = "dummy_validatorsregistry"
 	AirDropRegistryContract     = "dummy_airdropRegistry"
 )
 
 func NewTestCollectorConfig(urlWithScheme string) config.CollectorConfig {
 	host := strings.Split(urlWithScheme, "//")[1]
-	out := bytes.NewBuffer(nil)
 	cfg := config.CollectorConfig{
-		Logger:                      logging.NewDefaultLogger(),
-		LCDEndpoint:                 host,
-		HubContract:                 HubContract,
-		RewardContract:              RewardContract,
-		BlunaTokenInfoContract:      BlunaTokenInfoContract,
-		UpdateGlobalIndexBotAddress: UpdateGlobalIndexBotAddress,
-		RewardDispatcherContract:    RewardDispatcherContract,
-		ValidatorRegistryAddress:    ValidatorRegistryAddress,
-		AirDropRegistryContract:     AirDropRegistryContract,
-		Schemes:                     []string{"http"},
-		UpdateGlobalIndexInterval:   0,
+		LCD: config.LCD{
+			Endpoint: host,
+			Schemes:  []string{"http"},
+		},
+		Addresses: config.Addresses{
+			HubContract:                 HubContract,
+			RewardContract:              RewardContract,
+			BlunaTokenInfoContract:      BlunaTokenInfoContract,
+			UpdateGlobalIndexBotAddress: UpdateGlobalIndexBotAddress,
+			RewardsDispatcherContract:   RewardDispatcherContract,
+			ValidatorsRegistryContract:  ValidatorsRegistryContract,
+			AirDropRegistryContract:     AirDropRegistryContract,
+		},
 	}
-	cfg.Logger.Out = out
+
 	return cfg
+}
+
+func NewTestLogger() *logrus.Logger {
+	logger := logging.NewDefaultLogger()
+	out := bytes.NewBuffer(nil)
+	logger.Out = out
+
+	return logger
 }
 
 func NewServerWithResponse(resp string) *httptest.Server {

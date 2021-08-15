@@ -18,13 +18,13 @@ var (
 	BlunaTotalSupply MetricName = "bluna_total_supply"
 )
 
-func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig) *BlunaTokenInfoMonitor {
+func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *BlunaTokenInfoMonitor {
 	m := BlunaTokenInfoMonitor{
 		State:           &types.TokenInfoResponse{},
-		ContractAddress: cfg.BlunaTokenInfoContract,
+		ContractAddress: cfg.Addresses.BlunaTokenInfoContract,
 		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
-		logger:          cfg.Logger,
+		logger:          logger,
 		lock:            sync.RWMutex{},
 	}
 	m.InitMetrics()

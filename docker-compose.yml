@@ -31,3 +31,5 @@ services:
       - lido_terra
   lido_terra:
     build: .
+    env_file:
+      ./docker/env/.lido_terra.env
