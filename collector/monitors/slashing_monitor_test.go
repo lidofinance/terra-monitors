@@ -118,6 +118,7 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+
 	valRepository := NewV1ValidatorsRepository(cfg)
 
 	m := NewSlashingMonitor(cfg, valRepository)
