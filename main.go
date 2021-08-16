@@ -25,32 +25,32 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	c := collector.NewLCDCollector(cfg, logger)
 
 	hubStateMonitor := monitors.NewHubStateMonitor(cfg, logger)
-	c.RegisterMonitor(cfg, ctx, &hubStateMonitor)
+	c.RegisterMonitor(ctx, cfg, &hubStateMonitor)
 
 	rewardStateMonitor := monitors.NewRewardStateMonitor(cfg, logger)
-	c.RegisterMonitor(cfg, ctx, &rewardStateMonitor)
+	c.RegisterMonitor(ctx, cfg, &rewardStateMonitor)
 
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(cfg, logger)
-	c.RegisterMonitor(cfg, ctx, blunaTokenInfoMonitor)
+	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
 
 	validatorsRepository := monitors.NewV1ValidatorsRepository(cfg)
 	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository)
-	c.RegisterMonitor(cfg, ctx, slashingMonitor)
+	c.RegisterMonitor(ctx, cfg, slashingMonitor)
 
 	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(cfg, logger)
-	c.RegisterMonitor(cfg, ctx, updateGlobalIndexMonitor)
+	c.RegisterMonitor(ctx, cfg, updateGlobalIndexMonitor)
 
 	hubParameters := monitors.NewHubParametersMonitor(cfg, logger)
-	c.RegisterMonitor(cfg, ctx, &hubParameters)
+	c.RegisterMonitor(ctx, cfg, &hubParameters)
 
 	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(cfg, logger)
-	c.RegisterMonitor(cfg, ctx, &configCRC32Monitor)
+	c.RegisterMonitor(ctx, cfg, &configCRC32Monitor)
 
 	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(cfg, logger, validatorsRepository)
-	c.RegisterMonitor(cfg, ctx, &whitelistedValidatorsMonitor)
+	c.RegisterMonitor(ctx, cfg, &whitelistedValidatorsMonitor)
 
 	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(cfg, logger, validatorsRepository)
-	c.RegisterMonitor(cfg, ctx, validatorsFeeMonitor)
+	c.RegisterMonitor(ctx, cfg, validatorsFeeMonitor)
 
 	return c, nil
 }
