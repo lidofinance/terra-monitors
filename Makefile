@@ -7,6 +7,9 @@ dev_server: gen_client
 start:
 	docker-compose up -d --build
 
+start-no-build:
+	docker-compose up -d
+
 stop:
 	docker-compose down --remove-orphans
 

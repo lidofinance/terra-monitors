@@ -458,7 +458,7 @@
             },
             "reducer": {
               "params": [],
-              "type": "diff"
+              "type": "diff_abs"
             },
             "type": "query"
           }
@@ -866,7 +866,7 @@
             "type": "query"
           }
         ],
-        "executionErrorState": "keep_state",
+        "executionErrorState": "alerting",
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
@@ -963,6 +963,41 @@
       "type": "timeseries"
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Number of whitelisted is changed",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -1038,6 +1073,14 @@
           "interval": "",
           "legendFormat": "number of whitelisted validators",
           "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
         }
       ],
       "title": "Number of whitelisted validators",
@@ -1182,6 +1225,41 @@
       "type": "timeseries"
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                200
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "max"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "0m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Max number of missed blocks is above 200 in last 5 min",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -1258,6 +1336,14 @@
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "C"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 200,
+          "visible": true
         }
       ],
       "title": "Slashing: Missed Blocks",
@@ -1502,7 +1588,7 @@
             "query": {
               "params": [
                 "A",
-                "5m",
+                "30m",
                 "now"
               ]
             },
@@ -1514,11 +1600,11 @@
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "update global index bot failed transactions",
-        "noDataState": "ok",
+        "noDataState": "no_data",
         "notifications": []
       },
       "datasource": null,
@@ -1624,7 +1710,7 @@
           {
             "evaluator": {
               "params": [
-                0.8
+                0.9
               ],
               "type": "lt"
             },
@@ -1643,11 +1729,80 @@
               "type": "avg"
             },
             "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0.8
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "min"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                1.1
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                1.2
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "max"
+            },
+            "type": "query"
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "2m",
-        "frequency": "30s",
+        "for": "",
+        "frequency": "1m",
         "handler": 1,
         "name": "Bluna/luna exchange rate out of range",
         "noDataState": "no_data",
@@ -1731,12 +1886,6 @@
         }
       ],
       "thresholds": [
-        {
-          "colorMode": "critical",
-          "op": "gt",
-          "value": 1,
-          "visible": true
-        },
         {
           "colorMode": "critical",
           "op": "lt",
