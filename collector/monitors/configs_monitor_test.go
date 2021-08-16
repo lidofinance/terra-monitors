@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -33,7 +34,9 @@ func (suite *DetectorChangesTestSuite) TestHubParameters() {
 	suite.NoError(err)
 	ts := NewServerWithResponse(string(responseData))
 	cfg := NewTestCollectorConfig(ts.URL)
-	hubParametersMonitor := NewHubParametersMonitor(cfg)
+
+	logger := NewTestLogger()
+	hubParametersMonitor := NewHubParametersMonitor(cfg, logger)
 
 	err = hubParametersMonitor.Handler(context.Background())
 	suite.NoError(err)
@@ -59,7 +62,7 @@ func (suite *DetectorChangesTestSuite) TestHubParameters() {
 
 	ts = NewServerWithResponse(string(responseData))
 	cfg = NewTestCollectorConfig(ts.URL)
-	hubParametersMonitor = NewHubParametersMonitor(cfg)
+	hubParametersMonitor = NewHubParametersMonitor(cfg, logger)
 
 	err = hubParametersMonitor.Handler(context.Background())
 	suite.NoError(err)
@@ -74,7 +77,8 @@ func (suite *DetectorChangesTestSuite) TestHubParameters() {
 func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
 	ts := NewServerWithRandomJson()
 	cfg := NewTestCollectorConfig(ts.URL)
-	m1 := NewConfigsCRC32Monitor(cfg)
+	logger := NewTestLogger()
+	m1 := NewConfigsCRC32Monitor(cfg, logger)
 	savedMetrics := make(map[MetricName]MetricValue)
 
 	err := m1.Handler(context.Background())

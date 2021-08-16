@@ -3,13 +3,14 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"sync"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/lidofinance/terra-monitors/openapi/models"
 	"github.com/sirupsen/logrus"
-	"strconv"
-	"sync"
 )
 
 type UpdateGlobalIndexTxsVariants int
@@ -43,12 +44,12 @@ type UpdateGlobalIndexMonitor struct {
 	lock             sync.RWMutex
 }
 
-func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig) *UpdateGlobalIndexMonitor {
+func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
-		ContractAddress: cfg.UpdateGlobalIndexBotAddress,
+		ContractAddress: cfg.Addresses.UpdateGlobalIndexBotAddress,
 		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
-		logger:          cfg.Logger,
+		logger:          logger,
 		lock:            sync.RWMutex{},
 	}
 	m.InitMetrics()

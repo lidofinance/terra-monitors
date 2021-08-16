@@ -3,8 +3,9 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/suite"
 	"io/ioutil"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type UpdateGlobalIndexMonitorTestSuite struct {
@@ -28,8 +29,8 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestSuccessfulRequest() {
 	suite.NoError(err)
 	testServer := NewServerWithResponse(string(data))
 	cfg := NewTestCollectorConfig(testServer.URL)
-
-	m := NewUpdateGlobalIndexMonitor(cfg)
+	logger := NewTestLogger()
+	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -55,8 +56,8 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedTxRequest() {
 	suite.NoError(err)
 	testServer := NewServerWithResponse(string(data))
 	cfg := NewTestCollectorConfig(testServer.URL)
-
-	m := NewUpdateGlobalIndexMonitor(cfg)
+	logger := NewTestLogger()
+	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -68,7 +69,7 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedTxRequest() {
 	suite.Equal(expectedGasUsed, metrics[UpdateGlobalIndexGasUsed])
 	suite.Equal(expectedGasWanted, metrics[UpdateGlobalIndexGasWanted])
 	suite.Equal(expectedUUSDUsed, metrics[UpdateGlobalIndexUUSDFee])
-	actualMessages := fmt.Sprintln(cfg.Logger.Out)
+	actualMessages := fmt.Sprintln(logger.Out)
 	suite.Contains(actualMessages, expectedErrorMessagePattern)
 }
 
@@ -83,8 +84,8 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
 
 	testServer := NewServerForUpdateGlobalIndex()
 	cfg := NewTestCollectorConfig(testServer.URL)
-
-	m := NewUpdateGlobalIndexMonitor(cfg)
+	logger := NewTestLogger()
+	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 	// by setting lastMaxCheckedID to some value, we are pretending its not a first run
 	m.lastMaxCheckedID = 1
 
@@ -99,7 +100,7 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
 	suite.Equal(expectedSuccessTxsValue*expectedGasUsedPerTX.Get(), metrics[UpdateGlobalIndexGasUsed].Get())
 	suite.Equal(expectedSuccessTxsValue*expectedGasWantedPerTX.Get(), metrics[UpdateGlobalIndexGasWanted].Get())
 	suite.Equal(expectedSuccessTxsValue*expectedUUSDUsedPerTX.Get(), metrics[UpdateGlobalIndexUUSDFee].Get())
-	actualMessages := fmt.Sprintln(cfg.Logger.Out)
+	actualMessages := fmt.Sprintln(logger.Out)
 	suite.Contains(actualMessages, expectedErrorMessagePattern)
 	suite.Equal(200, m.lastMaxCheckedID)
 }
@@ -114,8 +115,8 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
 
 	testServer := NewServerForUpdateGlobalIndex()
 	cfg := NewTestCollectorConfig(testServer.URL)
-
-	m := NewUpdateGlobalIndexMonitor(cfg)
+	logger := NewTestLogger()
+	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 	// by setting lastMaxCheckedID to some value, we are pretending its not a first run
 	m.lastMaxCheckedID = 181
 
@@ -130,7 +131,7 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
 	suite.Equal(expectedSuccessTxsValue*expectedGasUsedPerTX.Get(), metrics[UpdateGlobalIndexGasUsed].Get())
 	suite.Equal(expectedSuccessTxsValue*expectedGasWantedPerTX.Get(), metrics[UpdateGlobalIndexGasWanted].Get())
 	suite.Equal(expectedSuccessTxsValue*expectedUUSDUsedPerTX.Get(), metrics[UpdateGlobalIndexUUSDFee].Get())
-	actualMessages := fmt.Sprintln(cfg.Logger.Out)
+	actualMessages := fmt.Sprintln(logger.Out)
 	suite.Contains(actualMessages, expectedErrorMessagePattern)
 	suite.Equal(200, m.lastMaxCheckedID)
 }

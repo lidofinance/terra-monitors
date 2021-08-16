@@ -3,11 +3,12 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"hash/crc32"
+	"strings"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
-	"hash/crc32"
-	"strings"
 )
 
 const (
@@ -22,11 +23,15 @@ type WhitelistedValidatorsMonitor struct {
 	validatorsRepository ValidatorsRepository
 }
 
-func NewWhitelistedValidatorsMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) WhitelistedValidatorsMonitor {
+func NewWhitelistedValidatorsMonitor(
+	cfg config.CollectorConfig,
+	logger *logrus.Logger,
+	repository ValidatorsRepository,
+) WhitelistedValidatorsMonitor {
 	m := WhitelistedValidatorsMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		apiClient:            cfg.GetTerraClient(),
-		logger:               cfg.Logger,
+		logger:               logger,
 		validatorsRepository: repository,
 	}
 	m.InitMetrics()

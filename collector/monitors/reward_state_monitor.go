@@ -17,13 +17,13 @@ var (
 	GlobalIndex MetricName = "global_index"
 )
 
-func NewRewardStateMonitor(cfg config.CollectorConfig) RewardStateMonitor {
+func NewRewardStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) RewardStateMonitor {
 	m := RewardStateMonitor{
 		State:           &types.RewardStateResponse{},
-		ContractAddress: cfg.RewardContract,
+		ContractAddress: cfg.Addresses.RewardContract,
 		metrics:         make(map[MetricName]MetricValue),
 		apiClient:       cfg.GetTerraClient(),
-		logger:          cfg.Logger,
+		logger:          logger,
 	}
 	m.InitMetrics()
 

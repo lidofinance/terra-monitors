@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
-	"strconv"
 )
 
 type ValidatorsRepository interface {
@@ -24,7 +25,7 @@ type V1ValidatorsRepository struct {
 
 func NewV1ValidatorsRepository(cfg config.CollectorConfig) *V1ValidatorsRepository {
 	return &V1ValidatorsRepository{
-		hubContract: cfg.HubContract,
+		hubContract: cfg.Addresses.HubContract,
 		apiClient:   cfg.GetTerraClient(),
 	}
 }

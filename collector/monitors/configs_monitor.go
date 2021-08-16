@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"hash/crc32"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 	"github.com/sirupsen/logrus"
-	"hash/crc32"
 )
 
 const (
@@ -27,18 +28,18 @@ type ConfigsCRC32Monitor struct {
 	logger    *logrus.Logger
 }
 
-func NewConfigsCRC32Monitor(cfg config.CollectorConfig) ConfigsCRC32Monitor {
+func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) ConfigsCRC32Monitor {
 	m := ConfigsCRC32Monitor{
 		Contracts: map[string]MetricName{
-			cfg.AirDropRegistryContract:  AirDropRegistryConfigCRC32,
-			cfg.ValidatorRegistryAddress: ValidatorsRegistryConfigCRC32,
-			cfg.RewardDispatcherContract: RewardDispatcherConfigCRC32,
-			cfg.HubContract:              HubConfigCRC32,
-			cfg.RewardContract:           BlunaRewardConfigCRC32,
+			cfg.Addresses.AirDropRegistryContract:    AirDropRegistryConfigCRC32,
+			cfg.Addresses.ValidatorsRegistryContract: ValidatorsRegistryConfigCRC32,
+			cfg.Addresses.RewardsDispatcherContract:  RewardDispatcherConfigCRC32,
+			cfg.Addresses.HubContract:                HubConfigCRC32,
+			cfg.Addresses.RewardContract:             BlunaRewardConfigCRC32,
 		},
 		metrics:   make(map[MetricName]MetricValue),
 		apiClient: cfg.GetTerraClient(),
-		logger:    cfg.Logger,
+		logger:    logger,
 	}
 	m.InitMetrics()
 

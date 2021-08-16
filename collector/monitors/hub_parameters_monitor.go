@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"hash/crc32"
+	"strconv"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 	"github.com/sirupsen/logrus"
-	"hash/crc32"
-	"strconv"
 )
 
 const (
@@ -29,13 +30,13 @@ type HubParametersMonitor struct {
 	logger          *logrus.Logger
 }
 
-func NewHubParametersMonitor(cfg config.CollectorConfig) HubParametersMonitor {
+func NewHubParametersMonitor(cfg config.CollectorConfig, logger *logrus.Logger) HubParametersMonitor {
 	m := HubParametersMonitor{
 		metrics:         make(map[MetricName]MetricValue),
 		State:           &types.HubParameters{},
-		ContractAddress: cfg.HubContract,
+		ContractAddress: cfg.Addresses.HubContract,
 		apiClient:       cfg.GetTerraClient(),
-		logger:          cfg.Logger,
+		logger:          logger,
 	}
 	m.InitMetrics()
 

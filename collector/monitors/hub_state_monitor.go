@@ -18,13 +18,13 @@ var (
 	BlunaExchangeRate MetricName = "bluna_exchange_rate"
 )
 
-func NewHubStateMonitor(cfg config.CollectorConfig) HubStateMonitor {
+func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitor {
 	m := HubStateMonitor{
 		State:      &types.HubStateResponse{},
-		HubAddress: cfg.HubContract,
+		HubAddress: cfg.Addresses.HubContract,
 		metrics:    make(map[MetricName]MetricValue),
 		apiClient:  cfg.GetTerraClient(),
-		logger:     cfg.Logger,
+		logger:     logger,
 	}
 	m.InitMetrics()
 

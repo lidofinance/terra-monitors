@@ -27,7 +27,8 @@ func (suite *MonitorTestSuite) TestSuccessfulQueryRequest() {
 	}
 	ts := NewServerWithResponse(BlunaTokenInfo)
 	cfg := NewTestCollectorConfig(ts.URL)
-	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg)
+	logger := NewTestLogger()
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg, logger)
 
 	err := blunaTokenInfoMonitor.Handler(context.Background())
 	suite.Require().NoError(err)
@@ -39,7 +40,8 @@ func (suite *MonitorTestSuite) TestBadQueryRequest() {
 	expectedErr := "bad query"
 	ts := NewServerWithError(expectedErr)
 	cfg := NewTestCollectorConfig(ts.URL)
-	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg)
+	logger := NewTestLogger()
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg, logger)
 
 	err := blunaTokenInfoMonitor.Handler(context.Background())
 	suite.Require().Error(err)
@@ -50,7 +52,8 @@ func (suite *MonitorTestSuite) TestConnectionRefusedRequest() {
 	expectedErr := "connection refused"
 	ts := NewServerWithClosedConnectionError()
 	cfg := NewTestCollectorConfig(ts.URL)
-	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg)
+	logger := NewTestLogger()
+	blunaTokenInfoMonitor := NewBlunaTokenInfoMonitor(cfg, logger)
 
 	err := blunaTokenInfoMonitor.Handler(context.Background())
 	suite.Require().Error(err)

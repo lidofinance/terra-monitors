@@ -3,64 +3,82 @@ package main
 import (
 	"context"
 	"flag"
+	"net/http"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/lidofinance/terra-monitors/internal/logging"
+
 	"github.com/lidofinance/terra-monitors/app"
 	"github.com/lidofinance/terra-monitors/collector"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
 	"github.com/lidofinance/terra-monitors/extractor"
-	"net/http"
 )
 
 var addr = flag.String("listen-address", ":8080",
 	"The address to listen on for HTTP requests.")
 
-func createCollector() collector.LCDCollector {
+func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collector.LCDCollector, error) {
 	ctx := context.Background()
-	defConfig := config.DefaultCollectorConfig()
-	c := collector.NewLCDCollector(defConfig)
 
-	hubStateMonitor := monitors.NewHubStateMonitor(defConfig)
-	c.RegisterMonitor(ctx, &hubStateMonitor)
+	c := collector.NewLCDCollector(cfg, logger)
 
-	rewardStateMonitor := monitors.NewRewardStateMonitor(defConfig)
-	c.RegisterMonitor(ctx, &rewardStateMonitor)
+	hubStateMonitor := monitors.NewHubStateMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, &hubStateMonitor)
 
-	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(defConfig)
-	c.RegisterMonitor(ctx, blunaTokenInfoMonitor)
+	rewardStateMonitor := monitors.NewRewardStateMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, &rewardStateMonitor)
 
-	validatorsRepository := monitors.NewV1ValidatorsRepository(defConfig)
-	slashingMonitor := monitors.NewSlashingMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(ctx, slashingMonitor)
+	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
 
-	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(defConfig)
-	c.RegisterMonitor(ctx, updateGlobalIndexMonitor)
+	validatorsRepository := monitors.NewV1ValidatorsRepository(cfg)
+	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, slashingMonitor)
 
-	hubParameters := monitors.NewHubParametersMonitor(defConfig)
-	c.RegisterMonitor(ctx, &hubParameters)
+	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, updateGlobalIndexMonitor)
 
-	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(defConfig)
-	c.RegisterMonitor(ctx, &configCRC32Monitor)
+	hubParameters := monitors.NewHubParametersMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, &hubParameters)
 
-	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(ctx, &whitelistedValidatorsMonitor)
+	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, &configCRC32Monitor)
 
-	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(defConfig, validatorsRepository)
-	c.RegisterMonitor(ctx, validatorsFeeMonitor)
+	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, &whitelistedValidatorsMonitor)
 
-	return c
+	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, validatorsFeeMonitor)
+
+	return c, nil
 }
 
 func main() {
 	flag.Parse()
-	c := createCollector()
-	logger := c.GetLogger()
-	p := extractor.NewPromExtractor(&c, logger)
-	app := app.NewAppHTTP(p)
-	http.Handle("/metrics", app)
+
+	logger := logging.NewDefaultLogger()
+
+	cfg, err := config.NewCollectorConfig()
+	if err != nil {
+		logger.Fatalf("Failed to create NewCollectorConfig: %s", err)
+	}
+
+	col, err := createCollector(cfg, logger)
+	if err != nil {
+		logger.Fatalf("Failed to createCollector(): %s", err)
+	}
+
+	var (
+		promExtractor = extractor.NewPromExtractor(&col, logger)
+		appInstance   = app.NewAppHTTP(promExtractor)
+	)
+	http.Handle("/metrics", appInstance)
+
 	logger.Printf("Starting web server at %s\n", *addr)
 
-	err := http.ListenAndServe(*addr, nil)
-	if err != nil {
-		logger.Errorf("http.ListenAndServer: %v\n", err)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
+		logger.Errorf("Failed to ListenAndServe: %v\n", err)
 	}
 }

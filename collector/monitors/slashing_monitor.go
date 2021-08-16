@@ -26,21 +26,25 @@ const (
 )
 
 type SlashingMonitor struct {
-	metrics       map[MetricName]MetricValue
-	metricVectors map[MetricName]*MetricVector
+	metrics              map[MetricName]MetricValue
+	metricVectors        map[MetricName]*MetricVector
 	apiClient            *client.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
 	lock                 sync.RWMutex
 }
 
-func NewSlashingMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *SlashingMonitor {
+func NewSlashingMonitor(
+	cfg config.CollectorConfig,
+	logger *logrus.Logger,
+	repository ValidatorsRepository,
+) *SlashingMonitor {
 	m := &SlashingMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
-		logger:               cfg.Logger,
+		logger:               logger,
 		lock:                 sync.RWMutex{},
 	}
 
@@ -72,8 +76,8 @@ func (m *SlashingMonitor) InitMetrics() {
 
 func (m *SlashingMonitor) Handler(ctx context.Context) error {
 	// tmp* for 2stage nonblocking update data
-	tmpMetrics          := make(map[MetricName]MetricValue)
-	tmpMetricVectors     :=make(map[MetricName]*MetricVector)
+	tmpMetrics := make(map[MetricName]MetricValue)
+	tmpMetricVectors := make(map[MetricName]*MetricVector)
 	initMetrics(m.providedMetrics(), m.providedMetricVectors(), tmpMetrics, tmpMetricVectors)
 
 	validatorsInfo, err := m.getValidatorsInfo(ctx)

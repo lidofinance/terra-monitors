@@ -1,76 +1,49 @@
 package config
 
 import (
-	"github.com/lidofinance/terra-monitors/internal/logging"
-	"github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/sirupsen/logrus"
+	"fmt"
 	"time"
-)
 
-const (
-	DefaultHubContract                 = "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts"
-	DefaultRewardContract              = "terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0"
-	DefaultBlunaTokenInfoContract      = "terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp"
-	DefaultUpdateGlobalIndexBotAddress = "terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy"
-
-	// TODO: use an actual address after validators_registry deployment.
-	DefaultValidatorRegistryAddress = "terra1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	DefaultAirDropRegistryContract  = "terra_dummy_airdrop"
-	DefaultRewardDispatcherContract = "terra_dummy_rewarddispatcher"
-
-	DefaultUpdateDataInterval = 30 * time.Second
+	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/vrischmann/envconfig"
 )
 
 type CollectorConfig struct {
-	Logger                        *logrus.Logger
-	LCDEndpoint                   string
-	HubContract                   string
-	RewardContract                string
-	BlunaTokenInfoContract        string
-	UpdateGlobalIndexBotAddress   string
-	ValidatorRegistryAddress      string
-	RewardDispatcherContract      string
-	AirDropRegistryContract       string
-	Schemes                       []string
-	UpdateGlobalIndexInterval     uint
-	SlashingMonitorUpdateInterval uint
+	LCD                LCD
+	Addresses          Addresses
+	UpdateDataInterval time.Duration `envconfig:"default=30s"`
 }
 
-func (c CollectorConfig) getSchemes() []string {
-	if len(c.Schemes) > 0 {
-		return c.Schemes
+func NewCollectorConfig() (CollectorConfig, error) {
+	config := CollectorConfig{}
+	if err := envconfig.Init(&config); err != nil {
+		return config, fmt.Errorf("failed to init config: %w", err)
 	}
 
-	return []string{"https"}
+	return config, nil
+}
+
+type LCD struct {
+	Endpoint string   `envconfig:"default=fcd.terra.dev"`
+	Schemes  []string `envconfig:"default=https"`
+}
+
+type Addresses struct {
+	HubContract                 string `envconfig:"default=terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts"`
+	RewardContract              string `envconfig:"default=terra17yap3mhph35pcwvhza38c2lkj7gzywzy05h7l0"`
+	BlunaTokenInfoContract      string `envconfig:"default=terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp"`
+	ValidatorsRegistryContract  string `envconfig:"default=terra_dummy_validators_registry"` // TODO: actualize.
+	RewardsDispatcherContract   string `envconfig:"default=terra_dummy_rewards_dispatcher"`  // TODO: actualize.
+	AirDropRegistryContract     string `envconfig:"default=terra_dummy_airdrop"`             // TODO: actualize.
+	UpdateGlobalIndexBotAddress string `envconfig:"default=terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy"`
 }
 
 func (c CollectorConfig) GetTerraClient() *client.TerraLiteForTerra {
-	if c.LCDEndpoint == "" {
-		return client.NewHTTPClient(nil)
-	}
-
 	transportConfig := &client.TransportConfig{
-		Host:     c.LCDEndpoint,
-		BasePath: "/",
-		Schemes:  c.getSchemes(),
+		Host:     c.LCD.Endpoint,
+		Schemes:  c.LCD.Schemes,
+		BasePath: client.DefaultBasePath,
 	}
 
 	return client.NewHTTPClientWithConfig(nil, transportConfig)
-}
-
-func DefaultCollectorConfig() CollectorConfig {
-	return CollectorConfig{
-		Logger:                      logging.NewDefaultLogger(),
-		HubContract:                 DefaultHubContract,
-		RewardContract:              DefaultRewardContract,
-		BlunaTokenInfoContract:      DefaultBlunaTokenInfoContract,
-		UpdateGlobalIndexBotAddress: DefaultUpdateGlobalIndexBotAddress,
-		ValidatorRegistryAddress:    DefaultValidatorRegistryAddress,
-
-		// change the fields to appropriate contracts values
-		AirDropRegistryContract:       DefaultAirDropRegistryContract,
-		RewardDispatcherContract:      DefaultRewardDispatcherContract,
-		UpdateGlobalIndexInterval:     30,
-		SlashingMonitorUpdateInterval: 30,
-	}
 }

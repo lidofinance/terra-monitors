@@ -3,10 +3,11 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
-	"sync"
 )
 
 const (
@@ -22,13 +23,17 @@ type ValidatorsCommissionMonitor struct {
 	lock                 sync.RWMutex
 }
 
-func NewValidatorsFeeMonitor(cfg config.CollectorConfig, repository ValidatorsRepository) *ValidatorsCommissionMonitor {
+func NewValidatorsFeeMonitor(
+	cfg config.CollectorConfig,
+	logger *logrus.Logger,
+	repository ValidatorsRepository,
+) *ValidatorsCommissionMonitor {
 	m := ValidatorsCommissionMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
 		apiClient:            cfg.GetTerraClient(),
 		validatorsRepository: repository,
-		logger:               cfg.Logger,
+		logger:               logger,
 	}
 	m.InitMetrics()
 	return &m
