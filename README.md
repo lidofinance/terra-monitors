@@ -9,7 +9,7 @@ TELEGRAM_CHAT_ID=<telegram_chat_id>
 
 Before running the service you have to fill .env file `./docker/env/.lido_terra.env` with the following variables:
 ```shell
-cat ./docker/env/.telegram.env 
+cat ./docker/env/.lido_terra.env 
 LCD_ENDPOINT=fcd.terra.dev
 LCD_SCHEMES=https
 UPDATE_DATA_INTERVAL=30s

@@ -92,6 +92,23 @@ func GetHubWhitelistedValidatorsPair() (HubWhitelistedValidatorsRequest, HubWhit
 	return HubWhitelistedValidatorsRequest{}, HubWhitelistedValidatorsResponse{}
 }
 
+type ValidatorRegistryValidatorsRequest struct {
+	WhitelistedValidators struct{} `json:"get_validators_for_delegation"`
+}
+
+type Validator struct {
+	Active          bool   `json:"active"`
+	Address         string `json:"address"`
+	DelegationLimit string `json:"delegation_limit"` //uint128
+	TotalDelegated  string `json:"total_delegated"`  //Uint128
+}
+
+type ValidatorRegistryValidatorsResponse = []Validator
+
+func GetValidatorRegistryValidatorsPair() (ValidatorRegistryValidatorsRequest, ValidatorRegistryValidatorsResponse) {
+	return ValidatorRegistryValidatorsRequest{}, ValidatorRegistryValidatorsResponse{}
+}
+
 type HubConfig struct {
 	Creator                    string `json:"creator"`
 	RewardDispatcherContract   string `json:"reward_dispatcher_contract"`

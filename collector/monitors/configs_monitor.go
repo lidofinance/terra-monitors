@@ -18,7 +18,6 @@ const (
 	BlunaRewardConfigCRC32        MetricName = "bluna_reward_config_crc32"
 	HubConfigCRC32                MetricName = "hub_config_crc32"
 	RewardDispatcherConfigCRC32   MetricName = "reward_dispatcher_config_crc32"
-	ValidatorsRegistryConfigCRC32 MetricName = "validators_registry_config_crc32"
 )
 
 type ConfigsCRC32Monitor struct {
@@ -32,7 +31,6 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) C
 	m := ConfigsCRC32Monitor{
 		Contracts: map[string]MetricName{
 			cfg.Addresses.AirDropRegistryContract:    AirDropRegistryConfigCRC32,
-			cfg.Addresses.ValidatorsRegistryContract: ValidatorsRegistryConfigCRC32,
 			cfg.Addresses.RewardsDispatcherContract:  RewardDispatcherConfigCRC32,
 			cfg.Addresses.HubContract:                HubConfigCRC32,
 			cfg.Addresses.RewardContract:             BlunaRewardConfigCRC32,
@@ -49,7 +47,6 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) C
 func (m *ConfigsCRC32Monitor) providedMetrics() []MetricName {
 	return []MetricName{
 		AirDropRegistryConfigCRC32,
-		ValidatorsRegistryConfigCRC32,
 		RewardDispatcherConfigCRC32,
 		HubConfigCRC32,
 		BlunaRewardConfigCRC32}
