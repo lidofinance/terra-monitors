@@ -24,7 +24,7 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 
 	c := collector.NewLCDCollector(cfg, logger)
 
-	hubStateMonitor := monitors.NewHubStateMonitor(cfg, logger)
+	hubStateMonitor := monitors.NewHubStateMonitorV2(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, &hubStateMonitor)
 
 	rewardStateMonitor := monitors.NewRewardStateMonitor(cfg, logger)
