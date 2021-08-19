@@ -13,14 +13,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	BlunaBondedAmount MetricName = "bluna_bonded_amount"
-	BlunaExchangeRate MetricName = "bluna_exchange_rate"
-)
 
-func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitor {
-	m := HubStateMonitor{
-		State:      &types.HubStateResponseV1{},
+
+func NewHubStateMonitorV2(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitorV2 {
+	m := HubStateMonitorV2{
+		State:      &types.HubStateResponseV2{},
 		HubAddress: cfg.Addresses.HubContract,
 		metrics:    make(map[MetricName]MetricValue),
 		apiClient:  cfg.GetTerraClient(),
@@ -31,30 +28,30 @@ func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) HubSt
 	return m
 }
 
-type HubStateMonitor struct {
-	State      *types.HubStateResponseV1
+type HubStateMonitorV2 struct {
+	State      *types.HubStateResponseV2
 	HubAddress string
 	metrics    map[MetricName]MetricValue
 	apiClient  *client.TerraLiteForTerra
 	logger     *logrus.Logger
 }
 
-func (h HubStateMonitor) Name() string {
+func (h HubStateMonitorV2) Name() string {
 	return "HubState"
 }
 
-func (h *HubStateMonitor) InitMetrics() {
+func (h *HubStateMonitorV2) InitMetrics() {
 	h.setStringMetric(BlunaBondedAmount, "0")
 	h.setStringMetric(BlunaExchangeRate, "0")
 }
 
-func (h *HubStateMonitor) updateMetrics() {
-	h.setStringMetric(BlunaBondedAmount, h.State.TotalBondAmount)
-	h.setStringMetric(BlunaExchangeRate, h.State.ExchangeRate)
+func (h *HubStateMonitorV2) updateMetrics() {
+	h.setStringMetric(BlunaBondedAmount, h.State.TotalBondBlunaAmount)
+	h.setStringMetric(BlunaExchangeRate, h.State.BlunaExchangeRate)
 }
 
-func (h *HubStateMonitor) Handler(ctx context.Context) error {
-	hubReq, hubResp := types.GetHubStatePairV1()
+func (h *HubStateMonitorV2) Handler(ctx context.Context) error {
+	hubReq, hubResp := types.GetHubStatePairV2()
 
 	reqRaw, err := json.Marshal(&hubReq)
 	if err != nil {
@@ -82,7 +79,7 @@ func (h *HubStateMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func (h *HubStateMonitor) setStringMetric(m MetricName, rawValue string) {
+func (h *HubStateMonitorV2) setStringMetric(m MetricName, rawValue string) {
 	v, err := strconv.ParseFloat(rawValue, 64)
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
@@ -93,18 +90,10 @@ func (h *HubStateMonitor) setStringMetric(m MetricName, rawValue string) {
 	h.metrics[m].Set(v)
 }
 
-func (h HubStateMonitor) GetMetrics() map[MetricName]MetricValue {
+func (h HubStateMonitorV2) GetMetrics() map[MetricName]MetricValue {
 	return h.metrics
 }
 
-func (h HubStateMonitor) GetMetricVectors() map[MetricName]*MetricVector {
+func (h HubStateMonitorV2) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
-}
-
-func (h *HubStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {
-	h.apiClient = client
-}
-
-func (h *HubStateMonitor) SetLogger(l *logrus.Logger) {
-	h.logger = l
 }

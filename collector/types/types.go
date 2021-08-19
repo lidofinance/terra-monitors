@@ -48,25 +48,7 @@ type TokenInfoResponse struct {
 	TotalSupply string `json:"total_supply"` //uint128
 }
 
-//current response type
-// {"exchange_rate":"1.000007185273335589","total_bond_amount":"79192023592216","last_index_modification":1626348317,"prev_hub_balance":"319234626534","actual_unbonded_amount":"0","last_unbonded_time":1626198926,"last_processed_batch":32}
-
-//next gen response type
-// pub struct StateResponse {
-//     pub bluna_exchange_rate: Decimal,
-//     pub stluna_exchange_rate: Decimal,
-//     pub total_bond_bluna_amount: Uint128,
-//     pub total_bond_stluna_amount: Uint128,
-//     pub last_index_modification: u64,
-//     pub prev_hub_balance: Uint128,
-//     pub actual_unbonded_amount: Uint128,
-//     pub last_unbonded_time: u64,
-//     pub last_processed_batch: u64,
-// }
-
-//should be corrected after contract migration according to the new response schema
-
-type HubStateResponse struct {
+type HubStateResponseV1 struct {
 	ExchangeRate          string `json:"exchange_rate"`     //decimal
 	TotalBondAmount       string `json:"total_bond_amount"` //uint128
 	LastIndexModification uint64 `json:"last_index_modification"`
@@ -76,8 +58,24 @@ type HubStateResponse struct {
 	LastProcessedBatch    uint64 `json:"last_processed_batch"`
 }
 
-func GetHubStatePair() (CommonStateRequest, HubStateResponse) {
-	return CommonStateRequest{}, HubStateResponse{}
+type HubStateResponseV2 struct {
+	BlunaExchangeRate     string `json:"bluna_exchange_rate"`      //decimal
+	StlunaExchangeRate    string `json:"stluna_exchange_rate"`     //decimal
+	TotalBondBlunaAmount  string `json:"total_bond_bluna_amount"`  //uint128
+	TotalBondStlunaAmount string `json:"total_bond_stluna_amount"` //uint128
+	LastIndexModification uint64 `json:"last_index_modification"`
+	PrevHubBalance        string `json:"prev_hub_balance"`       //uint128
+	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` //uint128
+	LastUnbondedTime      uint64 `json:"last_unbonded_time"`
+	LastProcessedBatch    uint64 `json:"last_processed_batch"`
+}
+
+func GetHubStatePairV1() (CommonStateRequest, HubStateResponseV1) {
+	return CommonStateRequest{}, HubStateResponseV1{}
+}
+
+func GetHubStatePairV2() (CommonStateRequest, HubStateResponseV2) {
+	return CommonStateRequest{}, HubStateResponseV2{}
 }
 
 type HubWhitelistedValidatorsRequest struct {
