@@ -91,8 +91,8 @@ func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
 
 	// since we are getting random data each http request
 	// we should get m1.metrics and savedMetrics from first request differ each other
-	suite.Equal(4, len(m1.metrics))
-	suite.Equal(4, len(savedMetrics))
+	suite.Equal(5, len(m1.metrics))
+	suite.Equal(5, len(savedMetrics))
 	for metric := range m1.metrics {
 		_, found := savedMetrics[metric]
 		suite.True(found)
