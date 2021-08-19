@@ -97,9 +97,7 @@ type ValidatorRegistryValidatorsRequest struct {
 }
 
 type Validator struct {
-	Active          bool   `json:"active"`
 	Address         string `json:"address"`
-	DelegationLimit string `json:"delegation_limit"` //uint128
 	TotalDelegated  string `json:"total_delegated"`  //Uint128
 }
 
