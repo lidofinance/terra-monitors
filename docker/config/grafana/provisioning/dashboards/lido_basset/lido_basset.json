@@ -208,7 +208,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub parameters epoch/unbonding period has been changed",
@@ -340,7 +340,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub er threshold has been changed",
@@ -458,13 +458,13 @@
             },
             "reducer": {
               "params": [],
-              "type": "diff"
+              "type": "diff_abs"
             },
             "type": "query"
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub peg recovery has been changed",
@@ -703,7 +703,7 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "one of the configs has been changed",
@@ -866,8 +866,8 @@
             "type": "query"
           }
         ],
-        "executionErrorState": "keep_state",
-        "for": "5m",
+        "executionErrorState": "alerting",
+        "for": "",
         "frequency": "1m",
         "handler": 1,
         "name": "Whitelisted validators set has been changed",
@@ -963,6 +963,41 @@
       "type": "timeseries"
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Number of whitelisted is changed",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -1040,6 +1075,14 @@
           "refId": "A"
         }
       ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
       "title": "Number of whitelisted validators",
       "type": "timeseries"
     },
@@ -1080,13 +1123,13 @@
             },
             "reducer": {
               "params": [],
-              "type": "avg"
+              "type": "max"
             },
             "type": "query"
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "2m",
+        "for": "0m",
         "frequency": "30s",
         "handler": 1,
         "name": "Some validators were jailed.",
@@ -1182,6 +1225,41 @@
       "type": "timeseries"
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                200
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "max"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "0m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Max number of missed blocks is above 200 in last 5 min",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -1260,6 +1338,14 @@
           "refId": "C"
         }
       ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 200,
+          "visible": true
+        }
+      ],
       "title": "Slashing: Missed Blocks",
       "type": "timeseries"
     },
@@ -1286,13 +1372,13 @@
             },
             "reducer": {
               "params": [],
-              "type": "avg"
+              "type": "max"
             },
             "type": "query"
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "2m",
+        "for": "0m",
         "frequency": "30s",
         "handler": 1,
         "name": "Found tombstoned validators",
@@ -1502,7 +1588,30 @@
             "query": {
               "params": [
                 "A",
-                "5m",
+                "30",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "max"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                1
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "B",
+                "20",
                 "now"
               ]
             },
@@ -1514,11 +1623,11 @@
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "5m",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "update global index bot failed transactions",
-        "noDataState": "ok",
+        "noDataState": "no_data",
         "notifications": []
       },
       "datasource": null,
@@ -1624,7 +1733,7 @@
           {
             "evaluator": {
               "params": [
-                0.8
+                0.9
               ],
               "type": "lt"
             },
@@ -1643,11 +1752,80 @@
               "type": "avg"
             },
             "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0.8
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "min"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                1.1
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                1.2
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "max"
+            },
+            "type": "query"
           }
         ],
         "executionErrorState": "keep_state",
-        "for": "2m",
-        "frequency": "30s",
+        "for": "0m",
+        "frequency": "1m",
         "handler": 1,
         "name": "Bluna/luna exchange rate out of range",
         "noDataState": "no_data",
@@ -1733,12 +1911,6 @@
       "thresholds": [
         {
           "colorMode": "critical",
-          "op": "gt",
-          "value": 1,
-          "visible": true
-        },
-        {
-          "colorMode": "critical",
           "op": "lt",
           "value": 0.9,
           "visible": true
@@ -1756,12 +1928,12 @@
     "list": []
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 1
+  "version": 3
 }
