@@ -17,4 +17,4 @@ jobs:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
         message: |
-          User ${{ github.actor }} updated PR #${{ github.event.number }}: ${{ github.event.action }}
+          User @${{ github.actor }} updated PR #${{ github.event.number }}: ${{ github.event.action }} (github.event.pull_request.html_url)
