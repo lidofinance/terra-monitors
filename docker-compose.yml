@@ -35,8 +35,30 @@ services:
     build: .
     env_file:
       ./docker/env/.lido_terra.env
+    logging:
+      driver: "json-file"
+      options:
+        tag: "lido_terra"
+  loki:
+    image: grafana/loki:2.3.0
+    volumes:
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+
+  promtail:
+    image: grafana/promtail:2.3.0
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - promtail-data:/var/lib/promtail/positions
+      - ./docker/config/promtail/promtail.yml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
 
 
 volumes:
   prometheus-data:
   grafana-storage:
+  promtail-data:
+  loki-data:
