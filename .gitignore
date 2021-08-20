@@ -16,5 +16,6 @@
 .golangci.yml
 .vscode
 .telegram.env
+.lido_terra.env
 
 .idea/
