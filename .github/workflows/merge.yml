@@ -1,0 +1,16 @@
+name: PR
+
+on: [pull_request]
+
+jobs:
+
+  tests:
+    name: Notify
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Send TG Notification
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
