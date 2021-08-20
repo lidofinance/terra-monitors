@@ -13,7 +13,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-
+var (
+	StlunaBondedAmount MetricName = "stluna_bonded_amount"
+	StlunaExchangeRate MetricName = "stluna_exchange_rate"
+)
 
 func NewHubStateMonitorV2(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitorV2 {
 	m := HubStateMonitorV2{
@@ -43,11 +46,15 @@ func (h HubStateMonitorV2) Name() string {
 func (h *HubStateMonitorV2) InitMetrics() {
 	h.setStringMetric(BlunaBondedAmount, "0")
 	h.setStringMetric(BlunaExchangeRate, "0")
+	h.setStringMetric(StlunaBondedAmount, "0")
+	h.setStringMetric(StlunaExchangeRate, "0")
 }
 
 func (h *HubStateMonitorV2) updateMetrics() {
 	h.setStringMetric(BlunaBondedAmount, h.State.TotalBondBlunaAmount)
 	h.setStringMetric(BlunaExchangeRate, h.State.BlunaExchangeRate)
+	h.setStringMetric(StlunaBondedAmount, h.State.TotalBondStlunaAmount)
+	h.setStringMetric(StlunaExchangeRate, h.State.StlunaExchangeRate)
 }
 
 func (h *HubStateMonitorV2) Handler(ctx context.Context) error {
