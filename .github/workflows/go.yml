@@ -20,3 +20,11 @@ jobs:
 
     - name: Test
       run: make test
+      
+    - name: Send TG Notification
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+      
+    
