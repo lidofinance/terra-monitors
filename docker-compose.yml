@@ -13,6 +13,7 @@ services:
       - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
     volumes:
       - ./docker/config/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-storage:/var/lib/grafana
   renderer:
     image: grafana/grafana-image-renderer:latest
     ports:
@@ -27,9 +28,15 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./docker/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
     depends_on:
       - lido_terra
   lido_terra:
     build: .
     env_file:
       ./docker/env/.lido_terra.env
+
+
+volumes:
+  prometheus-data:
+  grafana-storage:
