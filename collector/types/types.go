@@ -24,9 +24,9 @@ func GetRewardStatePair() (CommonStateRequest, RewardStateResponse) {
 }
 
 type RewardStateResponse struct {
-	GlobalIndex       string `json:"global_index"`        //decimal128
-	PrevRewardBalance string `json:"prev_reward_balance"` //uint128
-	TotalBalance      string `json:"total_balance"`       //uint128
+	GlobalIndex       string `json:"global_index"`        // decimal128
+	PrevRewardBalance string `json:"prev_reward_balance"` // uint128
+	TotalBalance      string `json:"total_balance"`       // uint128
 }
 
 type CommonStateRequest struct {
@@ -45,27 +45,27 @@ type TokenInfoResponse struct {
 	Name        string `json:"name"`
 	Symbol      string `json:"symbol"`
 	Decimals    int    `json:"decimals"`
-	TotalSupply string `json:"total_supply"` //uint128
+	TotalSupply string `json:"total_supply"` // uint128
 }
 
 type HubStateResponseV1 struct {
-	ExchangeRate          string `json:"exchange_rate"`     //decimal
-	TotalBondAmount       string `json:"total_bond_amount"` //uint128
+	ExchangeRate          string `json:"exchange_rate"`     // decimal
+	TotalBondAmount       string `json:"total_bond_amount"` // uint128
 	LastIndexModification uint64 `json:"last_index_modification"`
-	PrevHubBalance        string `json:"prev_hub_balance"`       //uint128
-	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` //uint128
+	PrevHubBalance        string `json:"prev_hub_balance"`       // uint128
+	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` // uint128
 	LastUnbondedTime      uint64 `json:"last_unbonded_time"`
 	LastProcessedBatch    uint64 `json:"last_processed_batch"`
 }
 
 type HubStateResponseV2 struct {
-	BlunaExchangeRate     string `json:"bluna_exchange_rate"`      //decimal
-	StlunaExchangeRate    string `json:"stluna_exchange_rate"`     //decimal
-	TotalBondBlunaAmount  string `json:"total_bond_bluna_amount"`  //uint128
-	TotalBondStlunaAmount string `json:"total_bond_stluna_amount"` //uint128
+	BlunaExchangeRate     string `json:"bluna_exchange_rate"`      // decimal
+	StlunaExchangeRate    string `json:"stluna_exchange_rate"`     // decimal
+	TotalBondBlunaAmount  string `json:"total_bond_bluna_amount"`  // uint128
+	TotalBondStlunaAmount string `json:"total_bond_stluna_amount"` // uint128
 	LastIndexModification uint64 `json:"last_index_modification"`
-	PrevHubBalance        string `json:"prev_hub_balance"`       //uint128
-	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` //uint128
+	PrevHubBalance        string `json:"prev_hub_balance"`       // uint128
+	ActualUnbondedAmount  string `json:"actual_unbonded_amount"` // uint128
 	LastUnbondedTime      uint64 `json:"last_unbonded_time"`
 	LastProcessedBatch    uint64 `json:"last_processed_batch"`
 }
@@ -95,8 +95,8 @@ type ValidatorRegistryValidatorsRequest struct {
 }
 
 type Validator struct {
-	Address         string `json:"address"`
-	TotalDelegated  string `json:"total_delegated"`  //Uint128
+	Address        string `json:"address"`
+	TotalDelegated string `json:"total_delegated"` // Uint128
 }
 
 type ValidatorRegistryValidatorsResponse = []Validator
@@ -122,8 +122,8 @@ type HubParameters struct {
 	EpochPeriod         uint64 `json:"epoch_period"`
 	UnderlyingCoinDenom string `json:"underlying_coin_denom"`
 	UnbondingPeriod     uint64 `json:"unbonding_period"`
-	PegRecoveryFee      string `json:"peg_recovery_fee"` //Decimal128 as string
-	ErThreshold         string `json:"er_threshold"`     //Decimal128 as string
+	PegRecoveryFee      string `json:"peg_recovery_fee"` // Decimal128 as string
+	ErThreshold         string `json:"er_threshold"`     // Decimal128 as string
 	RewardDenom         string `json:"reward_denom"`
 }
 
@@ -143,7 +143,7 @@ type RewardDispatcherConfig struct {
 	StlunaRewardDenom   string `json:"stluna_reward_denom"`
 	BlunaRewardDenom    string `json:"bluna_reward_denom"`
 	LidoFeeAddress      string `json:"lido_fee_address"`
-	LidoFeeRate         string `json:"lido_fee_rate"` //decimal128
+	LidoFeeRate         string `json:"lido_fee_rate"` // decimal128
 }
 
 type ValidatorsRegistryConfig struct {
