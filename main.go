@@ -24,7 +24,7 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 
 	c := collector.NewLCDCollector(cfg, logger)
 
-	hubStateMonitor := monitors.NewHubStateMonitorV2(cfg, logger)
+	hubStateMonitor := monitors.NewHubStateMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, &hubStateMonitor)
 
 	rewardStateMonitor := monitors.NewRewardStateMonitor(cfg, logger)
@@ -33,7 +33,7 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
 
-	validatorsRepository := monitors.NewV2ValidatorsRepository(cfg)
+	validatorsRepository := monitors.NewV1ValidatorsRepository(cfg)
 	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository)
 	c.RegisterMonitor(ctx, cfg, slashingMonitor)
 
