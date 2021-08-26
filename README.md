@@ -1,5 +1,10 @@
 # terra-monitors
 
+There are required three .env files to start service:
+`./docker/env/.telegram.env` - telegramm bot credentials
+`./docker/env/.lido_terra.env` - terra-monitor service settings
+`./docker/env/.grafana.env` - grafana related variables
+
 Before running the service you have to fill .env file `./docker/env/.telegram.env` with the following variables:
 ```shell
 cat ./docker/env/.telegram.env 
@@ -33,6 +38,13 @@ ADDRESSES_AIR_DROP_REGISTRY_CONTRACT=terra_dummy_airdrop
 ADDRESSES_UPDATE_GLOBAL_INDEX_BOT_ADDRESS=terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy
 ```
 
+To set relevant grafana address in alert messages, put env variable `GF_SERVER_ROOT_URL` with URL in `./docker/env/.grafana.env` file
+```shell
+cat ./docker/env/.grafana.env 
+GF_SERVER_ROOT_URL=http://some-host/
+```
+
+
 To run the service
 ```shell
 make start
@@ -44,6 +56,12 @@ make stop
 ```
 
 Grafana dashboards avaliable at http://127.0.0.1:3000.
+To change default port of the grafana host, pass variable `GRAFANA_PORT` to start command, lile:
+```shell
+GRAFANA_PORT=3001 make start
+#or
+GRAFANA_PORT=3001 docker-compose up -d
+```
 
 Default login/pass: `admin/admin`.
 
