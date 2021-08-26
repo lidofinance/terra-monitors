@@ -18,7 +18,32 @@ var (
 	BlunaExchangeRate MetricName = "bluna_exchange_rate"
 )
 
-func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitor {
+func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) Monitor {
+
+	if cfg.BassetContractsVersion == "1" {
+		m := HubStateMonitor{
+			State:      &types.HubStateResponseV1{},
+			HubAddress: cfg.Addresses.HubContract,
+			metrics:    make(map[MetricName]MetricValue),
+			apiClient:  cfg.GetTerraClient(),
+			logger:     logger,
+		}
+		m.InitMetrics()
+		return &m
+	}
+	m := HubStateMonitorV2{
+		State:      &types.HubStateResponseV2{},
+		HubAddress: cfg.Addresses.HubContract,
+		metrics:    make(map[MetricName]MetricValue),
+		apiClient:  cfg.GetTerraClient(),
+		logger:     logger,
+	}
+	m.InitMetrics()
+
+	return &m
+}
+
+func NewHubStateMonitorV1(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitor {
 	m := HubStateMonitor{
 		State:      &types.HubStateResponseV1{},
 		HubAddress: cfg.Addresses.HubContract,

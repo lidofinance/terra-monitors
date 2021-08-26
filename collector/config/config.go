@@ -9,9 +9,10 @@ import (
 )
 
 type CollectorConfig struct {
-	LCD                LCD
-	Addresses          Addresses
-	UpdateDataInterval time.Duration `envconfig:"default=30s"`
+	BassetContractsVersion string `envconfig:"default=2"` // available values: 1 and 2
+	LCD                    LCD
+	Addresses              Addresses
+	UpdateDataInterval     time.Duration `envconfig:"default=30s"`
 }
 
 func NewCollectorConfig() (CollectorConfig, error) {
