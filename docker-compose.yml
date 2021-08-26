@@ -7,7 +7,8 @@ services:
     depends_on:
       - prometheus
     env_file:
-      ./docker/env/.telegram.env
+      - ./docker/env/.telegram.env
+      - ./docker/env/.grafana.env
     environment:
       - GF_RENDERING_SERVER_URL=http://renderer:8081/render
       - GF_RENDERING_CALLBACK_URL=http://grafana:3000/

@@ -17,5 +17,6 @@
 .vscode
 .telegram.env
 .lido_terra.env
+.grafana.env
 
 .idea/
