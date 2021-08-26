@@ -1,8 +1,8 @@
 # terra-monitors
 
-There are required three .env files to start service:
-`./docker/env/.telegram.env` - telegramm bot credentials
-`./docker/env/.lido_terra.env` - terra-monitor service settings
+There are required three .env files to start service:\
+`./docker/env/.telegram.env` - telegramm bot credentials\
+`./docker/env/.lido_terra.env` - terra-monitor service settings\
 `./docker/env/.grafana.env` - grafana related variables
 
 Before running the service you have to fill .env file `./docker/env/.telegram.env` with the following variables:
