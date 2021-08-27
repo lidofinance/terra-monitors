@@ -3,9 +3,10 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"github.com/lidofinance/terra-monitors/openapi/client/oracle"
 	"strconv"
 	"sync"
+
+	"github.com/lidofinance/terra-monitors/openapi/client/oracle"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/openapi/client"
@@ -54,7 +55,7 @@ func (m *OracleVotesMonitor) Handler(ctx context.Context) error {
 	tmpMetricVectors := make(map[MetricName]*MetricVector)
 	initMetrics(nil, []MetricName{OracleMissedVoteRate}, nil, tmpMetricVectors)
 
-	validatorsAddress, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
+	validatorsAddresses, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to getValidatorsAddress: %w", err)
 	}
@@ -70,7 +71,7 @@ func (m *OracleVotesMonitor) Handler(ctx context.Context) error {
 
 	oracleParams := oracleParamsResponse.GetPayload().Result
 
-	for _, validatorAddress := range validatorsAddress {
+	for _, validatorAddress := range validatorsAddresses {
 		validatorInfo, err := m.validatorsRepository.GetValidatorInfo(ctx, validatorAddress)
 		if err != nil {
 			return fmt.Errorf("failed to GetValidatorInfo: %w", err)
@@ -100,6 +101,7 @@ func (m *OracleVotesMonitor) Handler(ctx context.Context) error {
 		// votePeriodsPerWindow = params.SlashWindow / params.VotePeriod
 		// missedVotesRate = (missedPeriods / votePeriodsPerWindow) * 100%
 		// If missedVotesRate greater than (100% - params.VoteThreshold) validator will be slashed
+		// More info: https://docs.terra.money/dev/spec-oracle.html#slashing
 		slashWindow, err := strconv.ParseFloat(oracleParams.SlashWindow, 64)
 		if err != nil {
 			return fmt.Errorf("failed to parse SlashWindow: %w", err)
