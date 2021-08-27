@@ -52,6 +52,9 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(cfg, logger, validatorsRepository)
 	c.RegisterMonitor(ctx, cfg, validatorsFeeMonitor)
 
+	oracleVotesMonitor := monitors.NewOracleVotesMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, oracleVotesMonitor)
+
 	return c, nil
 }
 

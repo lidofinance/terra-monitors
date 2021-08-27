@@ -10,6 +10,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
+	"github.com/lidofinance/terra-monitors/openapi/client/oracle"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 )
@@ -56,6 +57,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *TerraLiteF
 
 	cli := new(TerraLiteForTerra)
 	cli.Transport = transport
+	cli.Oracle = oracle.New(transport, formats)
 	cli.Transactions = transactions.New(transport, formats)
 	cli.Wasm = wasm.New(transport, formats)
 	return cli
@@ -102,6 +104,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // TerraLiteForTerra is a client for terra lite for terra
 type TerraLiteForTerra struct {
+	Oracle oracle.ClientService
+
 	Transactions transactions.ClientService
 
 	Wasm wasm.ClientService
@@ -112,6 +116,7 @@ type TerraLiteForTerra struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *TerraLiteForTerra) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
+	c.Oracle.SetTransport(transport)
 	c.Transactions.SetTransport(transport)
 	c.Wasm.SetTransport(transport)
 }
