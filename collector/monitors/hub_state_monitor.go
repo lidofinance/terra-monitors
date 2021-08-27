@@ -20,7 +20,7 @@ var (
 
 func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) Monitor {
 
-	if cfg.BassetContractsVersion == "1" {
+	if cfg.BassetContractsVersion == config.V1Contracts {
 		m := HubStateMonitor{
 			State:      &types.HubStateResponseV1{},
 			HubAddress: cfg.Addresses.HubContract,
@@ -41,19 +41,6 @@ func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) Monit
 	m.InitMetrics()
 
 	return &m
-}
-
-func NewHubStateMonitorV1(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitor {
-	m := HubStateMonitor{
-		State:      &types.HubStateResponseV1{},
-		HubAddress: cfg.Addresses.HubContract,
-		metrics:    make(map[MetricName]MetricValue),
-		apiClient:  cfg.GetTerraClient(),
-		logger:     logger,
-	}
-	m.InitMetrics()
-
-	return m
 }
 
 type HubStateMonitor struct {

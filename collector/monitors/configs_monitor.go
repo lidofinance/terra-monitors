@@ -41,7 +41,7 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) C
 		logger:           logger,
 		contractsVersion: cfg.BassetContractsVersion,
 	}
-	if m.contractsVersion == "2" {
+	if m.contractsVersion == config.V2Contracts {
 		m.Contracts[cfg.Addresses.ValidatorsRegistryContract] = ValidatorsRegistryConfigCRC32
 		m.Contracts[cfg.Addresses.RewardsDispatcherContract] = RewardDispatcherConfigCRC32
 	}
@@ -59,7 +59,7 @@ func (m *ConfigsCRC32Monitor) providedMetrics() []MetricName {
 	}
 	// ValidatorsRegistry and RewardDispatcher contracts are presented only for v2 contracts,
 	// we dont need these metrics on v1 monitor instance
-	if m.contractsVersion == "2" {
+	if m.contractsVersion == config.V2Contracts {
 		providedMetrics = append(providedMetrics, ValidatorsRegistryConfigCRC32, RewardDispatcherConfigCRC32)
 	}
 	return providedMetrics

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
@@ -16,13 +15,6 @@ import (
 type V2ValidatorsRepository struct {
 	validatorsRegistryContract string
 	apiClient                  *client.TerraLiteForTerra
-}
-
-func NewV2ValidatorsRepository(cfg config.CollectorConfig) *V2ValidatorsRepository {
-	return &V2ValidatorsRepository{
-		validatorsRegistryContract: cfg.Addresses.ValidatorsRegistryContract,
-		apiClient:                  cfg.GetTerraClient(),
-	}
 }
 
 func (r *V2ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {

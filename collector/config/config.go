@@ -8,6 +8,11 @@ import (
 	"github.com/vrischmann/envconfig"
 )
 
+const (
+	V1Contracts = "1"
+	V2Contracts = "2"
+)
+
 type CollectorConfig struct {
 	BassetContractsVersion string `envconfig:"default=2"` // available values: 1 and 2
 	LCD                    LCD

@@ -3,7 +3,7 @@ package monitors
 import "github.com/lidofinance/terra-monitors/collector/config"
 
 func NewValidatorsRepository(cfg config.CollectorConfig) ValidatorsRepository {
-	if cfg.BassetContractsVersion == "1" {
+	if cfg.BassetContractsVersion == config.V1Contracts {
 		return &V1ValidatorsRepository{
 			hubContract: cfg.Addresses.HubContract,
 			apiClient:   cfg.GetTerraClient(),

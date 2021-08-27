@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
@@ -17,19 +16,6 @@ var (
 	StlunaBondedAmount MetricName = "stluna_bonded_amount"
 	StlunaExchangeRate MetricName = "stluna_exchange_rate"
 )
-
-func NewHubStateMonitorV2(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitorV2 {
-	m := HubStateMonitorV2{
-		State:      &types.HubStateResponseV2{},
-		HubAddress: cfg.Addresses.HubContract,
-		metrics:    make(map[MetricName]MetricValue),
-		apiClient:  cfg.GetTerraClient(),
-		logger:     logger,
-	}
-	m.InitMetrics()
-
-	return m
-}
 
 type HubStateMonitorV2 struct {
 	State      *types.HubStateResponseV2
