@@ -22,37 +22,47 @@ const (
 )
 
 type ConfigsCRC32Monitor struct {
-	Contracts map[string]MetricName
-	metrics   map[MetricName]MetricValue
-	apiClient *client.TerraLiteForTerra
-	logger    *logrus.Logger
+	Contracts        map[string]MetricName
+	metrics          map[MetricName]MetricValue
+	apiClient        *client.TerraLiteForTerra
+	logger           *logrus.Logger
+	contractsVersion string
 }
 
 func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) ConfigsCRC32Monitor {
 	m := ConfigsCRC32Monitor{
 		Contracts: map[string]MetricName{
-			cfg.Addresses.AirDropRegistryContract:    AirDropRegistryConfigCRC32,
-			cfg.Addresses.ValidatorsRegistryContract: ValidatorsRegistryConfigCRC32,
-			cfg.Addresses.RewardsDispatcherContract:  RewardDispatcherConfigCRC32,
-			cfg.Addresses.HubContract:                HubConfigCRC32,
-			cfg.Addresses.RewardContract:             BlunaRewardConfigCRC32,
+			cfg.Addresses.AirDropRegistryContract: AirDropRegistryConfigCRC32,
+			cfg.Addresses.HubContract:             HubConfigCRC32,
+			cfg.Addresses.RewardContract:          BlunaRewardConfigCRC32,
 		},
-		metrics:   make(map[MetricName]MetricValue),
-		apiClient: cfg.GetTerraClient(),
-		logger:    logger,
+		metrics:          make(map[MetricName]MetricValue),
+		apiClient:        cfg.GetTerraClient(),
+		logger:           logger,
+		contractsVersion: cfg.BassetContractsVersion,
 	}
+	if m.contractsVersion == "2" {
+		m.Contracts[cfg.Addresses.ValidatorsRegistryContract] = ValidatorsRegistryConfigCRC32
+		m.Contracts[cfg.Addresses.RewardsDispatcherContract] = RewardDispatcherConfigCRC32
+	}
+
 	m.InitMetrics()
 
 	return m
 }
 
 func (m *ConfigsCRC32Monitor) providedMetrics() []MetricName {
-	return []MetricName{
+	providedMetrics := []MetricName{
 		AirDropRegistryConfigCRC32,
-		ValidatorsRegistryConfigCRC32,
-		RewardDispatcherConfigCRC32,
 		HubConfigCRC32,
-		BlunaRewardConfigCRC32}
+		BlunaRewardConfigCRC32,
+	}
+	// ValidatorsRegistry and RewardDispatcher contracts are presented only for v2 contracts,
+	// we dont need these metrics on v1 monitor instance
+	if m.contractsVersion == "2" {
+		providedMetrics = append(providedMetrics, ValidatorsRegistryConfigCRC32, RewardDispatcherConfigCRC32)
+	}
+	return providedMetrics
 }
 
 func (m ConfigsCRC32Monitor) Name() string {
