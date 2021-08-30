@@ -159,7 +159,7 @@
             "query": {
               "params": [
                 "A",
-                "1m",
+                "30m",
                 "now"
               ]
             },
@@ -1412,7 +1412,7 @@
             "query": {
               "params": [
                 "C",
-                "1m",
+                "30m",
                 "now"
               ]
             },
@@ -1427,7 +1427,7 @@
         "for": "0m",
         "frequency": "30s",
         "handler": 1,
-        "name": "Max number of missed blocks is above 200 in last 5 min",
+        "name": "Max number of missed blocks is above 200 in last 30 min",
         "noDataState": "no_data",
         "notifications": []
       },
