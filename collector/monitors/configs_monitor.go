@@ -57,7 +57,7 @@ func (m *ConfigsCRC32Monitor) providedMetrics() []MetricName {
 		HubConfigCRC32,
 		BlunaRewardConfigCRC32,
 	}
-	// ValidatorsRegistry and RewardDispatcher contracts are presented only for v2 contracts,
+	// ValidatorsRegistry and RewardDispatcher contracts are present in v2 contracts,
 	// we dont need these metrics on v1 monitor instance
 	if m.contractsVersion == config.V2Contracts {
 		providedMetrics = append(providedMetrics, ValidatorsRegistryConfigCRC32, RewardDispatcherConfigCRC32)

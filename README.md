@@ -8,7 +8,7 @@ TELEGRAM_CHAT_ID=<telegram_chat_id>
 ```
 
 Variables required to service work.\
-You can fill some .env file and pass it to docker-compose service with --env-file argument.
+You should pass the .env file and pass it to docker-compose service with `--env-file` argument.
 ```shell
 # custom endpoint for alert messages 
 GF_SERVER_ROOT_URL=http://swelf-host:3000
