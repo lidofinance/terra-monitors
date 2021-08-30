@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
@@ -28,8 +29,9 @@ func (suite *ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
 		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewV1ValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg)
 
 	expectedValidators := []string{testValAddress}
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
@@ -58,8 +60,9 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedValidatorsRepository() {
 		fmt.Sprintf("/wasm/contracts/%s/store", HubContract): string(validatorInfoData),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewV1ValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg)
 
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
 	suite.Nil(validators)

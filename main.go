@@ -24,8 +24,8 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 
 	c := collector.NewLCDCollector(cfg, logger)
 
-	hubStateMonitor := monitors.NewHubStateMonitorV2(cfg, logger)
-	c.RegisterMonitor(ctx, cfg, &hubStateMonitor)
+	hubStateMonitor := monitors.NewHubStateMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, hubStateMonitor)
 
 	rewardStateMonitor := monitors.NewRewardStateMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, &rewardStateMonitor)
@@ -33,7 +33,7 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
 
-	validatorsRepository := monitors.NewV2ValidatorsRepository(cfg)
+	validatorsRepository := monitors.NewValidatorsRepository(cfg)
 	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository)
 	c.RegisterMonitor(ctx, cfg, slashingMonitor)
 
@@ -78,8 +78,7 @@ func main() {
 		appInstance   = app.NewAppHTTP(promExtractor)
 	)
 	http.Handle("/metrics", appInstance)
-
-	logger.Printf("Starting web server at %s\n", *addr)
+	logger.Printf("Starting web server v%s at %s\n", cfg.BassetContractsVersion, *addr)
 
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		logger.Errorf("Failed to ListenAndServe: %v\n", err)

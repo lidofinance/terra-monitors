@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"io/ioutil"
 
 	"github.com/stretchr/testify/suite"
@@ -38,8 +39,9 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewV1ValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
 	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
@@ -78,8 +80,9 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewV1ValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
 	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
@@ -119,8 +122,9 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewV1ValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
 	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())

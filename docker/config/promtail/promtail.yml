@@ -29,5 +29,5 @@ scrape_configs:
             service_name:
             log_level:
     - match:
-        selector: '{job="containerlogs", service_name=""}'
+        selector: '{job="containerlogs", service_name != "${SERVICE_NAME}"}'
         action: drop

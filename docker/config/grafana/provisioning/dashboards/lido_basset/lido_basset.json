@@ -2405,7 +2405,7 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "sum(count_over_time({service_name=\"lido_terra\"}[1m])) by (log_level)",
+          "expr": "sum(count_over_time({job=\"containerlogs\"}[1m])) by (log_level)",
           "instant": false,
           "legendFormat": "{{log_level}}",
           "range": true,
@@ -2432,5 +2432,5 @@
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 1
+  "version": 7
 }

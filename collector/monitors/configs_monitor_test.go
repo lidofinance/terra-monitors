@@ -74,9 +74,10 @@ func (suite *DetectorChangesTestSuite) TestHubParameters() {
 	suite.NotEqual(crc32first, crc32second)
 }
 
-func (suite *DetectorChangesTestSuite) TestConfigsMonitor() {
+func (suite *DetectorChangesTestSuite) TestConfigsMonitorV2() {
 	ts := NewServerWithRandomJson()
 	cfg := NewTestCollectorConfig(ts.URL)
+	cfg.BassetContractsVersion = "2"
 	logger := NewTestLogger()
 	m1 := NewConfigsCRC32Monitor(cfg, logger)
 	savedMetrics := make(map[MetricName]MetricValue)

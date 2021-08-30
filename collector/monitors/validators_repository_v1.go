@@ -12,46 +12,47 @@ import (
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 )
 
-type V2ValidatorsRepository struct {
-	validatorsRegistryContract string
-	apiClient                  *client.TerraLiteForTerra
+type ValidatorsRepository interface {
+	GetValidatorsAddresses(ctx context.Context) ([]string, error)
+	GetValidatorInfo(ctx context.Context, address string) (types.ValidatorInfo, error)
 }
 
-func (r *V2ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {
-	valReq, valResp := types.GetValidatorRegistryValidatorsPair()
+type V1ValidatorsRepository struct {
+	hubContract string
+	apiClient   *client.TerraLiteForTerra
+}
 
-	reqRaw, err := json.Marshal(&valReq)
+func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {
+	hubReq, hubResp := types.GetHubWhitelistedValidatorsPair()
+
+	reqRaw, err := json.Marshal(&hubReq)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal ValidatorRegistryValidatorsRequest request: %w", err)
+		return nil, fmt.Errorf("failed to marshal HubWhitelistedValidators request: %w", err)
 	}
 
 	p := wasm.GetWasmContractsContractAddressStoreParams{}
 	p.SetContext(ctx)
-	p.SetContractAddress(r.validatorsRegistryContract)
+	p.SetContractAddress(r.hubContract)
 	p.SetQueryMsg(string(reqRaw))
 
 	resp, err := r.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 	if err != nil {
-		return nil, fmt.Errorf("failed to process ValidatorRegistryValidatorsRequest request: %w", err)
+		return nil, fmt.Errorf("failed to process HubWhitelistedValidators request: %w", err)
 	}
 
 	if err := resp.GetPayload().Validate(nil); err != nil {
 		return nil, fmt.Errorf("failed to validate ValidatorsWhitelist: %w", err)
 	}
 
-	err = types.CastMapToStruct(resp.Payload.Result, &valResp)
+	err = types.CastMapToStruct(resp.Payload.Result, &hubResp)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse ValidatorRegistryValidatorsResponse body interface: %w", err)
+		return nil, fmt.Errorf("failed to parse HubWhitelistedValidators body interface: %w", err)
 	}
 
-	valAddresses := make([]string, len(valResp))
-	for i, val := range valResp {
-		valAddresses[i] = val.Address
-	}
-	return valAddresses, nil
+	return hubResp.Validators, nil
 }
 
-func (r *V2ValidatorsRepository) GetValidatorInfo(ctx context.Context, address string) (types.ValidatorInfo, error) {
+func (r *V1ValidatorsRepository) GetValidatorInfo(ctx context.Context, address string) (types.ValidatorInfo, error) {
 	validatorInfoResponse, err := r.apiClient.Transactions.GetStakingValidatorsValidatorAddr(
 		&transactions.GetStakingValidatorsValidatorAddrParams{
 			ValidatorAddr: address,

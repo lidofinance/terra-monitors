@@ -18,17 +18,36 @@ var (
 	BlunaExchangeRate MetricName = "bluna_exchange_rate"
 )
 
-func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) HubStateMonitor {
-	m := HubStateMonitor{
-		State:      &types.HubStateResponseV1{},
-		HubAddress: cfg.Addresses.HubContract,
-		metrics:    make(map[MetricName]MetricValue),
-		apiClient:  cfg.GetTerraClient(),
-		logger:     logger,
-	}
-	m.InitMetrics()
+func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) Monitor {
 
-	return m
+	switch cfg.BassetContractsVersion {
+	case config.V1Contracts:
+		{
+			m1 := HubStateMonitor{
+				State:      &types.HubStateResponseV1{},
+				HubAddress: cfg.Addresses.HubContract,
+				metrics:    make(map[MetricName]MetricValue),
+				apiClient:  cfg.GetTerraClient(),
+				logger:     logger,
+			}
+			m1.InitMetrics()
+			return &m1
+		}
+	case config.V2Contracts:
+		{
+			m2 := HubStateMonitorV2{
+				State:      &types.HubStateResponseV2{},
+				HubAddress: cfg.Addresses.HubContract,
+				metrics:    make(map[MetricName]MetricValue),
+				apiClient:  cfg.GetTerraClient(),
+				logger:     logger,
+			}
+			m2.InitMetrics()
+			return &m2
+		}
+	default:
+		panic("unknown contracts version")
+	}
 }
 
 type HubStateMonitor struct {
