@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"hash/crc32"
+	"sort"
 	"strings"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
@@ -74,6 +75,7 @@ func (m *WhitelistedValidatorsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to get whiltelisted validators for %s: %w", m.Name(), err)
 	}
 
+	sort.Strings(validators)
 	m.metrics[WhitelistedValidatorsCRC32].Set(float64(crc32.ChecksumIEEE([]byte(strings.Join(validators, "")))))
 	m.metrics[WhitelistedValidatorsNum].Set(float64(len(validators)))
 	m.logger.Infoln("updated ", m.Name())
