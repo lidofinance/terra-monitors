@@ -36,8 +36,9 @@ func (suite *OracleVotesMonitorTestSuite) TestSuccessfulRequest() {
 		fmt.Sprintf("/oracle/voters/%s/miss", testValAddress): string(oracleMissedVotePeriods),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.BassetContractsVersion = "1"
 
-	valRepository := NewV1ValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
 	m := NewOracleVotesMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
@@ -67,8 +68,9 @@ func (suite *OracleVotesMonitorTestSuite) TestFailedValidatorsFeeRequest() {
 		fmt.Sprintf("/oracle/parameters"):                     string(oracleParams),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.BassetContractsVersion = "1"
 
-	valRepository := NewV1ValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
 	m := NewOracleVotesMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
