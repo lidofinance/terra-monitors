@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
-	"time"
 
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
@@ -103,20 +102,8 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 
 		var signingInfo = signingInfoResponse.GetPayload().Result
 
-		// This check is just in case, I haven't seen empty values in this
-		// field.
-		if len(*signingInfo.JailedUntil) > 0 {
-			jailedUntil, err := time.Parse(jailTimeLayout, *signingInfo.JailedUntil)
-			if err != nil {
-				m.logger.Errorf("failed to Parse `jailed_until` %s as %s: %s",
-					*signingInfo.JailedUntil, jailTimeLayout, err)
-			} else {
-				// If the `jailed_until` property is set to a date in the future, this
-				// validator is jailed.
-				if jailedUntil.After(time.Now()) {
-					tmpMetrics[SlashingNumJailedValidators].Add(1)
-				}
-			}
+		if validatorInfo.Jailed {
+			tmpMetrics[SlashingNumJailedValidators].Add(1)
 		}
 
 		// No blocks is sent as "", not as "0".

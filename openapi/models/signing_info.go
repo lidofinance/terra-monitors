@@ -27,10 +27,6 @@ type SigningInfo struct {
 	// Required: true
 	IndexOffset *string `json:"index_offset"`
 
-	// jailed until
-	// Required: true
-	JailedUntil *string `json:"jailed_until"`
-
 	// missed blocks counter
 	// Required: true
 	MissedBlocksCounter *string `json:"missed_blocks_counter"`
@@ -53,10 +49,6 @@ func (m *SigningInfo) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateIndexOffset(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateJailedUntil(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -90,15 +82,6 @@ func (m *SigningInfo) validateAddress(formats strfmt.Registry) error {
 func (m *SigningInfo) validateIndexOffset(formats strfmt.Registry) error {
 
 	if err := validate.Required("index_offset", "body", m.IndexOffset); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *SigningInfo) validateJailedUntil(formats strfmt.Registry) error {
-
-	if err := validate.Required("jailed_until", "body", m.JailedUntil); err != nil {
 		return err
 	}
 

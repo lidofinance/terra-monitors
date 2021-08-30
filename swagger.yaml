@@ -852,8 +852,6 @@ definitions:
         type: string
       index_offset:
         type: string
-      jailed_until:
-        type: string
       tombstoned:
         type: boolean
       missed_blocks_counter:
@@ -862,7 +860,6 @@ definitions:
       - address
       - start_height
       - index_offset
-      - jailed_until
       - tombstoned
       - missed_blocks_counter
   ValidatorInfo:
@@ -870,6 +867,8 @@ definitions:
     properties:
       consensus_pubkey:
         type: string
+      jailed:
+        type: boolean
       description:
         type: object
         properties:
@@ -891,6 +890,7 @@ definitions:
       - consensus_pubkey
       - description
       - commission
+      - jailed
   OracleParams:
     type: object
     properties:

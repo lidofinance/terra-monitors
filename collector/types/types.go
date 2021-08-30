@@ -162,4 +162,5 @@ type ValidatorInfo struct {
 	PubKey         string
 	Moniker        string
 	CommissionRate float64
+	Jailed         bool
 }

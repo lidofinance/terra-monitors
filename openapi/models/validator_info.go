@@ -30,6 +30,10 @@ type ValidatorInfo struct {
 	// description
 	// Required: true
 	Description *ValidatorInfoDescription `json:"description"`
+
+	// jailed
+	// Required: true
+	Jailed *bool `json:"jailed"`
 }
 
 // Validate validates this validator info
@@ -45,6 +49,10 @@ func (m *ValidatorInfo) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateDescription(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateJailed(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -94,6 +102,15 @@ func (m *ValidatorInfo) validateDescription(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *ValidatorInfo) validateJailed(formats strfmt.Registry) error {
+
+	if err := validate.Required("jailed", "body", m.Jailed); err != nil {
+		return err
 	}
 
 	return nil
