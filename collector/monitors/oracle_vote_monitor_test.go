@@ -17,7 +17,7 @@ func (suite *OracleVotesMonitorTestSuite) SetupTest() {
 }
 
 func (suite *OracleVotesMonitorTestSuite) TestSuccessfulRequest() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info.json")
+	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_not_jailed.json")
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")
@@ -53,7 +53,7 @@ func (suite *OracleVotesMonitorTestSuite) TestSuccessfulRequest() {
 }
 
 func (suite *OracleVotesMonitorTestSuite) TestFailedValidatorsFeeRequest() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info.json")
+	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_not_jailed.json")
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")

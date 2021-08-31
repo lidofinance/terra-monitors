@@ -3,8 +3,9 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"github.com/lidofinance/terra-monitors/collector/config"
 	"io/ioutil"
+
+	"github.com/lidofinance/terra-monitors/collector/config"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -23,7 +24,7 @@ func (suite *SlashingMonitorTestSuite) SetupTest() {
 }
 
 func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info.json")
+	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_jailed.json")
 	suite.NoError(err)
 
 	validatorSigningInfoData, err := ioutil.ReadFile(
@@ -64,7 +65,7 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 }
 
 func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info.json")
+	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_not_jailed.json")
 	suite.NoError(err)
 
 	validatorSigningInfoData, err := ioutil.ReadFile(

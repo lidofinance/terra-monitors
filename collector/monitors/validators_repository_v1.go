@@ -77,5 +77,6 @@ func (r *V1ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 		Moniker:        validatorInfoResponse.GetPayload().Result.Description.Moniker,
 		PubKey:         *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
 		CommissionRate: commissionRate,
+		Jailed:         *validatorInfoResponse.GetPayload().Result.Jailed,
 	}, nil
 }

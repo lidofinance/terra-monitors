@@ -3,10 +3,11 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/stretchr/testify/suite"
-	"io/ioutil"
 )
 
 type ValidatorsRepositoryTestSuite struct {
@@ -18,7 +19,7 @@ func (suite *ValidatorsRepositoryTestSuite) SetupTest() {
 }
 
 func (suite *ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info.json")
+	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_not_jailed.json")
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")
