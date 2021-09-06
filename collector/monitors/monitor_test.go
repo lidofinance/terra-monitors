@@ -69,4 +69,5 @@ func TestLocales(t *testing.T) {
 	suite.Run(t, new(ValidatorsRepositoryTestSuite))
 	suite.Run(t, new(V2ValidatorsRepositoryTestSuite))
 	suite.Run(t, new(OracleVotesMonitorTestSuite))
+	suite.Run(t, new(BalanceMonitorTestSuite))
 }

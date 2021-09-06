@@ -290,6 +290,34 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
+  /bank/balances/{address}:
+    get:
+      summary: Get the account balances
+      tags:
+        - Bank
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          description: Account address in bech32 format
+          required: true
+          type: string
+          x-example: terra1wg2mlrxdmnnkkykgqg4znky86nyrtc45q336yv
+      responses:
+        200:
+          description: Account balances
+          schema:
+            type: object
+            properties:
+              height:
+                type: string
+              result:
+                type: array
+                items:
+                  $ref: "#/definitions/Coin"
+        500:
+          description: Server internal error
 
 
 definitions:
@@ -909,3 +937,12 @@ definitions:
       slash_window:
         type: string
         example: '43200'
+  Coin:
+    type: object
+    properties:
+      denom:
+        type: string
+        example: uluna
+      amount:
+        type: string
+        example: "50"
