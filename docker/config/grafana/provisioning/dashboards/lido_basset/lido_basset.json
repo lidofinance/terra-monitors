@@ -904,6 +904,49 @@
               "tooltip": false,
               "viz": false
             },
+<<<<<<< HEAD
+=======
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff_abs"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "0m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "one of the configs has been changed",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+>>>>>>> refactored config monitoring to use labels metrics instead of predefined ones #LSC-67
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -957,10 +1000,26 @@
       "targets": [
         {
           "exemplar": true,
+<<<<<<< HEAD
           "expr": "hub_parameters_er_threshold{}",
           "interval": "",
           "legendFormat": "Er threshold",
           "refId": "A"
+=======
+          "expr": "hub_parameters_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "hub parameters",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "config_crc32{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{label}}",
+          "refId": "B"
+>>>>>>> refactored config monitoring to use labels metrics instead of predefined ones #LSC-67
         }
       ],
       "thresholds": [

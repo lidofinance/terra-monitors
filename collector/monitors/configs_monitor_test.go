@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"encoding/json"
+	"github.com/lidofinance/terra-monitors/collector/config"
 
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/stretchr/testify/suite"
@@ -77,26 +78,32 @@ func (suite *DetectorChangesTestSuite) TestHubParameters() {
 func (suite *DetectorChangesTestSuite) TestConfigsMonitorV2() {
 	ts := NewServerWithRandomJson()
 	cfg := NewTestCollectorConfig(ts.URL)
-	cfg.BassetContractsVersion = "2"
+	cfg.BassetContractsVersion = config.V2Contracts
 	logger := NewTestLogger()
 	m1 := NewConfigsCRC32Monitor(cfg, logger)
-	savedMetrics := make(map[MetricName]MetricValue)
+	savedMetrics := NewMetricVector()
 
 	err := m1.Handler(context.Background())
 	suite.NoError(err)
-	for metric, value := range m1.metrics {
-		savedMetrics[metric] = &SimpleMetricValue{value: value.Get()}
+	for _, label := range m1.metricVectors[ConfigCRC32].Labels() {
+		savedMetrics.Set(label, m1.metricVectors[ConfigCRC32].Get(label))
 	}
 	err = m1.Handler(context.Background())
 	suite.NoError(err)
 
 	// since we are getting random data each http request
 	// we should get m1.metrics and savedMetrics from first request differ each other
-	suite.Equal(5, len(m1.metrics))
-	suite.Equal(5, len(savedMetrics))
-	for metric := range m1.metrics {
-		_, found := savedMetrics[metric]
+	suite.Equal(5, len(m1.metricVectors[ConfigCRC32].Labels()))
+	suite.Equal(5, len(savedMetrics.Labels()))
+	for _, label := range m1.metricVectors[ConfigCRC32].Labels() {
+		var found bool
+		for _, wantedLabel := range savedMetrics.Labels() {
+			if label == wantedLabel {
+				found = true
+				break
+			}
+		}
 		suite.True(found)
-		suite.NotEqual(m1.metrics[metric], savedMetrics[metric])
+		suite.NotEqual(m1.metricVectors[ConfigCRC32].Get(label), savedMetrics.Get(label))
 	}
 }
