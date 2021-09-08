@@ -62,13 +62,13 @@ func (m *OperatorBotBalanceMonitor) Handler(ctx context.Context) error {
 	}
 	coins := resp.GetPayload().Result
 	for _, coin := range coins {
-		if coin.Denom == "uusd" {
+		if coin.Denom == UUSDDenom {
 			amount, err := strconv.ParseFloat(coin.Amount, 64)
 			if err != nil {
 				// if for some reason we cannot parse uusd float amount, just leave previous value
 				return fmt.Errorf("failed to parse coins uusd amount: %w", err)
 			}
-			m.balanceUST.Set(amount / 1000000)
+			m.balanceUST.Set(amount / 1_000_000)
 			m.logger.Infof("successfully retrieved \"%s\" account balance info\n", m.BotAddress)
 			return nil
 		}

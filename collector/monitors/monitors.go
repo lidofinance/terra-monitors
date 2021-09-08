@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const UUSDDenom = "uusd"
+
 type Monitor interface {
 	Name() string
 	// Handler fetches the data to inner storage
