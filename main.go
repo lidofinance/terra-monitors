@@ -44,7 +44,7 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	c.RegisterMonitor(ctx, cfg, &hubParameters)
 
 	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(cfg, logger)
-	c.RegisterMonitor(ctx, cfg, &configCRC32Monitor)
+	c.RegisterMonitor(ctx, cfg, configCRC32Monitor)
 
 	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(cfg, logger, validatorsRepository)
 	c.RegisterMonitor(ctx, cfg, &whitelistedValidatorsMonitor)

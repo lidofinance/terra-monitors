@@ -33,7 +33,7 @@ type ConfigsCRC32Monitor struct {
 	contractsVersion string
 }
 
-func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) ConfigsCRC32Monitor {
+func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) *ConfigsCRC32Monitor {
 	m := ConfigsCRC32Monitor{
 		Contracts: map[string]string{
 			cfg.Addresses.AirDropRegistryContract: AirDropRegistryConfigCRC32,
@@ -54,28 +54,14 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) C
 
 	m.InitMetrics()
 
-	return m
-}
-
-func (m *ConfigsCRC32Monitor) monitoredContracts() []string {
-	monitoredContracts := []string{
-		AirDropRegistryConfigCRC32,
-		HubConfigCRC32,
-		BlunaRewardConfigCRC32,
-	}
-	// ValidatorsRegistry and RewardDispatcher contracts are present in v2 contracts,
-	// we dont need these metrics on v1 monitor instance
-	if m.contractsVersion == config.V2Contracts {
-		monitoredContracts = append(monitoredContracts, ValidatorsRegistryConfigCRC32, RewardDispatcherConfigCRC32)
-	}
-	return monitoredContracts
+	return &m
 }
 
 func (m *ConfigsCRC32Monitor) providedMetricVectors() []MetricName {
 	return []MetricName{ConfigCRC32}
 }
 
-func (m ConfigsCRC32Monitor) Name() string {
+func (m *ConfigsCRC32Monitor) Name() string {
 	return "ConfigsCRC32Monitor"
 }
 
@@ -83,11 +69,11 @@ func (m *ConfigsCRC32Monitor) InitMetrics() {
 	initMetrics(nil, m.providedMetricVectors(), nil, m.metricVectors)
 }
 
-func (m ConfigsCRC32Monitor) GetMetrics() map[MetricName]MetricValue {
+func (m *ConfigsCRC32Monitor) GetMetrics() map[MetricName]MetricValue {
 	return nil
 }
 
-func (m ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]*MetricVector {
+func (m *ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]*MetricVector {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	return m.metricVectors
