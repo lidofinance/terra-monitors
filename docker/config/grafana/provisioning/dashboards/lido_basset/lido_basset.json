@@ -904,49 +904,6 @@
               "tooltip": false,
               "viz": false
             },
-<<<<<<< HEAD
-=======
-            "query": {
-              "params": [
-                "B",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff_abs"
-            },
-            "type": "query"
-          }
-        ],
-        "executionErrorState": "alerting",
-        "for": "0m",
-        "frequency": "1m",
-        "handler": 1,
-        "name": "one of the configs has been changed",
-        "noDataState": "no_data",
-        "notifications": []
-      },
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
->>>>>>> refactored config monitoring to use labels metrics instead of predefined ones #LSC-67
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1000,26 +957,10 @@
       "targets": [
         {
           "exemplar": true,
-<<<<<<< HEAD
           "expr": "hub_parameters_er_threshold{}",
           "interval": "",
           "legendFormat": "Er threshold",
           "refId": "A"
-=======
-          "expr": "hub_parameters_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "hub parameters",
-          "refId": "A"
-        },
-        {
-          "exemplar": true,
-          "expr": "config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "{{label}}",
-          "refId": "B"
->>>>>>> refactored config monitoring to use labels metrics instead of predefined ones #LSC-67
         }
       ],
       "thresholds": [
@@ -1206,102 +1147,10 @@
               "type": "diff_abs"
             },
             "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "C",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff_abs"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "D",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff_abs"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "E",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff_abs"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "F",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff_abs"
-            },
-            "type": "query"
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "one of the configs has been changed",
@@ -1379,50 +1228,19 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "airdrop_registry_config_crc32",
-          "interval": "",
-          "legendFormat": "airdrop registry config",
-          "refId": "A"
-        },
-        {
-          "exemplar": true,
-          "expr": "bluna_reward_config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "bluna reward config",
-          "refId": "B"
-        },
-        {
-          "exemplar": true,
-          "expr": "hub_config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "hub config",
-          "refId": "C"
-        },
-        {
-          "exemplar": true,
           "expr": "hub_parameters_crc32{}",
           "hide": false,
           "interval": "",
           "legendFormat": "hub parameters",
-          "refId": "D"
+          "refId": "A"
         },
         {
           "exemplar": true,
-          "expr": "reward_dispatcher_config_crc32{}",
+          "expr": "config_crc32",
           "hide": false,
           "interval": "",
-          "legendFormat": "reward dispatcher config",
-          "refId": "E"
-        },
-        {
-          "exemplar": true,
-          "expr": "validators_registry_config_crc32{}",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "validators registry config",
-          "refId": "F"
+          "legendFormat": "{{label}}",
+          "refId": "B"
         }
       ],
       "thresholds": [
@@ -2629,5 +2447,5 @@
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 26
+  "version": 31
 }
