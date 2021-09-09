@@ -33,7 +33,6 @@ const (
 
 const threshold int = 10
 
-const UUSDDenom = "uusd"
 
 type UpdateGlobalIndexMonitor struct {
 	ContractAddress  string
