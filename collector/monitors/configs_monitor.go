@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hash/crc32"
+	"sync"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
@@ -14,31 +15,36 @@ import (
 )
 
 const (
-	AirDropRegistryConfigCRC32    MetricName = "airdrop_registry_config_crc32"
-	BlunaRewardConfigCRC32        MetricName = "bluna_reward_config_crc32"
-	HubConfigCRC32                MetricName = "hub_config_crc32"
-	RewardDispatcherConfigCRC32   MetricName = "reward_dispatcher_config_crc32"
-	ValidatorsRegistryConfigCRC32 MetricName = "validators_registry_config_crc32"
+	AirDropRegistryConfigCRC32    string     = "airdrop_registry_config_crc32"
+	BlunaRewardConfigCRC32        string     = "bluna_reward_config_crc32"
+	HubConfigCRC32                string     = "hub_config_crc32"
+	RewardDispatcherConfigCRC32   string     = "reward_dispatcher_config_crc32"
+	ValidatorsRegistryConfigCRC32 string     = "validators_registry_config_crc32"
+	ConfigCRC32                   MetricName = "config_crc32"
 )
 
 type ConfigsCRC32Monitor struct {
-	Contracts        map[string]MetricName
+	Contracts        map[string]string
 	metrics          map[MetricName]MetricValue
+	metricVectors    map[MetricName]*MetricVector
 	apiClient        *client.TerraLiteForTerra
 	logger           *logrus.Logger
+	lock             sync.RWMutex
 	contractsVersion string
 }
 
-func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) ConfigsCRC32Monitor {
+func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) *ConfigsCRC32Monitor {
 	m := ConfigsCRC32Monitor{
-		Contracts: map[string]MetricName{
+		Contracts: map[string]string{
 			cfg.Addresses.AirDropRegistryContract: AirDropRegistryConfigCRC32,
 			cfg.Addresses.HubContract:             HubConfigCRC32,
 			cfg.Addresses.RewardContract:          BlunaRewardConfigCRC32,
 		},
 		metrics:          make(map[MetricName]MetricValue),
+		metricVectors:    make(map[MetricName]*MetricVector),
 		apiClient:        cfg.GetTerraClient(),
 		logger:           logger,
+		lock:             sync.RWMutex{},
 		contractsVersion: cfg.BassetContractsVersion,
 	}
 	if m.contractsVersion == config.V2Contracts {
@@ -48,46 +54,36 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) C
 
 	m.InitMetrics()
 
-	return m
+	return &m
 }
 
-func (m *ConfigsCRC32Monitor) providedMetrics() []MetricName {
-	providedMetrics := []MetricName{
-		AirDropRegistryConfigCRC32,
-		HubConfigCRC32,
-		BlunaRewardConfigCRC32,
-	}
-	// ValidatorsRegistry and RewardDispatcher contracts are present in v2 contracts,
-	// we dont need these metrics on v1 monitor instance
-	if m.contractsVersion == config.V2Contracts {
-		providedMetrics = append(providedMetrics, ValidatorsRegistryConfigCRC32, RewardDispatcherConfigCRC32)
-	}
-	return providedMetrics
+func (m *ConfigsCRC32Monitor) providedMetricVectors() []MetricName {
+	return []MetricName{ConfigCRC32}
 }
 
-func (m ConfigsCRC32Monitor) Name() string {
+func (m *ConfigsCRC32Monitor) Name() string {
 	return "ConfigsCRC32Monitor"
 }
 
 func (m *ConfigsCRC32Monitor) InitMetrics() {
-	for _, metric := range m.providedMetrics() {
-		if m.metrics[metric] == nil {
-			m.metrics[metric] = &SimpleMetricValue{}
-		}
-		m.metrics[metric].Set(0)
-	}
+	initMetrics(nil, m.providedMetricVectors(), nil, m.metricVectors)
 }
 
-func (m ConfigsCRC32Monitor) GetMetrics() map[MetricName]MetricValue {
-	return m.metrics
-}
-
-func (m ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]*MetricVector {
+func (m *ConfigsCRC32Monitor) GetMetrics() map[MetricName]MetricValue {
 	return nil
+}
+
+func (m *ConfigsCRC32Monitor) GetMetricVectors() map[MetricName]*MetricVector {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+	return m.metricVectors
 }
 
 func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
 	confReq := types.CommonConfigRequest{}
+
+	tmpMetricVectors := make(map[MetricName]*MetricVector)
+	initMetrics(nil, m.providedMetricVectors(), nil, tmpMetricVectors)
 
 	reqRaw, err := json.Marshal(&confReq)
 	if err != nil {
@@ -97,12 +93,12 @@ func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
 	p := wasm.GetWasmContractsContractAddressStoreParams{}
 	p.SetContext(ctx)
 	p.SetQueryMsg(string(reqRaw))
-	for contract, metric := range m.Contracts {
+	for contract, label := range m.Contracts {
 		p.SetContractAddress(contract)
 
 		resp, err := m.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 		if err != nil {
-			m.logger.Errorf("failed to process %s request for metric %s: %+v", m.Name(), metric, err)
+			m.logger.Errorf("failed to process %s request for label %s: %+v", m.Name(), label, err)
 			continue
 		}
 
@@ -111,8 +107,13 @@ func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
 			m.logger.Errorf("failed to marshal %s: %+v", m.Name(), err)
 		}
 
-		m.metrics[metric].Set(float64(crc32.ChecksumIEEE(data)))
+		tmpMetricVectors[ConfigCRC32].Set(label, float64(crc32.ChecksumIEEE(data)))
 	}
+
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	copyVectors(tmpMetricVectors, m.metricVectors)
+
 	m.logger.Infoln("updated ", m.Name())
 	return nil
 }
