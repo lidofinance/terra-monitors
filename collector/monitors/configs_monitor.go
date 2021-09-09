@@ -93,12 +93,12 @@ func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
 	p := wasm.GetWasmContractsContractAddressStoreParams{}
 	p.SetContext(ctx)
 	p.SetQueryMsg(string(reqRaw))
-	for contract, metric := range m.Contracts {
+	for contract, label := range m.Contracts {
 		p.SetContractAddress(contract)
 
 		resp, err := m.apiClient.Wasm.GetWasmContractsContractAddressStore(&p)
 		if err != nil {
-			m.logger.Errorf("failed to process %s request for metric %s: %+v", m.Name(), metric, err)
+			m.logger.Errorf("failed to process %s request for label %s: %+v", m.Name(), label, err)
 			continue
 		}
 
@@ -107,7 +107,7 @@ func (m *ConfigsCRC32Monitor) Handler(ctx context.Context) error {
 			m.logger.Errorf("failed to marshal %s: %+v", m.Name(), err)
 		}
 
-		tmpMetricVectors[ConfigCRC32].Set(metric, float64(crc32.ChecksumIEEE(data)))
+		tmpMetricVectors[ConfigCRC32].Set(label, float64(crc32.ChecksumIEEE(data)))
 	}
 
 	m.lock.Lock()
