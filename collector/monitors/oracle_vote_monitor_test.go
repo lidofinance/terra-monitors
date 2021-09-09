@@ -38,8 +38,8 @@ func (suite *OracleVotesMonitorTestSuite) TestSuccessfulRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "1"
 
-	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
+	valRepository := NewValidatorsRepository(cfg, logger)
 	m := NewOracleVotesMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -70,8 +70,8 @@ func (suite *OracleVotesMonitorTestSuite) TestFailedValidatorsFeeRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "1"
 
-	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
+	valRepository := NewValidatorsRepository(cfg, logger)
 	m := NewOracleVotesMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)

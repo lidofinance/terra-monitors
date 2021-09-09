@@ -6,7 +6,8 @@ import (
 	"sync"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,7 +18,7 @@ const (
 type ValidatorsCommissionMonitor struct {
 	metrics              map[MetricName]MetricValue
 	metricVectors        map[MetricName]*MetricVector
-	apiClient            *client.TerraLiteForTerra
+	apiClient            *terraClient.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
 	lock                 sync.RWMutex
@@ -31,7 +32,7 @@ func NewValidatorsFeeMonitor(
 	m := ValidatorsCommissionMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            cfg.GetTerraClient(),
+		apiClient:            client.New(cfg.LCD, logger),
 		validatorsRepository: repository,
 		logger:               logger,
 	}

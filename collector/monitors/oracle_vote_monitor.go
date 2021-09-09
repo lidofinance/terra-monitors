@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/lidofinance/terra-monitors/openapi/client/oracle"
-
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/openapi/client/oracle"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,7 +20,7 @@ const (
 type OracleVotesMonitor struct {
 	metrics              map[MetricName]MetricValue
 	metricVectors        map[MetricName]*MetricVector
-	apiClient            *client.TerraLiteForTerra
+	apiClient            *terraClient.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	logger               *logrus.Logger
 	lock                 sync.RWMutex
@@ -34,7 +34,7 @@ func NewOracleVotesMonitor(
 	m := OracleVotesMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            cfg.GetTerraClient(),
+		apiClient:            client.New(cfg.LCD, logger),
 		validatorsRepository: repository,
 		logger:               logger,
 	}

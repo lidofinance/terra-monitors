@@ -7,7 +7,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,7 +24,7 @@ func NewLCDCollector(cfg config.CollectorConfig, logger *logrus.Logger) LCDColle
 		Metrics:       make(map[monitors.MetricName]monitors.Monitor),
 		MetricVectors: make(map[monitors.MetricName]monitors.Monitor),
 		logger:        logger,
-		apiClient:     cfg.GetTerraClient(),
+		apiClient:     client.New(cfg.LCD, logger),
 	}
 }
 
@@ -32,10 +33,10 @@ type LCDCollector struct {
 	MetricVectors map[monitors.MetricName]monitors.Monitor
 	Monitors      []monitors.Monitor
 	logger        *logrus.Logger
-	apiClient     *client.TerraLiteForTerra
+	apiClient     *terraClient.TerraLiteForTerra
 }
 
-func (c LCDCollector) GetApiClient() *client.TerraLiteForTerra {
+func (c LCDCollector) GetApiClient() *terraClient.TerraLiteForTerra {
 	return c.apiClient
 }
 

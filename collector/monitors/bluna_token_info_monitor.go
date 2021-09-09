@@ -9,7 +9,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 	"github.com/sirupsen/logrus"
 )
@@ -23,7 +24,7 @@ func NewBlunaTokenInfoMonitor(cfg config.CollectorConfig, logger *logrus.Logger)
 		State:           &types.TokenInfoResponse{},
 		ContractAddress: cfg.Addresses.BlunaTokenInfoContract,
 		metrics:         make(map[MetricName]MetricValue),
-		apiClient:       cfg.GetTerraClient(),
+		apiClient:       client.New(cfg.LCD, logger),
 		logger:          logger,
 		lock:            sync.RWMutex{},
 	}
@@ -35,7 +36,7 @@ type BlunaTokenInfoMonitor struct {
 	State           *types.TokenInfoResponse
 	ContractAddress string
 	metrics         map[MetricName]MetricValue
-	apiClient       *client.TerraLiteForTerra
+	apiClient       *terraClient.TerraLiteForTerra
 	logger          *logrus.Logger
 	lock            sync.RWMutex
 }
@@ -102,10 +103,6 @@ func (h *BlunaTokenInfoMonitor) GetMetrics() map[MetricName]MetricValue {
 
 func (h *BlunaTokenInfoMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
-}
-
-func (h *BlunaTokenInfoMonitor) SetApiClient(client *client.TerraLiteForTerra) {
-	h.apiClient = client
 }
 
 func (h *BlunaTokenInfoMonitor) SetLogger(l *logrus.Logger) {

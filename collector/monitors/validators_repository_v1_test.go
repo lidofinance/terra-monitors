@@ -7,6 +7,7 @@ import (
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
+	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -32,7 +33,7 @@ func (suite *ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg, logging.NewDefaultLogger())
 
 	expectedValidators := []string{testValAddress}
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
@@ -63,7 +64,7 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedValidatorsRepository() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg, logging.NewDefaultLogger())
 
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
 	suite.Nil(validators)

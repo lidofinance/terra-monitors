@@ -6,7 +6,8 @@ import (
 	"strconv"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/bank"
 	"github.com/sirupsen/logrus"
 )
@@ -17,7 +18,7 @@ var (
 
 type OperatorBotBalanceMonitor struct {
 	BotAddress string
-	apiClient  *client.TerraLiteForTerra
+	apiClient  *terraClient.TerraLiteForTerra
 	logger     *logrus.Logger
 	balanceUST SimpleMetricValue
 }
@@ -25,7 +26,7 @@ type OperatorBotBalanceMonitor struct {
 func NewOperatorBotBalanceMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *OperatorBotBalanceMonitor {
 	m := OperatorBotBalanceMonitor{
 		BotAddress: cfg.Addresses.UpdateGlobalIndexBotAddress,
-		apiClient:  cfg.GetTerraClient(),
+		apiClient:  client.New(cfg.LCD, logger),
 		logger:     logger,
 		balanceUST: SimpleMetricValue{},
 	}

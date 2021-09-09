@@ -43,6 +43,12 @@ BASSET_CONTRACTS_VERSION=1
 SERVICE_NAME=lido_terra_mainnet
 ```
 
+**N.B.: you can specify failover endpoints (sorted by priority, max to min) for the `LCD_ENDPOINT` config:**
+
+```
+LCD_ENDPOINT=fcd.terra.dev,scp.terra.dev
+```
+
 To run the service with env file - `./docker/env/.lido_terra.env`, `./docker/env/.lido_terra.env` is not being tracked by a git, and could be changed for any purpose.
 ```shell
 make start
