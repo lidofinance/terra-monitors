@@ -8,12 +8,11 @@ import (
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/sirupsen/logrus"
 
-	"github.com/lidofinance/terra-monitors/openapi/client"
 	openapiClient "github.com/lidofinance/terra-monitors/openapi/client"
 )
 
-func New(lcd config.LCD, logger *logrus.Logger) *client.TerraLiteForTerra {
-	return client.New(NewFailoverTransport(logger, lcd), nil)
+func New(lcd config.LCD, logger *logrus.Logger) *openapiClient.TerraLiteForTerra {
+	return openapiClient.New(NewFailoverTransport(logger, lcd), nil)
 }
 
 type FailoverTransport struct {
