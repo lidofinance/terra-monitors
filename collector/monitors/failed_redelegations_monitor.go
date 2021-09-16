@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/go-openapi/strfmt"
+	"github.com/lidofinance/terra-monitors/collector/monitors/delegations"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClient "github.com/lidofinance/terra-monitors/openapi/client_bombay"
-	"github.com/lidofinance/terra-monitors/openapi/client_bombay/query"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,11 +20,13 @@ const (
 type FailedRedelegationsMonitor struct {
 	lock sync.RWMutex
 
-	metrics              map[MetricName]MetricValue
-	metricVectors        map[MetricName]*MetricVector
-	apiClient            *terraClient.TerraLiteForTerra
-	logger               *logrus.Logger
-	validatorsRepository ValidatorsRepository
+	metrics       map[MetricName]MetricValue
+	metricVectors map[MetricName]*MetricVector
+	apiClient     *terraClient.TerraLiteForTerra
+	logger        *logrus.Logger
+
+	validatorsRepository  ValidatorsRepository
+	delegationsRepository delegations.Repository
 
 	hubAddress string
 }
@@ -34,14 +35,18 @@ func NewFailedRedelegationsMonitor(
 	cfg config.CollectorConfig,
 	logger *logrus.Logger,
 	repository ValidatorsRepository,
+	delegationsRepository delegations.Repository,
 ) *FailedRedelegationsMonitor {
 	m := FailedRedelegationsMonitor{
-		metrics:              make(map[MetricName]MetricValue),
-		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            client.NewBombay(cfg.LCD, logger),
-		logger:               logger,
-		validatorsRepository: repository,
-		hubAddress:           cfg.Addresses.HubContract,
+		metrics:       make(map[MetricName]MetricValue),
+		metricVectors: make(map[MetricName]*MetricVector),
+		apiClient:     client.NewBombay(cfg.LCD, logger),
+		logger:        logger,
+
+		validatorsRepository:  repository,
+		delegationsRepository: delegationsRepository,
+
+		hubAddress: cfg.Addresses.HubContract,
 	}
 	m.InitMetrics()
 
@@ -79,66 +84,25 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to get whiltelisted whitelistedValidators for %s: %w", m.Name(), err)
 	}
 
-	var paginationKey strfmt.Base64
-	for {
-		delegationsResponse, err := m.apiClient.Query.DelegatorDelegations(&query.DelegatorDelegationsParams{
-			PaginationKey: &paginationKey,
-			DelegatorAddr: m.hubAddress,
-			Context:       ctx,
-		})
+	delegationsResponse, err := m.delegationsRepository.GetDelegationsFromAddress(ctx, m.hubAddress)
+	if err != nil {
+		return fmt.Errorf("failed to GetDelegationsFromAddress: %w", err)
+	}
+
+	for _, delegation := range delegationsResponse {
+		validatorInfo, err := m.validatorsRepository.GetValidatorInfo(ctx, delegation.ValidatorAddress)
 		if err != nil {
-			return fmt.Errorf("failed to get whitelistedValidators of delegator: %w", err)
+			return fmt.Errorf("failed to GetValidatorInfo: %w", err)
 		}
 
-		if err := delegationsResponse.GetPayload().Validate(nil); err != nil {
-			return fmt.Errorf("failed to validate delegator's validators response: %w", err)
-		}
+		label := fmt.Sprintf("%s (%s)", delegation.ValidatorAddress, validatorInfo.Moniker)
 
-		if delegationsResponse.Payload == nil {
-			return fmt.Errorf("failed to validate delegator's validators response: %w", err)
-		}
+		tmpMetricVectors[FailedRedelegations].Set(label, 0)
 
-		paginationKey = nil
-		if delegationsResponse.Payload.Pagination != nil {
-			paginationKey = delegationsResponse.Payload.Pagination.NextKey
-		}
-
-		for _, response := range delegationsResponse.GetPayload().DelegationResponses {
-			if err := response.Validate(nil); err != nil {
-				return fmt.Errorf("failed to validate response: %w", err)
-			}
-
-			if response.Delegation == nil {
-				return fmt.Errorf("failed to validate response: delegaion is nil")
-			}
-
-			delegatedAmount, ok := types.NewInt(0), false
-			if response.Balance != nil {
-				if delegatedAmount, ok = types.NewIntFromString(response.Balance.Amount); !ok {
-					return fmt.Errorf("failed to parse delegation balance amount: %w", err)
-				}
-			} else {
-				return fmt.Errorf("failed to get response balance: balance is nil")
-			}
-
-			validatorInfo, err := m.validatorsRepository.GetValidatorInfo(ctx, response.Delegation.ValidatorAddress)
-			if err != nil {
-				return fmt.Errorf("failed to GetValidatorInfo: %w", err)
-			}
-
-			label := fmt.Sprintf("%s (%s)", response.Delegation.ValidatorAddress, validatorInfo.Moniker)
-
-			tmpMetricVectors[FailedRedelegations].Set(label, 0)
-
-			// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
-			// that means a redelegation was not successful
-			if !delegatedAmount.IsZero() && !contains(whitelistedValidators, response.Delegation.ValidatorAddress) {
-				tmpMetricVectors[FailedRedelegations].Set(label, 1)
-			}
-		}
-
-		if len(paginationKey) == 0 {
-			break
+		// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
+		// that means a redelegation was not successful
+		if !delegation.DelegationAmount.IsZero() && !containsString(whitelistedValidators, delegation.ValidatorAddress) {
+			tmpMetricVectors[FailedRedelegations].Set(label, 1)
 		}
 	}
 
@@ -151,7 +115,7 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func contains(s []string, e string) bool {
+func containsString(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
 			return true
