@@ -1,0 +1,57 @@
+{
+  "height": "5875512",
+  "result": [
+    {
+      "operator_address": "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdt4x",
+      "consensus_pubkey": "terravalconspub1zcjduepq29l0tqfsfkaxg2hrd2gh028l90zumledluwqwtsqn33l0waddvpqhl0azc",
+      "jailed": false,
+      "status": 2,
+      "tokens": "61653294788",
+      "delegator_shares": "62905061869.348765395018196727",
+      "description": {
+        "moniker": "BTC.Secure",
+        "identity": "1BF3208F584A72F9",
+        "website": "https://btcsecure.io",
+        "security_contact": "",
+        "details": "Stake with the highly secure and stable validator. Earn rewards with 100% SLA guarantee. Operated by BTC.Secure Inc. By delegating, you agree to the Staking Service Agreement at: https://btcsecure.io/agreement"
+      },
+      "unbonding_height": "5663509",
+      "unbonding_time": "2021-09-03T19:51:37.595642169Z",
+      "commission": {
+        "commission_rates": {
+          "rate": "0.100000000000000000",
+          "max_rate": "0.300000000000000000",
+          "max_change_rate": "0.100000000000000000"
+        },
+        "update_time": "2021-03-27T08:16:36.772923458Z"
+      },
+      "min_self_delegation": "1"
+    },
+    {
+      "operator_address": "terravalcons1ezj3lps8nqwytt42at2sgt7seq9hk708g0spyk",
+      "consensus_pubkey": "terravalconspub1zcjduepq7au8xxnxvv734r5apydlq9gt36n2wkmnx6n44zrsk4f353l4vcvszk0k7l",
+      "jailed": false,
+      "status": 2,
+      "tokens": "34452230968",
+      "delegator_shares": "34803696258.623096629420064133",
+      "description": {
+        "moniker": "Terra-India",
+        "identity": "CD3403728A60A059",
+        "website": "https://www.terraindia.info",
+        "security_contact": "",
+        "details": "Terra validator close to home, in India"
+      },
+      "unbonding_height": "5413008",
+      "unbonding_time": "2021-08-18T05:25:24.769154934Z",
+      "commission": {
+        "commission_rates": {
+          "rate": "0.000000000000000000",
+          "max_rate": "0.100000000000000000",
+          "max_change_rate": "0.010000000000000000"
+        },
+        "update_time": "2021-05-03T06:14:33.382495649Z"
+      },
+      "min_self_delegation": "1"
+    }
+  ]
+}
