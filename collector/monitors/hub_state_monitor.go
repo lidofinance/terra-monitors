@@ -8,7 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 	"github.com/sirupsen/logrus"
 )
@@ -27,7 +28,7 @@ func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) Monit
 				State:      &types.HubStateResponseV1{},
 				HubAddress: cfg.Addresses.HubContract,
 				metrics:    make(map[MetricName]MetricValue),
-				apiClient:  cfg.GetTerraClient(),
+				apiClient:  client.New(cfg.LCD, logger),
 				logger:     logger,
 			}
 			m1.InitMetrics()
@@ -39,7 +40,7 @@ func NewHubStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) Monit
 				State:      &types.HubStateResponseV2{},
 				HubAddress: cfg.Addresses.HubContract,
 				metrics:    make(map[MetricName]MetricValue),
-				apiClient:  cfg.GetTerraClient(),
+				apiClient:  client.New(cfg.LCD, logger),
 				logger:     logger,
 			}
 			m2.InitMetrics()
@@ -54,7 +55,7 @@ type HubStateMonitor struct {
 	State      *types.HubStateResponseV1
 	HubAddress string
 	metrics    map[MetricName]MetricValue
-	apiClient  *client.TerraLiteForTerra
+	apiClient  *terraClient.TerraLiteForTerra
 	logger     *logrus.Logger
 }
 
@@ -118,10 +119,6 @@ func (h HubStateMonitor) GetMetrics() map[MetricName]MetricValue {
 
 func (h HubStateMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return nil
-}
-
-func (h *HubStateMonitor) SetApiClient(client *client.TerraLiteForTerra) {
-	h.apiClient = client
 }
 
 func (h *HubStateMonitor) SetLogger(l *logrus.Logger) {

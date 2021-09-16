@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/vrischmann/envconfig"
 )
 
@@ -30,8 +29,8 @@ func NewCollectorConfig() (CollectorConfig, error) {
 }
 
 type LCD struct {
-	Endpoint string   `envconfig:"default=fcd.terra.dev"`
-	Schemes  []string `envconfig:"default=https"`
+	Endpoints []string `envconfig:"default=fcd.terra.dev"`
+	Schemes   []string `envconfig:"default=https"`
 }
 
 type Addresses struct {
@@ -42,14 +41,4 @@ type Addresses struct {
 	RewardsDispatcherContract   string `envconfig:"default=terra_dummy_rewards_dispatcher"`  // TODO: actualize.
 	AirDropRegistryContract     string `envconfig:"default=terra_dummy_airdrop"`             // TODO: actualize.
 	UpdateGlobalIndexBotAddress string `envconfig:"default=terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy"`
-}
-
-func (c CollectorConfig) GetTerraClient() *client.TerraLiteForTerra {
-	transportConfig := &client.TransportConfig{
-		Host:     c.LCD.Endpoint,
-		Schemes:  c.LCD.Schemes,
-		BasePath: client.DefaultBasePath,
-	}
-
-	return client.NewHTTPClientWithConfig(nil, transportConfig)
 }

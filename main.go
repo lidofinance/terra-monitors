@@ -33,7 +33,7 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
 
-	validatorsRepository := monitors.NewValidatorsRepository(cfg)
+	validatorsRepository := monitors.NewValidatorsRepository(cfg, c.GetLogger())
 	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository)
 	c.RegisterMonitor(ctx, cfg, slashingMonitor)
 

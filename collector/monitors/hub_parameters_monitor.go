@@ -9,7 +9,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 	"github.com/sirupsen/logrus"
 )
@@ -26,7 +27,7 @@ type HubParametersMonitor struct {
 	metrics         map[MetricName]MetricValue
 	State           *types.HubParameters
 	ContractAddress string
-	apiClient       *client.TerraLiteForTerra
+	apiClient       *terraClient.TerraLiteForTerra
 	logger          *logrus.Logger
 }
 
@@ -35,7 +36,7 @@ func NewHubParametersMonitor(cfg config.CollectorConfig, logger *logrus.Logger) 
 		metrics:         make(map[MetricName]MetricValue),
 		State:           &types.HubParameters{},
 		ContractAddress: cfg.Addresses.HubContract,
-		apiClient:       cfg.GetTerraClient(),
+		apiClient:       client.New(cfg.LCD, logger),
 		logger:          logger,
 	}
 	m.InitMetrics()
