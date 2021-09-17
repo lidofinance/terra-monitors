@@ -318,6 +318,36 @@ paths:
                   $ref: "#/definitions/Coin"
         500:
           description: Server internal error
+  "/staking/delegators/{delegatorAddr}/delegations":
+    get:
+      summary: Get all delegations from a delegator
+      tags:
+        - Staking
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              height:
+                type: string
+              result:
+                type: array
+                items:
+                  "$ref": "#/definitions/Delegation"
+        '400':
+          description: Invalid delegator address
+        '500':
+          description: Internal Server Error
+      parameters:
+        - in: path
+          name: delegatorAddr
+          description: Bech32 AccAddress of Delegator
+          required: true
+          type: string
+          x-example: terra1wg2mlrxdmnnkkykgqg4znky86nyrtc45q336yv
 
 
 definitions:
@@ -946,3 +976,14 @@ definitions:
       amount:
         type: string
         example: "50"
+  Delegation:
+    type: object
+    properties:
+      delegator_address:
+        type: string
+      validator_address:
+        type: string
+      shares:
+        type: string
+      balance:
+        "$ref": "#/definitions/Coin"

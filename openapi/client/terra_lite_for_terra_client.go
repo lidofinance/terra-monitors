@@ -12,6 +12,7 @@ import (
 
 	"github.com/lidofinance/terra-monitors/openapi/client/bank"
 	"github.com/lidofinance/terra-monitors/openapi/client/oracle"
+	"github.com/lidofinance/terra-monitors/openapi/client/staking"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 )
@@ -60,6 +61,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *TerraLiteF
 	cli.Transport = transport
 	cli.Bank = bank.New(transport, formats)
 	cli.Oracle = oracle.New(transport, formats)
+	cli.Staking = staking.New(transport, formats)
 	cli.Transactions = transactions.New(transport, formats)
 	cli.Wasm = wasm.New(transport, formats)
 	return cli
@@ -110,6 +112,8 @@ type TerraLiteForTerra struct {
 
 	Oracle oracle.ClientService
 
+	Staking staking.ClientService
+
 	Transactions transactions.ClientService
 
 	Wasm wasm.ClientService
@@ -122,6 +126,7 @@ func (c *TerraLiteForTerra) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Bank.SetTransport(transport)
 	c.Oracle.SetTransport(transport)
+	c.Staking.SetTransport(transport)
 	c.Transactions.SetTransport(transport)
 	c.Wasm.SetTransport(transport)
 }
