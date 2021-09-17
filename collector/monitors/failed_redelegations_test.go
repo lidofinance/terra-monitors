@@ -32,8 +32,8 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationFailedRequest(
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "2"
 
-	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
+	valRepository := NewValidatorsRepository(cfg, logger)
 	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -60,8 +60,8 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationSucceedRequest
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "2"
 
-	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
+	valRepository := NewValidatorsRepository(cfg, logger)
 	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)

@@ -8,7 +8,8 @@ import (
 	"strings"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,7 +20,7 @@ const (
 
 type WhitelistedValidatorsMonitor struct {
 	metrics              map[MetricName]MetricValue
-	apiClient            *client.TerraLiteForTerra
+	apiClient            *terraClient.TerraLiteForTerra
 	logger               *logrus.Logger
 	validatorsRepository ValidatorsRepository
 }
@@ -31,7 +32,7 @@ func NewWhitelistedValidatorsMonitor(
 ) WhitelistedValidatorsMonitor {
 	m := WhitelistedValidatorsMonitor{
 		metrics:              make(map[MetricName]MetricValue),
-		apiClient:            cfg.GetTerraClient(),
+		apiClient:            client.New(cfg.LCD, logger),
 		logger:               logger,
 		validatorsRepository: repository,
 	}

@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-
 	"github.com/stretchr/testify/suite"
 )
 
@@ -42,8 +41,8 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
+	valRepository := NewValidatorsRepository(cfg, logger)
 	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -83,8 +82,8 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
+	valRepository := NewValidatorsRepository(cfg, logger)
 	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -125,8 +124,8 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
 	logger := NewTestLogger()
+	valRepository := NewValidatorsRepository(cfg, logger)
 	m := NewSlashingMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)

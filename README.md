@@ -17,7 +17,7 @@ GF_SERVER_ROOT_URL=http://swelf-host:3000
 GRAFANA_PORT=3000 
 
 # LCD - light client daemon, https://docs.terra.money/terracli/lcd.html
-LCD_ENDPOINT=fcd.terra.dev
+LCD_ENDPOINTS=fcd.terra.dev
 LCD_SCHEMES=https
 # terra-monitor data update interval
 UPDATE_DATA_INTERVAL=30s
@@ -41,6 +41,12 @@ BASSET_CONTRACTS_VERSION=1
 # default value is lido_terra
 # should be set explicitly to uniq values in case multiple monitoring instance works on same machine
 SERVICE_NAME=lido_terra_mainnet
+```
+
+**N.B.: you can specify failover endpoints (sorted by priority, max to min) for the `LCD_ENDPOINTS` config:**
+
+```
+LCD_ENDPOINTS=fcd.terra.dev,scp.terra.dev
 ```
 
 To run the service with env file - `./docker/env/.lido_terra.env`, `./docker/env/.lido_terra.env` is not being tracked by a git, and could be changed for any purpose.

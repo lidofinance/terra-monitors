@@ -30,7 +30,7 @@ services:
   lido_terra:
     build: .
     environment:
-      - LCD_ENDPOINT
+      - LCD_ENDPOINTS
       - LCD_SCHEMES
       - UPDATE_DATA_INTERVAL
       - ADDRESSES_HUB_CONTRACT

@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-
 	"github.com/stretchr/testify/suite"
 )
 
@@ -37,7 +36,7 @@ func (suite *ValidatorsCommissionTestSuite) TestSuccessfulRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg, NewTestLogger())
 	logger := NewTestLogger()
 	m := NewValidatorsFeeMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
@@ -65,7 +64,7 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedValidatorsFeeRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg, NewTestLogger())
 	logger := NewTestLogger()
 	m := NewValidatorsFeeMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())

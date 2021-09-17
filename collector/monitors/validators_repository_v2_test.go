@@ -32,7 +32,7 @@ func (suite *V2ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V2Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg, NewTestLogger())
 
 	expectedValidatorsAddresses := []string{testValAddress}
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
@@ -63,7 +63,7 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedV2ValidatorsRepository() {
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V2Contracts
 
-	valRepository := NewValidatorsRepository(cfg)
+	valRepository := NewValidatorsRepository(cfg, NewTestLogger())
 
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
 	suite.Nil(validators)

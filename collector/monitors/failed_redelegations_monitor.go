@@ -6,7 +6,8 @@ import (
 	"sync"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/client"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/staking"
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +21,7 @@ type FailedRedelegationsMonitor struct {
 
 	metrics              map[MetricName]MetricValue
 	metricVectors        map[MetricName]*MetricVector
-	apiClient            *client.TerraLiteForTerra
+	apiClient            *terraClient.TerraLiteForTerra
 	logger               *logrus.Logger
 	validatorsRepository ValidatorsRepository
 
@@ -35,7 +36,7 @@ func NewFailedRedelegationsMonitor(
 	m := FailedRedelegationsMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            cfg.GetTerraClient(),
+		apiClient:            client.New(cfg.LCD, logger),
 		logger:               logger,
 		validatorsRepository: repository,
 		hubAddress:           cfg.Addresses.HubContract,

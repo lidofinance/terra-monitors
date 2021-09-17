@@ -5,21 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strconv"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/logging"
+	"github.com/sirupsen/logrus"
 )
 
 const BlunaTokenInfo = `{"height":"3754668","result":{"name":"Bonded Luna","symbol":"BLUNA","decimals":6,"total_supply":"79178685320809"}}`
-
-const BadQuery = "{\"error\":\"contract query failed: parsing anchor_basset_hub::msg::QueryMsg: unknown variant `config1`, expected one of `config`, `state`, `whitelisted_validators`, `current_batch`, `withdrawable_unbonded`, `parameters`, `unbond_requests`, `all_history`\"}"
 
 const (
 	HubContract                 = "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts"
@@ -31,12 +30,21 @@ const (
 	AirDropRegistryContract     = "dummy_airdropRegistry"
 )
 
-func NewTestCollectorConfig(urlWithScheme string) config.CollectorConfig {
-	host := strings.Split(urlWithScheme, "//")[1]
+func NewTestCollectorConfig(urlsWithScheme ...string) config.CollectorConfig {
+	var endpoints []string
+	for _, urlWithScheme := range urlsWithScheme {
+		parsedURL, err := url.Parse(urlWithScheme)
+		if err != nil {
+			log.Fatalf("failed to parse URL %s: %s\n", urlWithScheme, err)
+		}
+
+		endpoints = append(endpoints, parsedURL.Host)
+	}
+
 	cfg := config.CollectorConfig{
 		LCD: config.LCD{
-			Endpoint: host,
-			Schemes:  []string{"http"},
+			Endpoints: endpoints,
+			Schemes:   []string{"http"},
 		},
 		Addresses: config.Addresses{
 			HubContract:                 HubContract,
@@ -63,7 +71,7 @@ func NewTestLogger() *logrus.Logger {
 func NewServerWithResponse(resp string) *httptest.Server {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		fmt.Fprintln(w, resp)
+		_, _ = fmt.Fprintln(w, resp)
 	}))
 
 	return ts
@@ -106,7 +114,7 @@ func NewServerWithRandomJson() *httptest.Server {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Fprintln(w, string(data))
+		_, _ = fmt.Fprintln(w, string(data))
 	}))
 	return ts
 }
@@ -115,7 +123,7 @@ func NewServerWithError(errorMessage string) *httptest.Server {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(500)
-		fmt.Fprintf(w, `{"error":"%s"}`, errorMessage)
+		_, _ = fmt.Fprintf(w, `{"error":"%s"}`, errorMessage)
 	}))
 	return ts
 }
@@ -169,7 +177,7 @@ func NewServerForUpdateGlobalIndex() *httptest.Server {
 			panic(err)
 		}
 		w.Header().Add("Content-Type", "application/json")
-		fmt.Fprintln(w, makeTxs(offset))
+		_, _ = fmt.Fprintln(w, makeTxs(offset))
 	}))
 	return ts
 }
