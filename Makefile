@@ -25,5 +25,11 @@ stop_testnet:
 stop_mainnet:
 	docker-compose -p terra_monitors_mainnet down --remove-orphans
 
+start_bombay:
+	docker-compose --env-file ./docker/env/.lido_terra.bombay.env -p terra_monitors_bombay up --build -d
+
+stop_bombay:
+	docker-compose -p terra_monitors_bombay down --remove-orphans
+
 test:
 	go test ./...
