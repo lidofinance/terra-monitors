@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"sync"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
@@ -77,7 +78,7 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to get whiltelisted whitelistedValidators for %s: %w", m.Name(), err)
 	}
 
-	validatorsResponse, err := m.apiClient.Staking.GetStakingDelegatorsDelegatorAddrValidators(&staking.GetStakingDelegatorsDelegatorAddrValidatorsParams{
+	delegationsResponse, err := m.apiClient.Staking.GetStakingDelegatorsDelegatorAddrDelegations(&staking.GetStakingDelegatorsDelegatorAddrDelegationsParams{
 		DelegatorAddr: m.hubAddress,
 		Context:       ctx,
 	})
@@ -85,17 +86,27 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to get whitelistedValidators of delegator: %w", err)
 	}
 
-	if err := validatorsResponse.GetPayload().Validate(nil); err != nil {
+	if err := delegationsResponse.GetPayload().Validate(nil); err != nil {
 		return fmt.Errorf("failed to validate delegator's validators response: %w", err)
 	}
 
-	for _, validator := range validatorsResponse.GetPayload().Result {
-		if err := validator.OperatorAddress.Validate(nil); err != nil {
-			return fmt.Errorf("failed to validate validator's address: %w", err)
+	for _, delegation := range delegationsResponse.GetPayload().Result {
+		if err := delegation.Validate(nil); err != nil {
+			return fmt.Errorf("failed to validate delegation: %w", err)
 		}
 
-		if !contains(whitelistedValidators, string(validator.OperatorAddress)) {
-			tmpMetricVectors[FailedRedelegations].Set(string(validator.OperatorAddress), 1)
+		delegatedAmount := uint64(0)
+		if delegation.Balance != nil {
+			delegatedAmount, err = strconv.ParseUint(delegation.Balance.Amount, 10, 64)
+			if err != nil {
+				return fmt.Errorf("failed to parse delegation amount: %w", err)
+			}
+		}
+
+		// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
+		// that means a redelegation was not successful
+		if delegatedAmount > 0 && !contains(whitelistedValidators, delegation.ValidatorAddress) {
+			tmpMetricVectors[FailedRedelegations].Set(delegation.ValidatorAddress, 1)
 		}
 	}
 

@@ -8,7 +8,10 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const TestFailedRedelegationValidatorAddress = "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdt4x"
+const (
+	TestFailedRedelegationValidatorAddress          = "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdt4x"
+	TestDelegationValidatorAddressWithNonZeroShares = "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdg38"
+)
 
 type FailedRedelegationsMonitorTestSuite struct {
 	suite.Suite
@@ -19,14 +22,14 @@ func (suite *FailedRedelegationsMonitorTestSuite) SetupTest() {
 }
 
 func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationFailedRequest() {
-	delegatedValidators, err := ioutil.ReadFile("./test_data/delegated_validators_response.json")
+	delegatedValidators, err := ioutil.ReadFile("./test_data/delegations_response.json")
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/validators_registry_validators_response.json")
 	suite.NoError(err)
 
 	testServer := NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/delegators/%s/validators", HubContract):       string(delegatedValidators),
+		fmt.Sprintf("/staking/delegators/%s/delegations", HubContract):      string(delegatedValidators),
 		fmt.Sprintf("/wasm/contracts/%s/store", ValidatorsRegistryContract): string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
@@ -42,19 +45,21 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationFailedRequest(
 
 	expectedFailedValidatorsRedelegations := 1.0
 	actualFailedValidatorsRedelegations := metricVectors[FailedRedelegations].Get(TestFailedRedelegationValidatorAddress)
-
 	suite.Equal(expectedFailedValidatorsRedelegations, actualFailedValidatorsRedelegations)
+
+	actualFailedValidatorsRedelegations = metricVectors[FailedRedelegations].Get(TestDelegationValidatorAddressWithNonZeroShares)
+	suite.Equal(actualFailedValidatorsRedelegations, 0.0)
 }
 
 func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationSucceedRequest() {
-	delegatedValidators, err := ioutil.ReadFile("./test_data/delegated_validators_response_one_validator.json")
+	delegatedValidators, err := ioutil.ReadFile("./test_data/delegations_response_one_delegation.json")
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/validators_registry_validators_response.json")
 	suite.NoError(err)
 
 	testServer := NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/delegators/%s/validators", HubContract):       string(delegatedValidators),
+		fmt.Sprintf("/staking/delegators/%s/delegations", HubContract):      string(delegatedValidators),
 		fmt.Sprintf("/wasm/contracts/%s/store", ValidatorsRegistryContract): string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
