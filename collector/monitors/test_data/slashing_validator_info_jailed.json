@@ -1,7 +1,10 @@
 {
   "height": "1",
   "result": {
-    "consensus_pubkey": "terravalconspub1zcjduepqw2hyr7u7y70z5kdewn00xuq0wwcvnn0s7x5pjqcdpn80qsyctcpqcjhz4c",
+    "consensus_pubkey": {
+      "type": "tendermint/PubKeyEd25519",
+      "value": "EAI7kGuMo6BG1poseFcoMiSa4vHmXcYM4VCpFeIMncw="
+    },
     "description": {
       "moniker": "Test validator"
     },

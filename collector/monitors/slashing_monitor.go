@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"github.com/lidofinance/terra-monitors/openapi/client/query"
 	"strconv"
 	"sync"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
 	"github.com/sirupsen/logrus"
 )
 
@@ -81,10 +81,10 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 	}
 
 	for _, validatorInfo := range validatorsInfo {
-		signingInfoResponse, err := m.apiClient.Transactions.GetSlashingValidatorsValidatorPubKeySigningInfo(
-			&transactions.GetSlashingValidatorsValidatorPubKeySigningInfoParams{
-				ValidatorPubKey: validatorInfo.PubKey,
-				Context:         ctx,
+		signingInfoResponse, err := m.apiClient.Query.SigningInfo(
+			&query.SigningInfoParams{
+				ConsAddress: validatorInfo.PubKey,
+				Context:     ctx,
 			},
 		)
 		if err != nil {
@@ -96,30 +96,31 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 			continue
 		}
 
-		var signingInfo = signingInfoResponse.GetPayload().Result
+		var signingInfo = signingInfoResponse.GetPayload().ValSigningInfo
 
 		if validatorInfo.Jailed {
 			tmpMetrics[SlashingNumJailedValidators].Add(1)
 		}
-
-		// No blocks is sent as "", not as "0".
-		if len(*signingInfo.MissedBlocksCounter) > 0 {
-			// If the current block is greater than minHeight and the validator's MissedBlocksCounter is
-			// greater than maxMissed, they will be slashed. So numMissedBlocks > 0 does not mean that we
-			// are already slashed, but is alarming. Note: Liveness slashes do NOT lead to a tombstoning.
-			// https://docs.terra.money/dev/spec-slashing.html#begin-block
-			numMissedBlocks, err := strconv.ParseInt(*signingInfo.MissedBlocksCounter, 10, 64)
-			if err != nil {
-				m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
-			} else {
-				if numMissedBlocks > 0 {
-					tmpMetricVectors[SlashingNumMissedBlocks].Add(validatorInfo.Moniker, float64(numMissedBlocks))
+		if signingInfo != nil {
+			// No blocks is sent as "", not as "0".
+			if len(signingInfo.MissedBlocksCounter) > 0 {
+				// If the current block is greater than minHeight and the validator's MissedBlocksCounter is
+				// greater than maxMissed, they will be slashed. So numMissedBlocks > 0 does not mean that we
+				// are already slashed, but is alarming. Note: Liveness slashes do NOT lead to a tombstoning.
+				// https://docs.terra.money/dev/spec-slashing.html#begin-block
+				numMissedBlocks, err := strconv.ParseInt(signingInfo.MissedBlocksCounter, 10, 64)
+				if err != nil {
+					m.logger.Errorf("failed to Parse `missed_blocks_counter:`: %s", err)
+				} else {
+					if numMissedBlocks > 0 {
+						tmpMetricVectors[SlashingNumMissedBlocks].Add(validatorInfo.Moniker, float64(numMissedBlocks))
+					}
 				}
 			}
-		}
 
-		if *signingInfo.Tombstoned {
-			tmpMetrics[SlashingNumTombstonedValidators].Add(1)
+			if signingInfo.Tombstoned {
+				tmpMetrics[SlashingNumTombstonedValidators].Add(1)
+			}
 		}
 	}
 

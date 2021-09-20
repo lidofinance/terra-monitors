@@ -41,7 +41,7 @@ func (suite *ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
 
 	expectedValidatorInfo := types.ValidatorInfo{
 		Address:        testValAddress,
-		PubKey:         testValPublicKey,
+		PubKey:         testConsAddress,
 		Moniker:        TestMoniker,
 		CommissionRate: TestCommissionRate,
 	}

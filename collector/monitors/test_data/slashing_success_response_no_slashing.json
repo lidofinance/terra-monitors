@@ -1,6 +1,5 @@
 {
-  "height": "1",
-  "result": {
+  "val_signing_info": {
     "address": "terravalcons1ezj3lps8nqwytt42at2sgt7seq9hk708g0spyk",
     "start_height": "2521439",
     "index_offset": "1411437",

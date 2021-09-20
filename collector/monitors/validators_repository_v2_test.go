@@ -41,13 +41,13 @@ func (suite *V2ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
 
 	expectedValidatorInfo := types.ValidatorInfo{
 		Address:        testValAddress,
-		PubKey:         testValPublicKey,
+		PubKey:         testConsAddress,
 		Moniker:        TestMoniker,
 		CommissionRate: TestCommissionRate,
 	}
 	validatorInfo, err := valRepository.GetValidatorInfo(context.Background(), testValAddress)
 	suite.NoError(err)
-	suite.Equal(validatorInfo, expectedValidatorInfo)
+	suite.Equal(expectedValidatorInfo,validatorInfo)
 }
 
 func (suite *ValidatorsCommissionTestSuite) TestFailedV2ValidatorsRepository() {

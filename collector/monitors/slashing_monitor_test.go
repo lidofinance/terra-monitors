@@ -12,6 +12,7 @@ import (
 const (
 	testValAddress   = "terravalcons1ezj3lps8nqwytt42at2sgt7seq9hk708g0spyk"
 	testValPublicKey = "terravalconspub1zcjduepqw2hyr7u7y70z5kdewn00xuq0wwcvnn0s7x5pjqcdpn80qsyctcpqcjhz4c"
+	testConsAddress  = "terravalcons1rfaxjug6md5jrz3c0uctyt6pzd50xyxlc2tf5m"
 )
 
 type SlashingMonitorTestSuite struct {
@@ -34,9 +35,9 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
 	suite.NoError(err)
 
 	testServer := NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/validators/%s", testValAddress):                 string(validatorInfoData),
-		fmt.Sprintf("/slashing/validators/%s/signing_info", testValPublicKey): string(validatorSigningInfoData),
-		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
+		fmt.Sprintf("/staking/validators/%s", testValAddress):                     string(validatorInfoData),
+		fmt.Sprintf("/cosmos/slashing/v1beta1/signing_infos/%s", testConsAddress): string(validatorSigningInfoData),
+		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                      string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
@@ -75,9 +76,9 @@ func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
 	suite.NoError(err)
 
 	testServer := NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/validators/%s", testValAddress):                 string(validatorInfoData),
-		fmt.Sprintf("/slashing/validators/%s/signing_info", testValPublicKey): string(validatorSigningInfoData),
-		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
+		fmt.Sprintf("/staking/validators/%s", testValAddress):                     string(validatorInfoData),
+		fmt.Sprintf("/cosmos/slashing/v1beta1/signing_infos/%s", testConsAddress): string(validatorSigningInfoData),
+		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                      string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
@@ -117,9 +118,9 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
 	suite.NoError(err)
 
 	testServer := NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/validators/%s", testValAddress):                 string(validatorInfoData),
-		fmt.Sprintf("/slashing/validators/%s/signing_info", testValPublicKey): string(validatorSigningInfoData),
-		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                  string(whitelistedValidators),
+		fmt.Sprintf("/staking/validators/%s", testValAddress):                     string(validatorInfoData),
+		fmt.Sprintf("/cosmos/slashing/v1beta1/signing_infos/%s", testConsAddress): string(validatorSigningInfoData),
+		fmt.Sprintf("/wasm/contracts/%s/store", HubContract):                      string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts

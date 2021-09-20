@@ -2,8 +2,11 @@ package monitors
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"strconv"
 
 	"github.com/lidofinance/terra-monitors/collector/types"
@@ -71,12 +74,24 @@ func (r *V1ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 	if err != nil {
 		return types.ValidatorInfo{}, fmt.Errorf("failed to parse validator's comission rate: %w", err)
 	}
+	key, err := base64.StdEncoding.DecodeString(validatorInfoResponse.GetPayload().Result.ConsensusPubkey.Value)
 
+	if err != nil {
+		return types.ValidatorInfo{}, fmt.Errorf("failed to decode validator's ConsensusPubkey: %w", err)
+	}
+
+	pub := &ed25519.PubKey{Key: key}
+
+	conPubKeyAddress, err := bech32.ConvertAndEncode(Bech32TerraValConsPrefix, pub.Address())
+
+	if err != nil {
+		return types.ValidatorInfo{}, fmt.Errorf("failed to convert validator's ConsensusPubkeyAddress to bech32: %w", err)
+	}
 	return types.ValidatorInfo{
 		Address:        address,
 		Moniker:        validatorInfoResponse.GetPayload().Result.Description.Moniker,
-		PubKey:         *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
+		PubKey:         conPubKeyAddress,
 		CommissionRate: commissionRate,
-		Jailed:         *validatorInfoResponse.GetPayload().Result.Jailed,
+		Jailed:         validatorInfoResponse.GetPayload().Result.Jailed,
 	}, nil
 }

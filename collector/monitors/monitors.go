@@ -9,6 +9,8 @@ import (
 
 const UUSDDenom = "uusd"
 
+const Bech32TerraValConsPrefix = "terravalcons"
+
 type Monitor interface {
 	Name() string
 	// Handler fetches the data to inner storage
