@@ -103,6 +103,7 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 			}
 		}
 
+		tmpMetricVectors[FailedRedelegations].Set(delegation.ValidatorAddress, 0)
 		// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
 		// that means a redelegation was not successful
 		if delegatedAmount > 0 && !contains(whitelistedValidators, delegation.ValidatorAddress) {
