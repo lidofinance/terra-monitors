@@ -172,7 +172,7 @@
           {
             "evaluator": {
               "params": [
-                2
+                4
               ],
               "type": "gt"
             },
@@ -191,13 +191,59 @@
               "type": "last"
             },
             "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                100
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "10m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                3600
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "6h",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
           }
         ],
         "executionErrorState": "keep_state",
         "for": "0m",
         "frequency": "1m",
         "handler": 1,
-        "message": "Validator ${label} missed more than 2% of vote periods!",
+        "message": "Validator ${label} missed more than 4% of vote periods!",
         "name": "Oracles Missed Votes Rate alert",
         "noDataState": "keep_state",
         "notifications": []
@@ -1806,6 +1852,52 @@
               "params": [
                 "C",
                 "30m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                100
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "10m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                3600
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "6h",
                 "now"
               ]
             },
