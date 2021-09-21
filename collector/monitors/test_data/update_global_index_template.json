@@ -17,7 +17,9 @@
                     "value": {
                         "sender": "terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy",
                         "contract": "terra1mtwph2juhj0rvjz7dy92gvl6xvukaxu8rfv8ts",
-                        "execute_msg": "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0=",
+                        "execute_msg": {
+                            "update_global_index": {}
+                        },
                         "coins": []
                     }
                 }

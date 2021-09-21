@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -71,7 +70,6 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Failed to create NewCollectorConfig: %s", err)
 	}
-	fmt.Println(cfg)
 
 	col, err := createCollector(cfg, logger)
 	if err != nil {

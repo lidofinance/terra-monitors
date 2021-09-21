@@ -19,7 +19,7 @@ import (
 // swagger:model getTxListResult.txs.tx
 type GetTxListResultTxsTx struct {
 
-	// Tx type
+	// type
 	// Required: true
 	Type *string `json:"type"`
 

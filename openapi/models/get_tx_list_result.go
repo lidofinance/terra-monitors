@@ -22,11 +22,10 @@ type GetTxListResult struct {
 
 	// Per page item limit
 	// Required: true
-	Limit *float64 `json:"limit"`
+	Limit *int64 `json:"limit"`
 
-	// Offset
-	// Required: true
-	Next *float64 `json:"next"`
+	// next
+	Next int64 `json:"next,omitempty"`
 
 	// tx list
 	// Required: true
@@ -38,10 +37,6 @@ func (m *GetTxListResult) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateLimit(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateNext(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -58,15 +53,6 @@ func (m *GetTxListResult) Validate(formats strfmt.Registry) error {
 func (m *GetTxListResult) validateLimit(formats strfmt.Registry) error {
 
 	if err := validate.Required("limit", "body", m.Limit); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *GetTxListResult) validateNext(formats strfmt.Registry) error {
-
-	if err := validate.Required("next", "body", m.Next); err != nil {
 		return err
 	}
 

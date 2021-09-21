@@ -22,7 +22,7 @@ const (
 	FailedUpdateGlobalIndexTx
 )
 
-const UpdateGlobalIndexBase64Encoded = "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0="
+const UpdateGlobalIndexMsg = "update_global_index"
 
 const (
 	UpdateGlobalIndexSuccessfulTxSinceLastCheck MetricName = "update_global_index_successful_tx_since_last_check"
@@ -39,7 +39,7 @@ type UpdateGlobalIndexMonitor struct {
 	metrics          map[MetricName]MetricValue
 	apiClient        *terraClient.TerraLiteForTerra
 	logger           *logrus.Logger
-	lastMaxCheckedID int
+	lastMaxCheckedID int64
 	lock             sync.RWMutex
 }
 
@@ -80,7 +80,7 @@ func (m *UpdateGlobalIndexMonitor) InitMetrics() {
 }
 
 func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
-	var offset *float64
+	var offset *int64
 	var fetchedTxs int
 	var firstCheck bool
 	if m.lastMaxCheckedID == 0 {
@@ -88,8 +88,8 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	}
 
 	iterations := 0
-	var maxProcessedID int
-	var maxProcessedIDPerRequest int
+	var maxProcessedID int64
+	var maxProcessedIDPerRequest int64
 	var alreadyProcessedFound bool
 	for iterations < threshold {
 		p := transactions.GetV1TxsParams{}
@@ -108,7 +108,7 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 		if alreadyProcessedFound || firstCheck {
 			break
 		}
-		offset = resp.Payload.Next
+		offset = &resp.Payload.Next
 		iterations++
 	}
 	m.lastMaxCheckedID = maxProcessedID
@@ -120,7 +120,7 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func maxInt(a, b int) int {
+func maxInt(a, b int64) int64 {
 	if a > b {
 		return a
 	}
@@ -129,14 +129,14 @@ func maxInt(a, b int) int {
 
 func (m *UpdateGlobalIndexMonitor) processTransactions(
 	txs []*models.GetTxListResultTxs,
-	previousMaxCheckedID int,
-) (newMaxCheckedID int, alreadyProcessedFound bool) {
+	previousMaxCheckedID int64,
+) (newMaxCheckedID int64, alreadyProcessedFound bool) {
 	// transactions are reverse ordered by ID field
 	for i, tx := range txs {
 		if i == 0 {
-			newMaxCheckedID = maxInt(int(*tx.ID), previousMaxCheckedID)
+			newMaxCheckedID = maxInt(tx.ID, previousMaxCheckedID)
 		}
-		if previousMaxCheckedID == int(*tx.ID) {
+		if previousMaxCheckedID == tx.ID {
 			// we have already checked this and earlier transactions
 			m.logger.Infoln("stopping processing, last checked transaction is found:", previousMaxCheckedID)
 			alreadyProcessedFound = true
@@ -182,9 +182,13 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 		if msg.Value == nil || msg.Value.ExecuteMsg == nil {
 			continue
 		}
-		if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) > 0 {
+		m, ok := msg.Value.ExecuteMsg.(map[string]interface{})
+		if !ok {
+			return NonUpdateGlobalIndexTX
+		}
+		if _, found := m[UpdateGlobalIndexMsg]; found && len(tx.Logs) > 0 {
 			return SuccessfulUpdateGlobalIndexTX
-		} else if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) == 0 {
+		} else if _, found := m[UpdateGlobalIndexMsg]; found && len(tx.Logs) == 0 {
 			// https://fcd.terra.dev/v1/txs?offset=126987824
 			// tx with id = 126987823 is a failed tx due to out of gas
 			// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.

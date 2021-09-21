@@ -129,7 +129,7 @@ paths:
           in: query
           name: offset
           required: false
-          type: number
+          type: integer
         - description: '# of page'
           in: query
           name: page
@@ -402,59 +402,55 @@ definitions:
   getTxListResult:
     properties:
       next:
-        description: Offset
-        type: number
+        type: integer
       limit:
+        type: integer
         description: Per page item limit
-        type: number
       txs:
+        type: array
         description: tx list
         items:
           $ref: '#/definitions/getTxListResult.txs'
-        type: array
     required:
-      - next
       - limit
       - txs
   getTxListResult.txs:
     properties:
-      id:
+      ID:
+        type: integer
+      tx:
+        type: object
         description: ''
-        type: number
+        $ref: '#/definitions/getTxListResult.txs.tx'
       events:
+        type: array
         description: events of tx
         items:
           $ref: '#/definitions/getTxListResult.txs.events'
-        type: array
-      gas_used:
-        description: total gas used in tx
-        type: string
-      gas_wanted:
-        description: gas wanted
-        type: string
-      height:
-        description: block height
-        type: string
       logs:
+        type: array
         description: tx logs
         items:
           $ref: '#/definitions/getTxListResult.txs.logs'
-        type: array
-      raw_log:
-        description: tx raw log
+      height:
         type: string
-      timestamp:
-        description: timestamp tx in utc 0
-        type: string
-      tx:
-        $ref: '#/definitions/getTxListResult.txs.tx'
-        description: tx info
-        type: object
+        description: block height
       txhash:
-        description: tx hash
         type: string
+        description: tx hash
+      raw_log:
+        type: string
+        description: tx raw log
+      gas_used:
+        type: string
+        description: total gas used in tx
+      timestamp:
+        type: string
+        description: timestamp tx in utc 0
+      gas_wanted:
+        type: string
+        description: gas wanted
     required:
-      - id
       - tx
       - events
       - logs
@@ -464,114 +460,37 @@ definitions:
       - gas_used
       - timestamp
       - gas_wanted
-  getTxListResult.txs.events:
-    properties:
-      attributes:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxListResult.txs.events.attributes'
-        type: array
-      type:
-        description: ''
-        type: string
-    required:
-      - type
-      - attributes
-  getTxListResult.txs.events.attributes:
-    properties:
-      key:
-        description: ''
-        type: string
-      value:
-        description: ''
-        type: string
-    required:
-      - key
-      - value
-  getTxListResult.txs.logs:
-    properties:
-      events:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxListResult.txs.logs.events'
-        type: array
-      log:
-        $ref: '#/definitions/getTxListResult.txs.logs.log'
-        description: ''
-        type: object
-      msg_index:
-        description: ''
-        type: number
-      success:
-        description: ''
-        type: boolean
-    required:
-      - msg_index
-      - success
-      - log
-      - events
-  getTxListResult.txs.logs.events:
-    properties:
-      attributes:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxListResult.txs.logs.events.attributes'
-        type: array
-      type:
-        description: ''
-        type: string
-    required:
-      - type
-      - attributes
-  getTxListResult.txs.logs.events.attributes:
-    properties:
-      key:
-        description: ''
-        type: string
-      value:
-        description: ''
-        type: string
-    required:
-      - key
-      - value
-  getTxListResult.txs.logs.log:
-    properties:
-      tax:
-        description: ''
-        type: string
-    required:
-      - tax
   getTxListResult.txs.tx:
     properties:
       type:
-        description: Tx type
         type: string
-      value:
-        $ref: '#/definitions/getTxListResult.txs.tx.value'
         description: ''
+      value:
         type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value'
     required:
       - type
       - value
   getTxListResult.txs.tx.value:
     properties:
       fee:
-        $ref: '#/definitions/getTxListResult.txs.tx.value.fee'
-        description: ''
         type: object
-      memo:
         description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value.fee'
+      memo:
         type: string
+        description: ''
       msg:
+        type: array
         description: ''
         items:
           $ref: '#/definitions/getTxListResult.txs.tx.value.msg'
-        type: array
       signatures:
+        type: array
         description: ''
         items:
           $ref: '#/definitions/getTxListResult.txs.tx.value.signatures'
-        type: array
     required:
       - fee
       - memo
@@ -579,37 +498,37 @@ definitions:
       - signatures
   getTxListResult.txs.tx.value.fee:
     properties:
+      gas:
+        type: string
+        description: ''
       amount:
+        type: array
         description: ''
         items:
           $ref: '#/definitions/getTxListResult.txs.tx.value.fee.amount'
-        type: array
-      gas:
-        description: ''
-        type: string
     required:
       - gas
       - amount
   getTxListResult.txs.tx.value.fee.amount:
     properties:
-      amount:
-        description: ''
-        type: string
       denom:
-        description: ''
         type: string
+        description: ''
+      amount:
+        type: string
+        description: ''
     required:
       - denom
       - amount
   getTxListResult.txs.tx.value.msg:
     properties:
       type:
-        description: ''
         type: string
-      value:
-        $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value'
         description: ''
+      value:
         type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value'
     required:
       - type
       - value
@@ -631,323 +550,154 @@ definitions:
 
       execute_msg:
         description: ''
-        type: string
-    required:
-      - coins
-      - sender
-      - contract
-      - execute_msg
+        type: object
   getTxListResult.txs.tx.value.msg.value.inputs:
     properties:
       address:
-        description: ''
         type: string
+        description: ''
       coins:
+        type: array
         description: ''
         items:
           $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.inputs.coins'
-        type: array
     required:
       - address
       - coins
   getTxListResult.txs.tx.value.msg.value.inputs.coins:
     properties:
-      amount:
-        description: ''
-        type: string
       deonm:
-        description: ''
         type: string
+        description: ''
+      amount:
+        type: string
+        description: ''
     required:
       - deonm
       - amount
   getTxListResult.txs.tx.value.msg.value.outputs:
     properties:
       address:
-        description: ''
         type: string
+        description: ''
       coins:
+        type: array
         description: ''
         items:
           $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.outputs.coins'
-        type: array
     required:
       - address
       - coins
   getTxListResult.txs.tx.value.msg.value.outputs.coins:
     properties:
-      amount:
-        description: ''
-        type: string
       deonm:
-        description: ''
         type: string
+        description: ''
+      amount:
+        type: string
+        description: ''
     required:
       - deonm
       - amount
   getTxListResult.txs.tx.value.signatures:
     properties:
-      pub_key:
-        $ref: '#/definitions/getTxListResult.txs.tx.value.signatures.pub_key'
-        description: ''
-        type: object
       signature:
-        description: ''
         type: string
+        description: ''
+      pub_key:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value.signatures.pub_key'
     required:
       - signature
       - pub_key
   getTxListResult.txs.tx.value.signatures.pub_key:
     properties:
       type:
-        description: ''
         type: string
+        description: ''
       value:
-        description: ''
         type: string
+        description: ''
     required:
       - type
       - value
-  getTxResult:
+  getTxListResult.txs.events:
     properties:
-      chainId:
-        description: ''
-        type: string
-      events:
-        description: events of tx
-        items:
-          $ref: '#/definitions/getTxResult.events'
-        type: array
-      gas_used:
-        description: total gas used in tx
-        type: string
-      gas_wanted:
-        description: gas wanted
-        type: string
-      height:
-        description: block height
-        type: string
-      logs:
-        description: tx logs
-        items:
-          $ref: '#/definitions/getTxResult.logs'
-        type: array
-      raw_log:
-        description: tx raw log
-        type: string
-      timestamp:
-        description: timestamp tx in utc 0
-        type: string
-      tx:
-        $ref: '#/definitions/getTxResult.tx'
-        description: tx info
-        type: object
-      txhash:
-        description: tx hash
-        type: string
-    required:
-      - tx
-      - events
-      - logs
-      - height
-      - txhash
-      - raw_log
-      - gas_used
-      - timestamp
-      - gas_wanted
-      - chainId
-  getTxResult.events:
-    properties:
-      attributes:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxResult.events.attributes'
-        type: array
       type:
-        description: ''
         type: string
+        description: ''
+      attributes:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.events.attributes'
     required:
       - type
       - attributes
-  getTxResult.events.attributes:
+  getTxListResult.txs.events.attributes:
     properties:
       key:
-        description: ''
         type: string
+        description: ''
       value:
-        description: ''
         type: string
+        description: ''
     required:
       - key
       - value
-  getTxResult.logs:
+  getTxListResult.txs.logs:
     properties:
+      msg_index:
+        type: number
+        description: ''
+      success:
+        type: boolean
+        description: ''
+      log:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.logs.log'
       events:
+        type: array
         description: ''
         items:
-          $ref: '#/definitions/getTxResult.logs.events'
-        type: array
-      log:
-        $ref: '#/definitions/getTxResult.logs.log'
-        description: ''
-        type: object
-      msg_index:
-        description: ''
-        type: number
-      success:
-        description: ''
-        type: boolean
+          $ref: '#/definitions/getTxListResult.txs.logs.events'
     required:
-      - events
-      - log
       - msg_index
       - success
-  getTxResult.logs.events:
-    properties:
-      attributes:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxResult.logs.events.attributes'
-        type: array
-      types:
-        description: ''
-        type: string
-    required:
-      - attributes
-      - types
-  getTxResult.logs.events.attributes:
-    properties:
-      key:
-        description: ''
-        type: string
-      value:
-        description: ''
-        type: string
-    required:
-      - key
-      - value
-  getTxResult.logs.log:
+      - log
+      - events
+  getTxListResult.txs.logs.log:
     properties:
       tax:
-        description: ''
         type: string
+        description: ''
     required:
       - tax
-  getTxResult.tx:
+  getTxListResult.txs.logs.events:
     properties:
       type:
-        description: tx type
         type: string
-      value:
-        $ref: '#/definitions/getTxResult.tx.value'
         description: ''
-        type: object
+      attributes:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.logs.events.attributes'
     required:
       - type
-      - value
-  getTxResult.tx.value:
+      - attributes
+  getTxListResult.txs.logs.events.attributes:
     properties:
-      fee:
-        $ref: '#/definitions/getTxResult.tx.value.fee'
-        description: ''
-        type: object
-      memo:
-        description: ''
+      key:
         type: string
-      msg:
         description: ''
-        items:
-          $ref: '#/definitions/getTxResult.tx.value.msg'
-        type: array
-      signatures:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxResult.tx.value.signatures'
-        type: array
-    required:
-      - fee
-      - memo
-      - msg
-      - signatures
-  getTxResult.tx.value.fee:
-    properties:
-      amount:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxResult.tx.value.fee.amount'
-        type: array
-      gas:
-        description: ''
-        type: string
-    required:
-      - amount
-      - gas
-  getTxResult.tx.value.fee.amount:
-    properties:
-      amount:
-        description: ''
-        type: string
-      denom:
-        description: ''
-        type: string
-    required:
-      - denom
-      - amount
-  getTxResult.tx.value.msg:
-    properties:
-      type:
-        description: ''
-        type: string
       value:
-        $ref: '#/definitions/getTxResult.tx.value.msg.value'
-        description: ''
-        type: object
-    required:
-      - type
-      - value
-  getTxResult.tx.value.msg.value:
-    properties:
-      amount:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxResult.tx.value.msg.value.amount'
-        type: array
-    required:
-      - amount
-  getTxResult.tx.value.msg.value.amount:
-    properties:
-      amount:
-        description: ''
         type: string
-      denom:
         description: ''
-        type: string
     required:
-      - denom
-      - amount
-  getTxResult.tx.value.signatures:
-    properties:
-      pubKey:
-        description: ''
-        items:
-          $ref: '#/definitions/getTxResult.tx.value.signatures.pubKey'
-        type: array
-      signature:
-        description: ''
-        type: string
-    required:
-      - pubKey
-      - signature
-  getTxResult.tx.value.signatures.pubKey:
-    properties:
-      type:
-        description: ''
-        type: string
-      value:
-        description: ''
-        type: string
-    required:
-      - type
+      - key
       - value
   SigningInfo:
     type: object

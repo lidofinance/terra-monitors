@@ -12,7 +12,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // GetTxListResultTxsTxValueMsgValue get tx list result txs tx value msg value
@@ -21,20 +20,16 @@ import (
 type GetTxListResultTxsTxValueMsgValue struct {
 
 	// coins
-	// Required: true
 	Coins []*GetTxListResultTxsTxValueMsgValueInputsCoins `json:"coins"`
 
 	// contract
-	// Required: true
-	Contract *string `json:"contract"`
+	Contract string `json:"contract,omitempty"`
 
 	// execute msg
-	// Required: true
-	ExecuteMsg *string `json:"execute_msg"`
+	ExecuteMsg interface{} `json:"execute_msg,omitempty"`
 
 	// sender
-	// Required: true
-	Sender *string `json:"sender"`
+	Sender string `json:"sender,omitempty"`
 }
 
 // Validate validates this get tx list result txs tx value msg value
@@ -45,18 +40,6 @@ func (m *GetTxListResultTxsTxValueMsgValue) Validate(formats strfmt.Registry) er
 		res = append(res, err)
 	}
 
-	if err := m.validateContract(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateExecuteMsg(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateSender(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -64,9 +47,8 @@ func (m *GetTxListResultTxsTxValueMsgValue) Validate(formats strfmt.Registry) er
 }
 
 func (m *GetTxListResultTxsTxValueMsgValue) validateCoins(formats strfmt.Registry) error {
-
-	if err := validate.Required("coins", "body", m.Coins); err != nil {
-		return err
+	if swag.IsZero(m.Coins) { // not required
+		return nil
 	}
 
 	for i := 0; i < len(m.Coins); i++ {
@@ -83,33 +65,6 @@ func (m *GetTxListResultTxsTxValueMsgValue) validateCoins(formats strfmt.Registr
 			}
 		}
 
-	}
-
-	return nil
-}
-
-func (m *GetTxListResultTxsTxValueMsgValue) validateContract(formats strfmt.Registry) error {
-
-	if err := validate.Required("contract", "body", m.Contract); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *GetTxListResultTxsTxValueMsgValue) validateExecuteMsg(formats strfmt.Registry) error {
-
-	if err := validate.Required("execute_msg", "body", m.ExecuteMsg); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *GetTxListResultTxsTxValueMsgValue) validateSender(formats strfmt.Registry) error {
-
-	if err := validate.Required("sender", "body", m.Sender); err != nil {
-		return err
 	}
 
 	return nil

@@ -20,6 +20,9 @@ import (
 // swagger:model getTxListResult.txs
 type GetTxListResultTxs struct {
 
+	// ID
+	ID int64 `json:"ID,omitempty"`
+
 	// events of tx
 	// Required: true
 	Events []*GetTxListResultTxsEvents `json:"events"`
@@ -36,10 +39,6 @@ type GetTxListResultTxs struct {
 	// Required: true
 	Height *string `json:"height"`
 
-	// id
-	// Required: true
-	ID *float64 `json:"id"`
-
 	// tx logs
 	// Required: true
 	Logs []*GetTxListResultTxsLogs `json:"logs"`
@@ -52,7 +51,7 @@ type GetTxListResultTxs struct {
 	// Required: true
 	Timestamp *string `json:"timestamp"`
 
-	// tx info
+	// tx
 	// Required: true
 	Tx *GetTxListResultTxsTx `json:"tx"`
 
@@ -78,10 +77,6 @@ func (m *GetTxListResultTxs) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateHeight(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -157,15 +152,6 @@ func (m *GetTxListResultTxs) validateGasWanted(formats strfmt.Registry) error {
 func (m *GetTxListResultTxs) validateHeight(formats strfmt.Registry) error {
 
 	if err := validate.Required("height", "body", m.Height); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *GetTxListResultTxs) validateID(formats strfmt.Registry) error {
-
-	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 
