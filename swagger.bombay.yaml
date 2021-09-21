@@ -1,0 +1,628 @@
+swagger: "2.0"
+info:
+  version: "3.0"
+  title: 'Terra-Lite for Terra'
+  description: A REST interface for state queries, transaction generation and broadcasting.
+tags:
+  - name: Transactions
+    description: Search, encode, or broadcast transactions.
+  - name: Tendermint RPC
+    description: Tendermint APIs, such as query blocks, transactions and validatorset
+  - name: Auth
+    description: Authenticate accounts
+  - name: Bank
+    description: Create and broadcast transactions
+  - name: Staking
+    description: Stake module APIs
+  - name: Governance
+    description: Governance module APIs
+  - name: Slashing
+    description: Slashing module APIs
+  - name: Distribution
+    description: Fee distribution module APIs
+  - name: Mint
+    description: Minting module APIs
+  - name: Supply
+    description: Supply module APIs
+  - name: Market
+    description: Market modules APIs
+  - name: Oracle
+    description: Get price and voting modules APIs
+  - name: Treasury
+    description: Treasury modules APIs
+  - name: Wasm
+    description: Wasm modules APIs
+  - name: Authorization
+    description: Authorization modules APIs
+schemes:
+  - https
+host: fcd.terra.dev
+securityDefinitions:
+  kms:
+    type: basic
+
+paths:
+  /v1/txs:
+    get:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - description: Account address
+          in: query
+          name: account
+          required: false
+          type: string
+        - description: Type of tx (account is required)
+          in: query
+          name: action
+          required: false
+          type: string
+        - description: Block number
+          in: query
+          name: block
+          required: false
+          type: string
+        - description: Memo filter
+          in: query
+          name: memo
+          required: false
+          type: string
+        - description: ',''DESC''] Ordering (default: DESC)'
+          in: query
+          name: order
+          required: false
+          type: string
+        - description: 'Chain ID of Blockchain (default: chain id of mainnet)'
+          in: query
+          name: chainId
+          required: false
+          type: string
+        - description: Timestamp from
+          in: query
+          name: from
+          required: false
+          type: number
+        - description: Timestamp to
+          in: query
+          name: to
+          required: false
+          type: number
+        - description: Use last id from previous result for pagination
+          in: query
+          name: offset
+          required: false
+          type: integer
+        - description: '# of page'
+          in: query
+          name: page
+          required: false
+          type: number
+        - description: Size of page
+          in: query
+          name: limit
+          required: false
+          type: number
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/getTxListResult'
+        400:
+          description: Error
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+              code:
+                type: number
+      tags:
+        - Transactions
+      description: Get Tx List
+      summary: Get Tx List
+
+  /staking/validators/{validatorAddr}:
+    get:
+      parameters:
+        - in: path
+          name: validatorAddr
+          description: validator address
+          required: true
+          type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              height:
+                type: string
+              result:
+                type: object
+                $ref: '#/definitions/ValidatorInfo'
+        400:
+          description: Error
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+              code:
+                type: number
+      tags:
+        - Transactions
+      description: Get validator info
+      summary: Get Validator Info
+
+
+
+  /cosmos/slashing/v1beta1/signing_infos/{cons_address}:
+    get:
+      summary: SigningInfo queries the signing info of given cons address
+      operationId: SigningInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              val_signing_info:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  start_height:
+                    type: string
+                    format: int64
+                    title: Height at which validator was first a candidate OR was unjailed
+                  index_offset:
+                    type: string
+                    format: int64
+                    description: |-
+                      Index which is incremented each time the validator was a bonded
+                      in a block and may have signed a precommit or not. This in conjunction with the
+                      `SignedBlocksWindow` param determines the index in the `MissedBlocksBitArray`.
+                  jailed_until:
+                    type: string
+                    format: date-time
+                    description: Timestamp until which the validator is jailed due to liveness downtime.
+                  tombstoned:
+                    type: boolean
+                    format: boolean
+                    description: |-
+                      Whether or not a validator has been tombstoned (killed out of validator set). It is set
+                      once the validator commits an equivocation or for any other configured misbehiavor.
+                  missed_blocks_counter:
+                    type: string
+                    format: int64
+                    description: |-
+                      A counter kept to avoid unnecessary array reads.
+                      Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`.
+                description: |-
+                  ValidatorSigningInfo defines a validator's signing info for monitoring their
+                  liveness activity.
+                title: val_signing_info is the signing info of requested val cons address
+            title: |-
+              QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
+              method
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: cons_address
+          description: cons_address is the address to query signing info of
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+
+definitions:
+  getTxListResult:
+    properties:
+      next:
+        type: integer
+      limit:
+        type: integer
+        description: Per page item limit
+      txs:
+        type: array
+        description: tx list
+        items:
+          $ref: '#/definitions/getTxListResult.txs'
+    required:
+      - limit
+      - txs
+  getTxListResult.txs:
+    properties:
+      ID:
+        type: integer
+      tx:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx'
+      events:
+        type: array
+        description: events of tx
+        items:
+          $ref: '#/definitions/getTxListResult.txs.events'
+      logs:
+        type: array
+        description: tx logs
+        items:
+          $ref: '#/definitions/getTxListResult.txs.logs'
+      height:
+        type: string
+        description: block height
+      txhash:
+        type: string
+        description: tx hash
+      raw_log:
+        type: string
+        description: tx raw log
+      gas_used:
+        type: string
+        description: total gas used in tx
+      timestamp:
+        type: string
+        description: timestamp tx in utc 0
+      gas_wanted:
+        type: string
+        description: gas wanted
+    required:
+      - tx
+      - events
+      - logs
+      - height
+      - txhash
+      - raw_log
+      - gas_used
+      - timestamp
+      - gas_wanted
+  getTxListResult.txs.tx:
+    properties:
+      type:
+        type: string
+        description: ''
+      value:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value'
+    required:
+      - type
+      - value
+  getTxListResult.txs.tx.value:
+    properties:
+      fee:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value.fee'
+      memo:
+        type: string
+        description: ''
+      msg:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg'
+      signatures:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.signatures'
+    required:
+      - fee
+      - memo
+      - msg
+      - signatures
+  getTxListResult.txs.tx.value.fee:
+    properties:
+      gas:
+        type: string
+        description: ''
+      amount:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.fee.amount'
+    required:
+      - gas
+      - amount
+  getTxListResult.txs.tx.value.fee.amount:
+    properties:
+      denom:
+        type: string
+        description: ''
+      amount:
+        type: string
+        description: ''
+    required:
+      - denom
+      - amount
+  getTxListResult.txs.tx.value.msg:
+    properties:
+      type:
+        type: string
+        description: ''
+      value:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value'
+    required:
+      - type
+      - value
+  getTxListResult.txs.tx.value.msg.value:
+    properties:
+      coins:
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.inputs.coins'
+        type: array
+
+      sender:
+        description: ''
+        type: string
+
+      contract:
+        description: ''
+        type: string
+
+      execute_msg:
+        description: ''
+        type: object
+  getTxListResult.txs.tx.value.msg.value.inputs:
+    properties:
+      address:
+        type: string
+        description: ''
+      coins:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.inputs.coins'
+    required:
+      - address
+      - coins
+  getTxListResult.txs.tx.value.msg.value.inputs.coins:
+    properties:
+      deonm:
+        type: string
+        description: ''
+      amount:
+        type: string
+        description: ''
+    required:
+      - deonm
+      - amount
+  getTxListResult.txs.tx.value.msg.value.outputs:
+    properties:
+      address:
+        type: string
+        description: ''
+      coins:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.tx.value.msg.value.outputs.coins'
+    required:
+      - address
+      - coins
+  getTxListResult.txs.tx.value.msg.value.outputs.coins:
+    properties:
+      deonm:
+        type: string
+        description: ''
+      amount:
+        type: string
+        description: ''
+    required:
+      - deonm
+      - amount
+  getTxListResult.txs.tx.value.signatures:
+    properties:
+      signature:
+        type: string
+        description: ''
+      pub_key:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.tx.value.signatures.pub_key'
+    required:
+      - signature
+      - pub_key
+  getTxListResult.txs.tx.value.signatures.pub_key:
+    properties:
+      type:
+        type: string
+        description: ''
+      value:
+        type: string
+        description: ''
+    required:
+      - type
+      - value
+  getTxListResult.txs.events:
+    properties:
+      type:
+        type: string
+        description: ''
+      attributes:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.events.attributes'
+    required:
+      - type
+      - attributes
+  getTxListResult.txs.events.attributes:
+    properties:
+      key:
+        type: string
+        description: ''
+      value:
+        type: string
+        description: ''
+    required:
+      - key
+      - value
+  getTxListResult.txs.logs:
+    properties:
+      msg_index:
+        type: number
+        description: ''
+      success:
+        type: boolean
+        description: ''
+      log:
+        type: object
+        description: ''
+        $ref: '#/definitions/getTxListResult.txs.logs.log'
+      events:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.logs.events'
+    required:
+      - msg_index
+      - success
+      - log
+      - events
+  getTxListResult.txs.logs.log:
+    properties:
+      tax:
+        type: string
+        description: ''
+    required:
+      - tax
+  getTxListResult.txs.logs.events:
+    properties:
+      type:
+        type: string
+        description: ''
+      attributes:
+        type: array
+        description: ''
+        items:
+          $ref: '#/definitions/getTxListResult.txs.logs.events.attributes'
+    required:
+      - type
+      - attributes
+  getTxListResult.txs.logs.events.attributes:
+    properties:
+      key:
+        type: string
+        description: ''
+      value:
+        type: string
+        description: ''
+    required:
+      - key
+      - value
+  SigningInfo:
+    type: object
+    properties:
+      address:
+        type: string
+      start_height:
+        type: string
+      index_offset:
+        type: string
+      tombstoned:
+        type: boolean
+      missed_blocks_counter:
+        type: string
+    required:
+      - address
+      - start_height
+      - index_offset
+      - tombstoned
+      - missed_blocks_counter
+  ValidatorInfo:
+    type: object
+    properties:
+      consensus_pubkey:
+        type: object
+        properties:
+          type:
+            type: string
+          value:
+            type: string
+      jailed:
+        type: boolean
+      description:
+        type: object
+        properties:
+          moniker:
+            type: string
+      commission:
+        type: object
+        properties:
+          commission_rates:
+            type: object
+            properties:
+              rate:
+                type: string
+            required:
+              - rate
+        required:
+          - commission_rates
+    required:
+      - consensus_pubkey
+      - description
+      - commission
+  OracleParams:
+    type: object
+    properties:
+      vote_period:
+        type: string
+        example: '900'
+      vote_threshold:
+        type: string
+        example: '0.67'
+      drop_threshold:
+        type: string
+        example: '10'
+      oracle_reward_band:
+        type: string
+        example: '0.02'
+      slash_window:
+        type: string
+        example: '43200'
+  Coin:
+    type: object
+    properties:
+      denom:
+        type: string
+        example: uluna
+      amount:
+        type: string
+        example: "50"

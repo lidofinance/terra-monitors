@@ -17,6 +17,7 @@ type CollectorConfig struct {
 	LCD                    LCD
 	Addresses              Addresses
 	UpdateDataInterval     time.Duration `envconfig:"default=30s"`
+	NetworkGeneration      string        `envconfig:"default=columbus-4"` // available values: columbus-4, columbus-5
 }
 
 func NewCollectorConfig() (CollectorConfig, error) {
