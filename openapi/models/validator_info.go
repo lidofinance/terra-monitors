@@ -25,7 +25,7 @@ type ValidatorInfo struct {
 
 	// consensus pubkey
 	// Required: true
-	ConsensusPubkey *ValidatorInfoConsensusPubkey `json:"consensus_pubkey"`
+	ConsensusPubkey interface{} `json:"consensus_pubkey"`
 
 	// description
 	// Required: true
@@ -77,17 +77,8 @@ func (m *ValidatorInfo) validateCommission(formats strfmt.Registry) error {
 
 func (m *ValidatorInfo) validateConsensusPubkey(formats strfmt.Registry) error {
 
-	if err := validate.Required("consensus_pubkey", "body", m.ConsensusPubkey); err != nil {
-		return err
-	}
-
-	if m.ConsensusPubkey != nil {
-		if err := m.ConsensusPubkey.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("consensus_pubkey")
-			}
-			return err
-		}
+	if m.ConsensusPubkey == nil {
+		return errors.Required("consensus_pubkey", "body", nil)
 	}
 
 	return nil
@@ -119,10 +110,6 @@ func (m *ValidatorInfo) ContextValidate(ctx context.Context, formats strfmt.Regi
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateConsensusPubkey(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateDescription(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -139,20 +126,6 @@ func (m *ValidatorInfo) contextValidateCommission(ctx context.Context, formats s
 		if err := m.Commission.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("commission")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *ValidatorInfo) contextValidateConsensusPubkey(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.ConsensusPubkey != nil {
-		if err := m.ConsensusPubkey.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("consensus_pubkey")
 			}
 			return err
 		}
@@ -330,46 +303,6 @@ func (m *ValidatorInfoCommissionCommissionRates) MarshalBinary() ([]byte, error)
 // UnmarshalBinary interface implementation
 func (m *ValidatorInfoCommissionCommissionRates) UnmarshalBinary(b []byte) error {
 	var res ValidatorInfoCommissionCommissionRates
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
-// ValidatorInfoConsensusPubkey validator info consensus pubkey
-//
-// swagger:model ValidatorInfoConsensusPubkey
-type ValidatorInfoConsensusPubkey struct {
-
-	// type
-	Type string `json:"type,omitempty"`
-
-	// value
-	Value string `json:"value,omitempty"`
-}
-
-// Validate validates this validator info consensus pubkey
-func (m *ValidatorInfoConsensusPubkey) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this validator info consensus pubkey based on context it is used
-func (m *ValidatorInfoConsensusPubkey) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *ValidatorInfoConsensusPubkey) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *ValidatorInfoConsensusPubkey) UnmarshalBinary(b []byte) error {
-	var res ValidatorInfoConsensusPubkey
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

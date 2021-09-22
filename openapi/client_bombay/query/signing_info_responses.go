@@ -373,7 +373,8 @@ type SigningInfoOKBodyValSigningInfo struct {
 
 	// A counter kept to avoid unnecessary array reads.
 	// Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`.
-	MissedBlocksCounter string `json:"missed_blocks_counter,omitempty"`
+	// Required: true
+	MissedBlocksCounter *string `json:"missed_blocks_counter"`
 
 	// Height at which validator was first a candidate OR was unjailed
 	StartHeight string `json:"start_height,omitempty"`
@@ -391,6 +392,10 @@ func (o *SigningInfoOKBodyValSigningInfo) Validate(formats strfmt.Registry) erro
 		res = append(res, err)
 	}
 
+	if err := o.validateMissedBlocksCounter(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -403,6 +408,15 @@ func (o *SigningInfoOKBodyValSigningInfo) validateJailedUntil(formats strfmt.Reg
 	}
 
 	if err := validate.FormatOf("signingInfoOK"+"."+"val_signing_info"+"."+"jailed_until", "body", "date-time", o.JailedUntil.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *SigningInfoOKBodyValSigningInfo) validateMissedBlocksCounter(formats strfmt.Registry) error {
+
+	if err := validate.Required("signingInfoOK"+"."+"val_signing_info"+"."+"missed_blocks_counter", "body", o.MissedBlocksCounter); err != nil {
 		return err
 	}
 

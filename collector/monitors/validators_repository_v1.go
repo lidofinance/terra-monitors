@@ -2,11 +2,8 @@ package monitors
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"strconv"
 
 	"github.com/lidofinance/terra-monitors/collector/types"
@@ -15,14 +12,10 @@ import (
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 )
 
-type ValidatorsRepository interface {
-	GetValidatorsAddresses(ctx context.Context) ([]string, error)
-	GetValidatorInfo(ctx context.Context, address string) (types.ValidatorInfo, error)
-}
-
 type V1ValidatorsRepository struct {
-	hubContract string
-	apiClient   *client.TerraLiteForTerra
+	hubContract       string
+	apiClient         *client.TerraLiteForTerra
+	networkGeneration string
 }
 
 func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {
@@ -74,23 +67,16 @@ func (r *V1ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 	if err != nil {
 		return types.ValidatorInfo{}, fmt.Errorf("failed to parse validator's comission rate: %w", err)
 	}
-	key, err := base64.StdEncoding.DecodeString(validatorInfoResponse.GetPayload().Result.ConsensusPubkey.Value)
 
+	consPubKeyAddress, err := GetPubKeyIdentifier(r.networkGeneration, validatorInfoResponse.GetPayload().Result.ConsensusPubkey)
 	if err != nil {
-		return types.ValidatorInfo{}, fmt.Errorf("failed to decode validator's ConsensusPubkey: %w", err)
+		return types.ValidatorInfo{}, fmt.Errorf("failed to extract identifier from payload: %w", err)
 	}
 
-	pub := &ed25519.PubKey{Key: key}
-
-	conPubKeyAddress, err := bech32.ConvertAndEncode(Bech32TerraValConsPrefix, pub.Address())
-
-	if err != nil {
-		return types.ValidatorInfo{}, fmt.Errorf("failed to convert validator's ConsensusPubkeyAddress to bech32: %w", err)
-	}
 	return types.ValidatorInfo{
 		Address:        address,
 		Moniker:        validatorInfoResponse.GetPayload().Result.Description.Moniker,
-		PubKey:         conPubKeyAddress,
+		PubKey:         consPubKeyAddress,
 		CommissionRate: commissionRate,
 		Jailed:         validatorInfoResponse.GetPayload().Result.Jailed,
 	}, nil

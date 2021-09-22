@@ -12,7 +12,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // GetTxListResult get tx list result
@@ -21,24 +20,18 @@ import (
 type GetTxListResult struct {
 
 	// Per page item limit
-	// Required: true
-	Limit *int64 `json:"limit"`
+	Limit float64 `json:"limit,omitempty"`
 
-	// next
+	// Offset
 	Next int64 `json:"next,omitempty"`
 
 	// tx list
-	// Required: true
 	Txs []*GetTxListResultTxs `json:"txs"`
 }
 
 // Validate validates this get tx list result
 func (m *GetTxListResult) Validate(formats strfmt.Registry) error {
 	var res []error
-
-	if err := m.validateLimit(formats); err != nil {
-		res = append(res, err)
-	}
 
 	if err := m.validateTxs(formats); err != nil {
 		res = append(res, err)
@@ -50,19 +43,9 @@ func (m *GetTxListResult) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *GetTxListResult) validateLimit(formats strfmt.Registry) error {
-
-	if err := validate.Required("limit", "body", m.Limit); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *GetTxListResult) validateTxs(formats strfmt.Registry) error {
-
-	if err := validate.Required("txs", "body", m.Txs); err != nil {
-		return err
+	if swag.IsZero(m.Txs) { // not required
+		return nil
 	}
 
 	for i := 0; i < len(m.Txs); i++ {

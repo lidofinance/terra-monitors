@@ -20,9 +20,6 @@ import (
 // swagger:model getTxListResult.txs
 type GetTxListResultTxs struct {
 
-	// ID
-	ID int64 `json:"ID,omitempty"`
-
 	// events of tx
 	// Required: true
 	Events []*GetTxListResultTxsEvents `json:"events"`
@@ -39,6 +36,9 @@ type GetTxListResultTxs struct {
 	// Required: true
 	Height *string `json:"height"`
 
+	// id
+	ID int64 `json:"id,omitempty"`
+
 	// tx logs
 	// Required: true
 	Logs []*GetTxListResultTxsLogs `json:"logs"`
@@ -51,7 +51,7 @@ type GetTxListResultTxs struct {
 	// Required: true
 	Timestamp *string `json:"timestamp"`
 
-	// tx
+	// tx info
 	// Required: true
 	Tx *GetTxListResultTxsTx `json:"tx"`
 

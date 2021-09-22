@@ -11,7 +11,6 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	"github.com/lidofinance/terra-monitors/openapi/client_bombay/query"
-	"github.com/lidofinance/terra-monitors/openapi/client_bombay/transactions"
 )
 
 // Default terra lite for terra HTTP client.
@@ -57,7 +56,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *TerraLiteF
 	cli := new(TerraLiteForTerra)
 	cli.Transport = transport
 	cli.Query = query.New(transport, formats)
-	cli.Transactions = transactions.New(transport, formats)
 	return cli
 }
 
@@ -104,8 +102,6 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 type TerraLiteForTerra struct {
 	Query query.ClientService
 
-	Transactions transactions.ClientService
-
 	Transport runtime.ClientTransport
 }
 
@@ -113,5 +109,4 @@ type TerraLiteForTerra struct {
 func (c *TerraLiteForTerra) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Query.SetTransport(transport)
-	c.Transactions.SetTransport(transport)
 }

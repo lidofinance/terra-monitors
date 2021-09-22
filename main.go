@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -34,7 +35,8 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
 
 	validatorsRepository := monitors.NewValidatorsRepository(cfg, c.GetLogger())
-	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository)
+	signInfoRepository := signinfo.NewSignInfoRepository(cfg, c.GetLogger())
+	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository, signInfoRepository)
 	c.RegisterMonitor(ctx, cfg, slashingMonitor)
 
 	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(cfg, logger)

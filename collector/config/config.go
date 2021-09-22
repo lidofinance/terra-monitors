@@ -10,6 +10,9 @@ import (
 const (
 	V1Contracts = "1"
 	V2Contracts = "2"
+
+	NetworkGenerationColumbus4 = "columbus-4"
+	NetworkGenerationColumbus5 = "columbus-5"
 )
 
 type CollectorConfig struct {

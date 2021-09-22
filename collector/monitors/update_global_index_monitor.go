@@ -23,6 +23,7 @@ const (
 )
 
 const UpdateGlobalIndexMsg = "update_global_index"
+const UpdateGlobalIndexBase64Encoded = "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0="
 
 const (
 	UpdateGlobalIndexSuccessfulTxSinceLastCheck MetricName = "update_global_index_successful_tx_since_last_check"
@@ -35,21 +36,23 @@ const (
 const threshold int = 10
 
 type UpdateGlobalIndexMonitor struct {
-	ContractAddress  string
-	metrics          map[MetricName]MetricValue
-	apiClient        *terraClient.TerraLiteForTerra
-	logger           *logrus.Logger
-	lastMaxCheckedID int64
-	lock             sync.RWMutex
+	ContractAddress   string
+	metrics           map[MetricName]MetricValue
+	apiClient         *terraClient.TerraLiteForTerra
+	logger            *logrus.Logger
+	lastMaxCheckedID  int64
+	lock              sync.RWMutex
+	networkGeneration string
 }
 
 func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
-		ContractAddress: cfg.Addresses.UpdateGlobalIndexBotAddress,
-		metrics:         make(map[MetricName]MetricValue),
-		apiClient:       client.New(cfg.LCD, logger),
-		logger:          logger,
-		lock:            sync.RWMutex{},
+		ContractAddress:   cfg.Addresses.UpdateGlobalIndexBotAddress,
+		metrics:           make(map[MetricName]MetricValue),
+		apiClient:         client.New(cfg.LCD, logger),
+		logger:            logger,
+		lock:              sync.RWMutex{},
+		networkGeneration: cfg.NetworkGeneration,
 	}
 	m.InitMetrics()
 
@@ -142,7 +145,7 @@ func (m *UpdateGlobalIndexMonitor) processTransactions(
 			alreadyProcessedFound = true
 			break
 		}
-		switch isTxUpdateGlobalIndex(tx) {
+		switch isTxUpdateGlobalIndex(tx, m.networkGeneration) {
 		case SuccessfulUpdateGlobalIndexTX:
 			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck].Add(1)
 		case FailedUpdateGlobalIndexTx:
@@ -174,7 +177,7 @@ func getTxRawLog(tx *models.GetTxListResultTxs) string {
 	return *tx.RawLog
 }
 
-func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVariants {
+func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs, networkGeneration string) UpdateGlobalIndexTxsVariants {
 	if tx == nil || tx.Tx == nil || tx.Tx.Value == nil || len(tx.Tx.Value.Msg) == 0 {
 		return NonUpdateGlobalIndexTX
 	}
@@ -182,13 +185,18 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 		if msg.Value == nil || msg.Value.ExecuteMsg == nil {
 			continue
 		}
-		m, ok := msg.Value.ExecuteMsg.(map[string]interface{})
-		if !ok {
-			return NonUpdateGlobalIndexTX
+		var isUpdateGlobalIndexMsg bool
+		switch networkGeneration {
+		case config.NetworkGenerationColumbus4:
+			isUpdateGlobalIndexMsg = isUpdateGlobalIndexMsgColumbus4(msg)
+		case config.NetworkGenerationColumbus5:
+			isUpdateGlobalIndexMsg = isUpdateGlobalIndexMsgColumbus5(msg)
+		default:
+			panic("unknown network generation. available variants: columbus-4 or columbus-5")
 		}
-		if _, found := m[UpdateGlobalIndexMsg]; found && len(tx.Logs) > 0 {
+		if isUpdateGlobalIndexMsg && len(tx.Logs) > 0 {
 			return SuccessfulUpdateGlobalIndexTX
-		} else if _, found := m[UpdateGlobalIndexMsg]; found && len(tx.Logs) == 0 {
+		} else if isUpdateGlobalIndexMsg && len(tx.Logs) == 0 {
 			// https://fcd.terra.dev/v1/txs?offset=126987824
 			// tx with id = 126987823 is a failed tx due to out of gas
 			// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.
@@ -197,6 +205,34 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 		}
 	}
 	return NonUpdateGlobalIndexTX
+}
+
+func isUpdateGlobalIndexMsgColumbus5(msg *models.GetTxListResultTxsTxValueMsg) bool {
+	// columbus-5 execute message format
+	// "execute_msg": {
+	//     "update_global_index": {}
+	//  },
+	m, ok := msg.Value.ExecuteMsg.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	if _, found := m[UpdateGlobalIndexMsg]; found {
+		return true
+	}
+	return false
+}
+
+func isUpdateGlobalIndexMsgColumbus4(msg *models.GetTxListResultTxsTxValueMsg) bool {
+	// columbus-4 execute message format
+	// "execute_msg": "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0=",
+	m, ok := msg.Value.ExecuteMsg.(string)
+	if ok {
+		return true
+	}
+	if m == UpdateGlobalIndexBase64Encoded {
+		return false
+	}
+	return false
 }
 
 func gasUsed(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {

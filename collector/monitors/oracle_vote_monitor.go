@@ -87,7 +87,6 @@ func (m *OracleVotesMonitor) Handler(ctx context.Context) error {
 		if err := missedVotePeriodsResponse.GetPayload().Validate(nil); err != nil {
 			return fmt.Errorf("failed to validate missedVotePeriodsResponse: %w", err)
 		}
-
 		oracleMissedVotePeriods, err := strconv.ParseFloat(missedVotePeriodsResponse.GetPayload().Result, 64)
 		if err != nil {
 			return fmt.Errorf("failed to parse oracleMissedVotePeriods: %w", err)

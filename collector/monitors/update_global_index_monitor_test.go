@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"github.com/lidofinance/terra-monitors/collector/config"
 	"io/ioutil"
 
 	"github.com/stretchr/testify/suite"
@@ -25,10 +26,12 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestSuccessfulRequest() {
 	// 391413+391258+410636+410178+410187+410064+388524+409701+409756+409922
 	expectedUUSDUsed := &ReadOnceMetric{value: 4041639.0}
 
-	data, err := ioutil.ReadFile("./test_data/update_global_index_success_response.json")
+	data, err := ioutil.ReadFile("./test_data/columbus-5/update_global_index_success_response.json")
 	suite.NoError(err)
 	testServer := NewServerWithResponse(string(data))
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
+
 	logger := NewTestLogger()
 	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 
@@ -52,10 +55,12 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedTxRequest() {
 	expectedUUSDUsed := &ReadOnceMetric{value: 276407.0}
 	expectedErrorMessagePattern := "failed tx detected: out of gas: out of gas in location"
 
-	data, err := ioutil.ReadFile("./test_data/update_global_index_error.json")
+	data, err := ioutil.ReadFile("./test_data/columbus-5/update_global_index_error.json")
 	suite.NoError(err)
 	testServer := NewServerWithResponse(string(data))
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
+
 	logger := NewTestLogger()
 	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 
@@ -73,7 +78,7 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedTxRequest() {
 	suite.Contains(actualMessages, expectedErrorMessagePattern)
 }
 
-func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
+func (suite *UpdateGlobalIndexMonitorTestSuite) testThresholdTxRequest(networkGeneration string) {
 	expectedFailedTx := &ReadOnceMetric{value: 0.0}
 	// tx counter is limited by threshold, 10 iteration, 10 tx each
 	expectedSuccessTxs := &ReadOnceMetric{value: 100.0}
@@ -82,8 +87,10 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
 	expectedUUSDUsedPerTX := &ReadOnceMetric{value: 100000.0}
 	expectedErrorMessagePattern := "update global index processing stopped due to requests threshold"
 
-	testServer := NewServerForUpdateGlobalIndex()
+	testServer := NewServerForUpdateGlobalIndex(networkGeneration)
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.NetworkGeneration = networkGeneration
+
 	logger := NewTestLogger()
 	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 	// by setting lastMaxCheckedID to some value, we are pretending its not a first run
@@ -105,6 +112,11 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
 	suite.Equal(int64(200), m.lastMaxCheckedID)
 }
 
+func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
+	//suite.testThresholdTxRequest(config.NetworkGenerationColumbus5)
+	suite.testThresholdTxRequest(config.NetworkGenerationColumbus4)
+}
+
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
 	expectedFailedTx := &ReadOnceMetric{value: 0.0}
 	expectedSuccessTxs := &ReadOnceMetric{value: 19.0}
@@ -113,8 +125,10 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
 	expectedUUSDUsedPerTX := &ReadOnceMetric{value: 100000.0}
 	expectedErrorMessagePattern := "stopping processing, last checked transaction is found"
 
-	testServer := NewServerForUpdateGlobalIndex()
+	testServer := NewServerForUpdateGlobalIndex(config.NetworkGenerationColumbus5)
 	cfg := NewTestCollectorConfig(testServer.URL)
+	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
+
 	logger := NewTestLogger()
 	m := NewUpdateGlobalIndexMonitor(cfg, logger)
 	// by setting lastMaxCheckedID to some value, we are pretending its not a first run
