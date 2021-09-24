@@ -9,8 +9,6 @@ import (
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
-	"github.com/lidofinance/terra-monitors/internal/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,7 +21,6 @@ const (
 type SlashingMonitor struct {
 	metrics              map[MetricName]MetricValue
 	metricVectors        map[MetricName]*MetricVector
-	apiClient            *terraClient.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	signInfoRepository   signinfo.Repository
 	logger               *logrus.Logger
@@ -39,7 +36,6 @@ func NewSlashingMonitor(
 	m := &SlashingMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            client.New(cfg.LCD, logger),
 		validatorsRepository: repository,
 		signInfoRepository:   signInfoRepository,
 		logger:               logger,
