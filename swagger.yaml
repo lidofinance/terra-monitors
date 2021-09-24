@@ -42,6 +42,45 @@ securityDefinitions:
     type: basic
 
 paths:
+  /blocks/latest:
+    get:
+      summary: Get the latest block
+      tags:
+        - Tendermint RPC
+      produces:
+        - application/json
+      responses:
+        200:
+          description: The latest block
+          schema:
+            $ref: "#/definitions/BlockQuery"
+        500:
+          description: Server internal error
+  /blocks/{height}:
+    get:
+      summary: Get a block at a certain height
+      tags:
+        - Tendermint RPC
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          type: integer
+          x-example: 1
+      responses:
+        200:
+          description: The block at a specific height
+          schema:
+            $ref: "#/definitions/BlockQuery"
+        404:
+          description: Request block height doesn't
+        400:
+          description: Invalid height
+        500:
+          description: Server internal error
   /wasm/contracts/{contractAddress}/store:
     get:
       summary: Get stored information with query msg
@@ -980,3 +1019,114 @@ definitions:
         type: string
       balance:
         "$ref": "#/definitions/Coin"
+  BlockQuery:
+    type: object
+    properties:
+      block:
+        $ref: "#/definitions/Block"
+
+
+  Block:
+    type: object
+    properties:
+      last_commit:
+        type: object
+        properties:
+          height:
+            type: string
+          signatures:
+            type: array
+            items:
+              type: object
+              properties:
+                validator_address:
+                  type: string
+                timestamp:
+                  type: string
+                  example: "2017-12-30T05:53:09.287+01:00"
+                signature:
+                  type: string
+                  example: "7uTC74QlknqYWEwg7Vn6M8Om7FuZ0EO4bjvuj6rwH1mTUJrRuMMZvAAqT9VjNgP0RA/TDp6u/92AqrZfXJSpBQ=="
+                block_id_flag:
+                  type: integer
+  Hash:
+    type: string
+    example: EE5F3404034C524501629B56E0DDC38FAD651F04
+  TxQuery:
+    type: object
+    properties:
+      hash:
+        type: string
+        example: "D085138D913993919295FF4B0A9107F1F2CDE0D37A87CE0644E217CBF3B49656"
+      height:
+        type: number
+        example: 368
+      tx:
+        $ref: "#/definitions/StdTx"
+      result:
+        type: object
+        properties:
+          log:
+            type: string
+          gas_wanted:
+            type: string
+            example: "200000"
+          gas_used:
+            type: string
+            example: "26354"
+          tags:
+            type: array
+            items:
+              $ref: "#/definitions/KVPair"
+  Address:
+    type: string
+    description: bech32 encoded address
+    example: terra1wg2mlrxdmnnkkykgqg4znky86nyrtc45q336yv
+  KVPair:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+  StdTx:
+    type: object
+    properties:
+      msg:
+        type: array
+        items:
+          $ref: "#/definitions/Msg"
+      fee:
+        type: object
+        properties:
+          gas:
+            type: string
+          amount:
+            type: array
+            items:
+              $ref: "#/definitions/Coin"
+      memo:
+        type: string
+      signature:
+        type: object
+        properties:
+          signature:
+            type: string
+            example: MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
+          pub_key:
+            type: object
+            properties:
+              type:
+                type: string
+                example: "tendermint/PubKeySecp256k1"
+              value:
+                type: string
+                example: "Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH"
+          account_number:
+            type: string
+            example: "0"
+          sequence:
+            type: string
+            example: "0"
+  Msg:
+    type: string

@@ -66,9 +66,18 @@ func (s *RepositoryColumbus4) GetMissedBlockCounter() float64 {
 
 func (s *RepositoryColumbus4) GetTombstoned() bool {
 	if s.signingInfo != nil {
-		if *s.signingInfo.Tombstoned {
-			return true
+		if s.signingInfo.Tombstoned != nil {
+			return *s.signingInfo.Tombstoned
 		}
 	}
 	return false
+}
+
+func (s *RepositoryColumbus4) GetAddress() string {
+	if s.signingInfo != nil {
+		if s.signingInfo.Address != nil {
+			return *s.signingInfo.Address
+		}
+	}
+	return ""
 }

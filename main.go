@@ -63,6 +63,9 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 
 	failedRedelegationsMonitor := monitors.NewFailedRedelegationsMonitor(cfg, logger, validatorsRepository)
 	c.RegisterMonitor(ctx, cfg, failedRedelegationsMonitor)
+	
+	missedBlocksMonitor := monitors.NewMissedBlocksMonitor(cfg, logger, validatorsRepository, signInfoRepository)
+	c.RegisterMonitor(ctx, cfg, missedBlocksMonitor)
 
 	return c, nil
 }
