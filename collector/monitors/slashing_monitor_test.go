@@ -13,6 +13,7 @@ import (
 
 const (
 	testValAddress   = "terravalcons1ezj3lps8nqwytt42at2sgt7seq9hk708g0spyk"
+	testValAddress2   = "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdt4x"
 	testValPublicKey = "terravalconspub1zcjduepqw2hyr7u7y70z5kdewn00xuq0wwcvnn0s7x5pjqcdpn80qsyctcpqcjhz4c"
 	testConsAddress  = "terravalcons1rfaxjug6md5jrz3c0uctyt6pzd50xyxlc2tf5m"
 )

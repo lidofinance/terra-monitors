@@ -1,0 +1,19 @@
+{
+  "height": "1",
+  "result": {
+    "consensus_pubkey": {
+      "type": "tendermint/PubKeyEd25519",
+      "value": "UX71gTBNumQq42qRd6j/K8XN/y3/HAcuAJxj97utawI="
+    },
+    "description": {
+      "moniker": "Test validator2"
+    },
+    "commission": {
+      "commission_rates":
+      {
+        "rate": "0.08"
+      }
+    },
+    "jailed": false
+  }
+}

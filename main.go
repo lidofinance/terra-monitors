@@ -61,6 +61,9 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	balanceMonitor := monitors.NewOperatorBotBalanceMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, balanceMonitor)
 
+	missedBlocksMonitor := monitors.NewMissedBlocksMonitor(cfg, logger, validatorsRepository, signInfoRepository)
+	c.RegisterMonitor(ctx, cfg, missedBlocksMonitor)
+
 	return c, nil
 }
 

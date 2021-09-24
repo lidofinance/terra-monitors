@@ -74,7 +74,7 @@ func (m *SlashingMonitor) Handler(ctx context.Context) error {
 	tmpMetricVectors := make(map[MetricName]*MetricVector)
 	initMetrics(m.providedMetrics(), m.providedMetricVectors(), tmpMetrics, tmpMetricVectors)
 
-	validatorsInfo, err := m.getValidatorsInfo(ctx)
+	validatorsInfo, err := getValidatorsInfo(ctx, m.validatorsRepository)
 	if err != nil {
 		return fmt.Errorf("failed to getValidatorsInfo: %w", err)
 	}
@@ -117,8 +117,8 @@ func (m *SlashingMonitor) GetMetricVectors() map[MetricName]*MetricVector {
 	return m.metricVectors
 }
 
-func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]types.ValidatorInfo, error) {
-	validatorsAddresses, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
+func getValidatorsInfo(ctx context.Context, validatorsRepository ValidatorsRepository) ([]types.ValidatorInfo, error) {
+	validatorsAddresses, err := validatorsRepository.GetValidatorsAddresses(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to getWhitelistedValidatorsAddresses: %w", err)
 	}
@@ -127,7 +127,7 @@ func (m *SlashingMonitor) getValidatorsInfo(ctx context.Context) ([]types.Valida
 	// later get the signing info).
 	var validatorsInfo []types.ValidatorInfo
 	for _, validatorAddress := range validatorsAddresses {
-		validatorInfo, err := m.validatorsRepository.GetValidatorInfo(ctx, validatorAddress)
+		validatorInfo, err := validatorsRepository.GetValidatorInfo(ctx, validatorAddress)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get validator info: %w", err)
 		}
