@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"net/http"
+
+	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 
 	"github.com/sirupsen/logrus"
 

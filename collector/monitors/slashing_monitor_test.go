@@ -3,8 +3,9 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"io/ioutil"
+
+	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/stretchr/testify/suite"

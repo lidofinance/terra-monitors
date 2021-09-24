@@ -3,12 +3,13 @@ package signinfo
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClientBombay "github.com/lidofinance/terra-monitors/openapi/client_bombay"
 	"github.com/lidofinance/terra-monitors/openapi/client_bombay/query"
 	"github.com/sirupsen/logrus"
-	"strconv"
 )
 
 func NewRepositoryCol5(cfg config.CollectorConfig, logger *logrus.Logger) *RepositoryColumbus5 {

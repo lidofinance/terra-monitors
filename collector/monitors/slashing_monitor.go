@@ -3,14 +3,14 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"sync"
+
+	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	terraClientBombay "github.com/lidofinance/terra-monitors/openapi/client_bombay"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,7 +24,6 @@ type SlashingMonitor struct {
 	metrics              map[MetricName]MetricValue
 	metricVectors        map[MetricName]*MetricVector
 	apiClient            *terraClient.TerraLiteForTerra
-	apiClientBombay      *terraClientBombay.TerraLiteForTerra
 	validatorsRepository ValidatorsRepository
 	signInfoRepository   signinfo.Repository
 	logger               *logrus.Logger

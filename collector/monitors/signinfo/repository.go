@@ -2,6 +2,7 @@ package signinfo
 
 import (
 	"context"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/sirupsen/logrus"
 )

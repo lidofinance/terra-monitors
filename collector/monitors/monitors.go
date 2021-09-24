@@ -2,9 +2,10 @@ package monitors
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
 	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const UUSDDenom = "uusd"

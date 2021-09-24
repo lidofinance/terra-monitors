@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/lidofinance/terra-monitors/collector/config"
@@ -39,7 +40,7 @@ type ValidatorsRepository interface {
 func GetPubKeyIdentifier(networkGeneration string, pubkey interface{}) (string, error) {
 	switch networkGeneration {
 	case config.NetworkGenerationColumbus4:
-		// columbus5 ConsensusPubkey is just a string
+		// columbus4 ConsensusPubkey is just a string
 		pk, ok := pubkey.(string)
 		if !ok {
 			return "", fmt.Errorf("failed to cast pubkey interface to string: %+v", pubkey)
