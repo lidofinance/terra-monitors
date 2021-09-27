@@ -27,15 +27,15 @@ const (
 )
 
 type MissedBlocksMonitor struct {
-	networkGeneration        string
-	validators               map[string]string // map valoper address -> valcons address
-	latestCheckedBlockHeight int
-	metricVectors            map[MetricName]*MetricVector
-	apiClient                *terraClient.TerraLiteForTerra
-	validatorsRepository     ValidatorsRepository
-	signInfoRepository       signinfo.Repository
-	logger                   *logrus.Logger
-	lock                     sync.RWMutex
+	networkGeneration      string
+	validators             map[string]string // map valoper address -> valcons address
+	latestCommittedChecked int
+	metricVectors          map[MetricName]*MetricVector
+	apiClient              *terraClient.TerraLiteForTerra
+	validatorsRepository   ValidatorsRepository
+	signInfoRepository     signinfo.Repository
+	logger                 *logrus.Logger
+	lock                   sync.RWMutex
 }
 
 func NewMissedBlocksMonitor(
@@ -102,31 +102,33 @@ func (m *MissedBlocksMonitor) FetchLatestBlocks(ctx context.Context) ([]*models.
 	if err := resp.GetPayload().Validate(nil); err != nil {
 		return nil, fmt.Errorf("failed to validate latest block response: %w", err)
 	}
-	latestHeight, err := strconv.Atoi(resp.GetPayload().Block.LastCommit.Height)
+	// last committed = 'height' - 1
+	lastCommitted, err := strconv.Atoi(resp.GetPayload().Block.LastCommit.Height)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse commits height: %w", err)
 	}
 
 	// no new blocks
-	if latestHeight == m.latestCheckedBlockHeight {
+	if lastCommitted == m.latestCommittedChecked {
 		return nil, nil
 	}
 
 	blocks = append(blocks, resp.GetPayload())
 
-	if m.latestCheckedBlockHeight == 0 {
-		m.latestCheckedBlockHeight = latestHeight - InitialBlocksAmount
+	if m.latestCommittedChecked == 0 {
+		m.latestCommittedChecked = lastCommitted - InitialBlocksAmount
 	}
 
 	//fetching needed blocks to check signatures
-	for i := m.latestCheckedBlockHeight + 1; i <= latestHeight; i++ {
+	for committed := m.latestCommittedChecked + 1; committed < lastCommitted; committed++ {
 		wg.Add(1)
-		go func(height int) {
+		go func(committed int) {
 			defer wg.Done()
 			req := tendermint_rpc.GetBlocksHeightParams{}
 			req.SetContext(ctx)
-			// fetching block with height = "height"
-			// we are checking signatures for block "height - 1" witch number in Block.LastCommit.Height field
+			// fetching block with height = committed + 1
+			// we are checking signatures for committed block "height - 1" witch number in Block.LastCommit.Height field
+			height := committed + 1
 			req.SetHeight(int64(height))
 
 			resp, err := m.apiClient.TendermintRPC.GetBlocksHeight(&req)
@@ -142,10 +144,10 @@ func (m *MissedBlocksMonitor) FetchLatestBlocks(ctx context.Context) ([]*models.
 			lock.Lock()
 			defer lock.Unlock()
 			blocks = append(blocks, resp.GetPayload())
-		}(i)
+		}(committed)
 	}
 	wg.Wait()
-	m.latestCheckedBlockHeight = latestHeight
+	m.latestCommittedChecked = lastCommitted
 	return blocks, nil
 }
 
