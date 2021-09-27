@@ -91,7 +91,5 @@ func (suite *MissedBlocksMonitorTestSuite) testMissedBlocks(networkGeneration st
 	// "Test validator2" has not signed the block
 	// we have checked 10 blocks and  all 11 with no "Test validators2" sign
 	suite.Equal(10.0, metricVectors[MissedBlocksForPeriod].Get("Test validator2"))
-
-	//there are some errors due to not implemented test endpoint /blocks/height
-	fmt.Println(logger.Out)
+	
 }
