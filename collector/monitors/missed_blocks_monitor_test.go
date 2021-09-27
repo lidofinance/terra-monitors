@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"github.com/lidofinance/terra-monitors/openapi/models"
 	"github.com/stretchr/testify/suite"
 )
@@ -77,9 +76,8 @@ func (suite *MissedBlocksMonitorTestSuite) testMissedBlocks(networkGeneration st
 
 	logger := NewTestLogger()
 	valRepository := NewValidatorsRepository(cfg, logger)
-	signInfoRepository := signinfo.NewSignInfoRepository(cfg, logger)
 
-	m := NewMissedBlocksMonitor(cfg, logger, valRepository, signInfoRepository)
+	m := NewMissedBlocksMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 

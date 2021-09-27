@@ -10,7 +10,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/lidofinance/terra-monitors/collector/config"
-	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/tendermint_rpc"
@@ -33,7 +32,6 @@ type MissedBlocksMonitor struct {
 	metricVectors          map[MetricName]*MetricVector
 	apiClient              *terraClient.TerraLiteForTerra
 	validatorsRepository   ValidatorsRepository
-	signInfoRepository     signinfo.Repository
 	logger                 *logrus.Logger
 	lock                   sync.RWMutex
 }
@@ -42,7 +40,6 @@ func NewMissedBlocksMonitor(
 	cfg config.CollectorConfig,
 	logger *logrus.Logger,
 	repository ValidatorsRepository,
-	signInfoRepository signinfo.Repository,
 ) *MissedBlocksMonitor {
 	m := &MissedBlocksMonitor{
 		networkGeneration:    cfg.NetworkGeneration,
@@ -50,7 +47,6 @@ func NewMissedBlocksMonitor(
 		metricVectors:        make(map[MetricName]*MetricVector),
 		apiClient:            client.New(cfg.LCD, logger),
 		validatorsRepository: repository,
-		signInfoRepository:   signInfoRepository,
 		logger:               logger,
 		lock:                 sync.RWMutex{},
 	}
