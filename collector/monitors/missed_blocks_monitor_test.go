@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strconv"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"github.com/lidofinance/terra-monitors/openapi/models"
 	"github.com/stretchr/testify/suite"
-	"io/ioutil"
-	"strconv"
 )
 
 type MissedBlocksMonitorTestSuite struct {
@@ -91,5 +92,5 @@ func (suite *MissedBlocksMonitorTestSuite) testMissedBlocks(networkGeneration st
 	// "Test validator2" has not signed the block
 	// we have checked 10 blocks and  all 11 with no "Test validators2" sign
 	suite.Equal(10.0, metricVectors[MissedBlocksForPeriod].Get("Test validator2"))
-	
+
 }
