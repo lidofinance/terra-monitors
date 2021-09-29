@@ -17,7 +17,7 @@ start_testnet:
 	docker-compose --env-file ./docker/env/.lido_terra.testnet.env up --build -d
 
 start_mainnet:
-	docker-compose --env-file ./docker/env/.lido_terra.prod.env -p terra_monitors_mainnet up --build -d
+	docker-compose --env-file ./docker/env/.lido_terra.prod.env -p terra-monitoring-mainnet up --build -d
 
 start-no-build:
 	docker-compose up -d
@@ -29,7 +29,7 @@ stop_testnet:
 	docker-compose down --remove-orphans
 
 stop_mainnet:
-	docker-compose -p terra_monitors_mainnet down --remove-orphans
+	docker-compose -p terra-monitoring-mainnet down --remove-orphans
 
 start_bombay:
 	docker-compose --env-file ./docker/env/.lido_terra.bombay.env -p terra_monitors_bombay up --build -d
