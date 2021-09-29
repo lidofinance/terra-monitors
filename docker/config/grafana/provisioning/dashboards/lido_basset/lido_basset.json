@@ -149,29 +149,6 @@
           {
             "evaluator": {
               "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "A",
-                "30m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
                 4
               ],
               "type": "gt"
@@ -195,7 +172,7 @@
           {
             "evaluator": {
               "params": [
-                100
+                0.023
               ],
               "type": "gt"
             },
@@ -218,7 +195,7 @@
           {
             "evaluator": {
               "params": [
-                3600
+                0.83
               ],
               "type": "gt"
             },
@@ -243,7 +220,7 @@
         "for": "0m",
         "frequency": "1m",
         "handler": 1,
-        "message": "Validator ${label} missed more than 4% of vote periods!",
+        "message": "",
         "name": "Oracles Missed Votes Rate alert",
         "noDataState": "keep_state",
         "notifications": []
@@ -329,7 +306,7 @@
         {
           "colorMode": "critical",
           "op": "gt",
-          "value": 0,
+          "value": 4,
           "visible": true
         }
       ],
@@ -1841,29 +1818,6 @@
           {
             "evaluator": {
               "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "C",
-                "30m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
                 100
               ],
               "type": "gt"
@@ -1912,7 +1866,7 @@
         "for": "0m",
         "frequency": "30s",
         "handler": 1,
-        "name": "Max number of missed blocks is above 200 in last 30 min",
+        "name": "Max number of missed blocks is above 200",
         "noDataState": "no_data",
         "notifications": []
       },
@@ -2664,5 +2618,5 @@
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 1
+  "version": 12
 }
