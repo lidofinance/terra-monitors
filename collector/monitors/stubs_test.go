@@ -143,13 +143,13 @@ func makeTxFromData(data []byte) map[string]interface{} {
 	return txData
 }
 
-func makeTxs(offset int) string {
+func makeTxs(networkGeneration string, offset int) string {
 	resp := map[string]interface{}{
 		"next":  offset - 10,
 		"limit": 10,
 		"txs":   []interface{}{},
 	}
-	txDataRaw, err := ioutil.ReadFile("./test_data/update_global_index_template.json")
+	txDataRaw, err := ioutil.ReadFile(fmt.Sprintf("./test_data/%s/update_global_index_template.json", networkGeneration))
 	if err != nil {
 		panic(err)
 	}
@@ -166,7 +166,7 @@ func makeTxs(offset int) string {
 	return string(respRaw)
 }
 
-func NewServerForUpdateGlobalIndex() *httptest.Server {
+func NewServerForUpdateGlobalIndex(networkGeneration string) *httptest.Server {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		offsetRaw := r.URL.Query().Get("offset")
 		if offsetRaw == "" {
@@ -177,7 +177,7 @@ func NewServerForUpdateGlobalIndex() *httptest.Server {
 			panic(err)
 		}
 		w.Header().Add("Content-Type", "application/json")
-		_, _ = fmt.Fprintln(w, makeTxs(offset))
+		_, _ = fmt.Fprintln(w, makeTxs(networkGeneration, offset))
 	}))
 	return ts
 }

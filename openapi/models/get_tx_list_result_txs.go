@@ -37,8 +37,7 @@ type GetTxListResultTxs struct {
 	Height *string `json:"height"`
 
 	// id
-	// Required: true
-	ID *float64 `json:"id"`
+	ID int64 `json:"id,omitempty"`
 
 	// tx logs
 	// Required: true
@@ -78,10 +77,6 @@ func (m *GetTxListResultTxs) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateHeight(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -157,15 +152,6 @@ func (m *GetTxListResultTxs) validateGasWanted(formats strfmt.Registry) error {
 func (m *GetTxListResultTxs) validateHeight(formats strfmt.Registry) error {
 
 	if err := validate.Required("height", "body", m.Height); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *GetTxListResultTxs) validateID(formats strfmt.Registry) error {
-
-	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 

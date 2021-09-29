@@ -10,6 +10,9 @@ import (
 const (
 	V1Contracts = "1"
 	V2Contracts = "2"
+
+	NetworkGenerationColumbus4 = "columbus-4"
+	NetworkGenerationColumbus5 = "columbus-5"
 )
 
 type CollectorConfig struct {
@@ -17,6 +20,7 @@ type CollectorConfig struct {
 	LCD                    LCD
 	Addresses              Addresses
 	UpdateDataInterval     time.Duration `envconfig:"default=30s"`
+	NetworkGeneration      string        `envconfig:"default=columbus-4"` // available values: columbus-4, columbus-5
 }
 
 func NewCollectorConfig() (CollectorConfig, error) {

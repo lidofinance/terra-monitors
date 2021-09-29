@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 
 	"github.com/lidofinance/terra-monitors/collector/types"

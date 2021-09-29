@@ -1,5 +1,11 @@
-gen_client:
+gen_client: gen_columbus_4 gen_columbus_5
+
+gen_columbus_4:
 	mkdir -p ./openapi/ && swagger generate client -f swagger.yaml -t ./openapi/
+
+
+gen_columbus_5:
+	mkdir -p ./openapi/ && swagger generate client -f swagger.bombay.yaml -t ./openapi/ -c client_bombay
 
 dev_server: gen_client
 	go run main.go
@@ -24,6 +30,12 @@ stop_testnet:
 
 stop_mainnet:
 	docker-compose -p terra_monitors_mainnet down --remove-orphans
+
+start_bombay:
+	docker-compose --env-file ./docker/env/.lido_terra.bombay.env -p terra_monitors_bombay up --build -d
+
+stop_bombay:
+	docker-compose -p terra_monitors_bombay down --remove-orphans
 
 test:
 	go test ./...

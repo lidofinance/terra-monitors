@@ -29,8 +29,7 @@ type GetTxListResultTxsTxValueMsgValue struct {
 	Contract *string `json:"contract"`
 
 	// execute msg
-	// Required: true
-	ExecuteMsg *string `json:"execute_msg"`
+	ExecuteMsg interface{} `json:"execute_msg,omitempty"`
 
 	// sender
 	// Required: true
@@ -46,10 +45,6 @@ func (m *GetTxListResultTxsTxValueMsgValue) Validate(formats strfmt.Registry) er
 	}
 
 	if err := m.validateContract(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateExecuteMsg(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -91,15 +86,6 @@ func (m *GetTxListResultTxsTxValueMsgValue) validateCoins(formats strfmt.Registr
 func (m *GetTxListResultTxsTxValueMsgValue) validateContract(formats strfmt.Registry) error {
 
 	if err := validate.Required("contract", "body", m.Contract); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *GetTxListResultTxsTxValueMsgValue) validateExecuteMsg(formats strfmt.Registry) error {
-
-	if err := validate.Required("execute_msg", "body", m.ExecuteMsg); err != nil {
 		return err
 	}
 

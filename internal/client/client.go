@@ -9,10 +9,15 @@ import (
 	"github.com/sirupsen/logrus"
 
 	openapiClient "github.com/lidofinance/terra-monitors/openapi/client"
+	openapiClientBombay "github.com/lidofinance/terra-monitors/openapi/client_bombay"
 )
 
 func New(lcd config.LCD, logger *logrus.Logger) *openapiClient.TerraLiteForTerra {
-	return openapiClient.New(NewFailoverTransport(logger, lcd), nil)
+	return openapiClient.New(NewFailoverTransport(logger, lcd, openapiClient.DefaultBasePath), nil)
+}
+
+func NewBombay(lcd config.LCD, logger *logrus.Logger) *openapiClientBombay.TerraLiteForTerra {
+	return openapiClientBombay.New(NewFailoverTransport(logger, lcd, openapiClient.DefaultBasePath), nil)
 }
 
 type FailoverTransport struct {
@@ -21,7 +26,7 @@ type FailoverTransport struct {
 	endpoints []runtime.ClientTransport
 }
 
-func NewFailoverTransport(logger *logrus.Logger, lcd config.LCD) runtime.ClientTransport {
+func NewFailoverTransport(logger *logrus.Logger, lcd config.LCD, basepath string) runtime.ClientTransport {
 	out := &FailoverTransport{
 		lcd:    lcd,
 		logger: logger,
@@ -30,7 +35,7 @@ func NewFailoverTransport(logger *logrus.Logger, lcd config.LCD) runtime.ClientT
 	for _, endpoint := range lcd.Endpoints {
 		out.endpoints = append(
 			out.endpoints,
-			openapiTransport.New(endpoint, openapiClient.DefaultBasePath, lcd.Schemes),
+			openapiTransport.New(endpoint, basepath, lcd.Schemes),
 		)
 	}
 

@@ -12,14 +12,10 @@ import (
 	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
 )
 
-type ValidatorsRepository interface {
-	GetValidatorsAddresses(ctx context.Context) ([]string, error)
-	GetValidatorInfo(ctx context.Context, address string) (types.ValidatorInfo, error)
-}
-
 type V1ValidatorsRepository struct {
-	hubContract string
-	apiClient   *client.TerraLiteForTerra
+	hubContract       string
+	apiClient         *client.TerraLiteForTerra
+	networkGeneration string
 }
 
 func (r *V1ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {
@@ -72,11 +68,16 @@ func (r *V1ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 		return types.ValidatorInfo{}, fmt.Errorf("failed to parse validator's comission rate: %w", err)
 	}
 
+	consPubKeyAddress, err := GetPubKeyIdentifier(r.networkGeneration, validatorInfoResponse.GetPayload().Result.ConsensusPubkey)
+	if err != nil {
+		return types.ValidatorInfo{}, fmt.Errorf("failed to extract identifier from payload: %w", err)
+	}
+
 	return types.ValidatorInfo{
 		Address:        address,
 		Moniker:        validatorInfoResponse.GetPayload().Result.Description.Moniker,
-		PubKey:         *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
+		PubKey:         consPubKeyAddress,
 		CommissionRate: commissionRate,
-		Jailed:         *validatorInfoResponse.GetPayload().Result.Jailed,
+		Jailed:         validatorInfoResponse.GetPayload().Result.Jailed,
 	}, nil
 }

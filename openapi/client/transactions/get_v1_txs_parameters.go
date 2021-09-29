@@ -106,7 +106,7 @@ type GetV1TxsParams struct {
 
 	   Use last id from previous result for pagination
 	*/
-	Offset *float64
+	Offset *int64
 
 	/* Order.
 
@@ -257,13 +257,13 @@ func (o *GetV1TxsParams) SetMemo(memo *string) {
 }
 
 // WithOffset adds the offset to the get v1 txs params
-func (o *GetV1TxsParams) WithOffset(offset *float64) *GetV1TxsParams {
+func (o *GetV1TxsParams) WithOffset(offset *int64) *GetV1TxsParams {
 	o.SetOffset(offset)
 	return o
 }
 
 // SetOffset adds the offset to the get v1 txs params
-func (o *GetV1TxsParams) SetOffset(offset *float64) {
+func (o *GetV1TxsParams) SetOffset(offset *int64) {
 	o.Offset = offset
 }
 
@@ -430,12 +430,12 @@ func (o *GetV1TxsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regi
 	if o.Offset != nil {
 
 		// query param offset
-		var qrOffset float64
+		var qrOffset int64
 
 		if o.Offset != nil {
 			qrOffset = *o.Offset
 		}
-		qOffset := swag.FormatFloat64(qrOffset)
+		qOffset := swag.FormatInt64(qrOffset)
 		if qOffset != "" {
 
 			if err := r.SetQueryParam("offset", qOffset); err != nil {

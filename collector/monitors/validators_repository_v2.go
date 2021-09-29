@@ -15,6 +15,7 @@ import (
 type V2ValidatorsRepository struct {
 	validatorsRegistryContract string
 	apiClient                  *client.TerraLiteForTerra
+	networkGeneration          string
 }
 
 func (r *V2ValidatorsRepository) GetValidatorsAddresses(ctx context.Context) ([]string, error) {
@@ -71,11 +72,16 @@ func (r *V2ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 		return types.ValidatorInfo{}, fmt.Errorf("failed to parse validator's comission rate: %w", err)
 	}
 
+	consPubKeyAddress, err := GetPubKeyIdentifier(r.networkGeneration, validatorInfoResponse.GetPayload().Result.ConsensusPubkey)
+	if err != nil {
+		return types.ValidatorInfo{}, fmt.Errorf("failed to extract identifier from payload: %w", err)
+	}
+
 	return types.ValidatorInfo{
 		Address:        address,
 		Moniker:        validatorInfoResponse.GetPayload().Result.Description.Moniker,
-		PubKey:         *validatorInfoResponse.GetPayload().Result.ConsensusPubkey,
+		PubKey:         consPubKeyAddress,
 		CommissionRate: commissionRate,
-		Jailed:         *validatorInfoResponse.GetPayload().Result.Jailed,
+		Jailed:         validatorInfoResponse.GetPayload().Result.Jailed,
 	}, nil
 }

@@ -129,7 +129,7 @@ paths:
           in: query
           name: offset
           required: false
-          type: number
+          type: integer
         - description: '# of page'
           in: query
           name: page
@@ -355,7 +355,7 @@ definitions:
     properties:
       next:
         description: Offset
-        type: number
+        type: integer
       limit:
         description: Per page item limit
         type: number
@@ -364,15 +364,11 @@ definitions:
         items:
           $ref: '#/definitions/getTxListResult.txs'
         type: array
-    required:
-      - next
-      - limit
-      - txs
   getTxListResult.txs:
     properties:
       id:
         description: ''
-        type: number
+        type: integer
       events:
         description: events of tx
         items:
@@ -406,7 +402,6 @@ definitions:
         description: tx hash
         type: string
     required:
-      - id
       - tx
       - events
       - logs
@@ -583,12 +578,11 @@ definitions:
 
       execute_msg:
         description: ''
-        type: string
+        type: object
     required:
       - coins
       - sender
       - contract
-      - execute_msg
   getTxListResult.txs.tx.value.msg.value.inputs:
     properties:
       address:
@@ -924,7 +918,7 @@ definitions:
     type: object
     properties:
       consensus_pubkey:
-        type: string
+        type: object
       jailed:
         type: boolean
       description:
@@ -948,7 +942,6 @@ definitions:
       - consensus_pubkey
       - description
       - commission
-      - jailed
   OracleParams:
     type: object
     properties:
