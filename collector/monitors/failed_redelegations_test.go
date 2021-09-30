@@ -29,7 +29,7 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationFailedRequest(
 	suite.NoError(err)
 
 	testServer := NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/delegators/%s/delegations", HubContract):      string(delegatedValidators),
+		fmt.Sprintf("/cosmos/staking/v1beta1/delegations/%s", HubContract):  string(delegatedValidators),
 		fmt.Sprintf("/wasm/contracts/%s/store", ValidatorsRegistryContract): string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
@@ -59,7 +59,7 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationSucceedRequest
 	suite.NoError(err)
 
 	testServer := NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/delegators/%s/delegations", HubContract):      string(delegatedValidators),
+		fmt.Sprintf("/cosmos/staking/v1beta1/delegations/%s", HubContract):  string(delegatedValidators),
 		fmt.Sprintf("/wasm/contracts/%s/store", ValidatorsRegistryContract): string(whitelistedValidators),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)

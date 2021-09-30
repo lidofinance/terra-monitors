@@ -8,8 +8,8 @@ import (
 
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/staking"
+	terraClient "github.com/lidofinance/terra-monitors/openapi/client_bombay"
+	"github.com/lidofinance/terra-monitors/openapi/client_bombay/query"
 	"github.com/sirupsen/logrus"
 )
 
@@ -37,7 +37,7 @@ func NewFailedRedelegationsMonitor(
 	m := FailedRedelegationsMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            client.New(cfg.LCD, logger),
+		apiClient:            client.NewBombay(cfg.LCD, logger),
 		logger:               logger,
 		validatorsRepository: repository,
 		hubAddress:           cfg.Addresses.HubContract,
@@ -78,7 +78,7 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to get whiltelisted whitelistedValidators for %s: %w", m.Name(), err)
 	}
 
-	delegationsResponse, err := m.apiClient.Staking.GetStakingDelegatorsDelegatorAddrDelegations(&staking.GetStakingDelegatorsDelegatorAddrDelegationsParams{
+	delegationsResponse, err := m.apiClient.Query.DelegatorDelegations(&query.DelegatorDelegationsParams{
 		DelegatorAddr: m.hubAddress,
 		Context:       ctx,
 	})
@@ -90,9 +90,15 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to validate delegator's validators response: %w", err)
 	}
 
-	for _, delegation := range delegationsResponse.GetPayload().Result {
+	// New cosmos endpoint has a pagination there with a default limit 100 entities per query.
+	// The hub contract has a much less delegations (16 now)
+	for _, delegation := range delegationsResponse.GetPayload().DelegationResponses {
 		if err := delegation.Validate(nil); err != nil {
 			return fmt.Errorf("failed to validate delegation: %w", err)
+		}
+
+		if delegation == nil {
+			return fmt.Errorf("failed to validate delegation: delegaion is nil")
 		}
 
 		delegatedAmount := uint64(0)
@@ -101,13 +107,15 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 			if err != nil {
 				return fmt.Errorf("failed to parse delegation amount: %w", err)
 			}
+		} else {
+			return fmt.Errorf("failed to get delegation balance: balance is nil")
 		}
 
-		tmpMetricVectors[FailedRedelegations].Set(delegation.ValidatorAddress, 0)
+		tmpMetricVectors[FailedRedelegations].Set(delegation.Delegation.ValidatorAddress, 0)
 		// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
 		// that means a redelegation was not successful
-		if delegatedAmount > 0 && !contains(whitelistedValidators, delegation.ValidatorAddress) {
-			tmpMetricVectors[FailedRedelegations].Set(delegation.ValidatorAddress, 1)
+		if delegatedAmount > 0 && !contains(whitelistedValidators, delegation.Delegation.ValidatorAddress) {
+			tmpMetricVectors[FailedRedelegations].Set(delegation.Delegation.ValidatorAddress, 1)
 		}
 	}
 
