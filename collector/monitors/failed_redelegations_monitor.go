@@ -91,13 +91,14 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 	}
 
 	// New cosmos endpoint has a pagination there with a default limit 100 entities per query.
-	// The hub contract has a much less delegations (16 now)
+	// The hub contract has a much less delegations (16 now, 100+ validators is impossible I think),
+	// so there is no need in pagination logic
 	for _, delegation := range delegationsResponse.GetPayload().DelegationResponses {
 		if err := delegation.Validate(nil); err != nil {
 			return fmt.Errorf("failed to validate delegation: %w", err)
 		}
 
-		if delegation == nil {
+		if delegation.Delegation == nil {
 			return fmt.Errorf("failed to validate delegation: delegaion is nil")
 		}
 
