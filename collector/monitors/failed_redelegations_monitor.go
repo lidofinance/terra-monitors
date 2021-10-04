@@ -98,6 +98,7 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 			return fmt.Errorf("failed to validate delegator's validators response: %w", err)
 		}
 
+		paginationKey = nil
 		if delegationsResponse.Payload.Pagination != nil {
 			paginationKey = delegationsResponse.Payload.Pagination.NextKey
 		}
