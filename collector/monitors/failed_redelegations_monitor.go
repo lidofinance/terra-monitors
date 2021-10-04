@@ -121,12 +121,19 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 				return fmt.Errorf("failed to get response balance: balance is nil")
 			}
 
-			tmpMetricVectors[FailedRedelegations].Set(response.Delegation.ValidatorAddress, 0)
+			validatorInfo, err := m.validatorsRepository.GetValidatorInfo(ctx, response.Delegation.ValidatorAddress)
+			if err != nil {
+				return fmt.Errorf("failed to GetValidatorInfo: %w", err)
+			}
+
+			label := fmt.Sprintf("%s (%s)", response.Delegation.ValidatorAddress, validatorInfo.Moniker)
+
+			tmpMetricVectors[FailedRedelegations].Set(label, 0)
 
 			// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
 			// that means a redelegation was not successful
 			if !delegatedAmount.IsZero() && !contains(whitelistedValidators, response.Delegation.ValidatorAddress) {
-				tmpMetricVectors[FailedRedelegations].Set(response.Delegation.ValidatorAddress, 1)
+				tmpMetricVectors[FailedRedelegations].Set(label, 1)
 			}
 		}
 
