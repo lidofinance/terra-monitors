@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/go-openapi/strfmt"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClient "github.com/lidofinance/terra-monitors/openapi/client_bombay"
@@ -78,45 +79,59 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to get whiltelisted whitelistedValidators for %s: %w", m.Name(), err)
 	}
 
-	delegationsResponse, err := m.apiClient.Query.DelegatorDelegations(&query.DelegatorDelegationsParams{
-		DelegatorAddr: m.hubAddress,
-		Context:       ctx,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to get whitelistedValidators of delegator: %w", err)
-	}
-
-	if err := delegationsResponse.GetPayload().Validate(nil); err != nil {
-		return fmt.Errorf("failed to validate delegator's validators response: %w", err)
-	}
-
-	// New cosmos endpoint has a pagination there with a default limit 100 entities per query.
-	// The hub contract has a much less delegations (16 now, 100+ validators is impossible I think),
-	// so there is no need in pagination logic
-	for _, delegation := range delegationsResponse.GetPayload().DelegationResponses {
-		if err := delegation.Validate(nil); err != nil {
-			return fmt.Errorf("failed to validate delegation: %w", err)
+	var paginationKey strfmt.Base64
+	for {
+		delegationsResponse, err := m.apiClient.Query.DelegatorDelegations(&query.DelegatorDelegationsParams{
+			PaginationKey: &paginationKey,
+			DelegatorAddr: m.hubAddress,
+			Context:       ctx,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to get whitelistedValidators of delegator: %w", err)
 		}
 
-		if delegation.Delegation == nil {
-			return fmt.Errorf("failed to validate delegation: delegaion is nil")
+		if err := delegationsResponse.GetPayload().Validate(nil); err != nil {
+			return fmt.Errorf("failed to validate delegator's validators response: %w", err)
 		}
 
-		delegatedAmount := uint64(0)
-		if delegation.Balance != nil {
-			delegatedAmount, err = strconv.ParseUint(delegation.Balance.Amount, 10, 64)
-			if err != nil {
-				return fmt.Errorf("failed to parse delegation amount: %w", err)
+		if delegationsResponse.Payload == nil {
+			return fmt.Errorf("failed to validate delegator's validators response: %w", err)
+		}
+
+		if delegationsResponse.Payload.Pagination != nil {
+			paginationKey = delegationsResponse.Payload.Pagination.NextKey
+		}
+
+		for _, response := range delegationsResponse.GetPayload().DelegationResponses {
+			if err := response.Validate(nil); err != nil {
+				return fmt.Errorf("failed to validate response: %w", err)
 			}
-		} else {
-			return fmt.Errorf("failed to get delegation balance: balance is nil")
+
+			if response.Delegation == nil {
+				return fmt.Errorf("failed to validate response: delegaion is nil")
+			}
+
+			delegatedAmount := uint64(0)
+			if response.Balance != nil {
+				delegatedAmount, err = strconv.ParseUint(response.Balance.Amount, 10, 64)
+				if err != nil {
+					return fmt.Errorf("failed to parse response amount: %w", err)
+				}
+			} else {
+				return fmt.Errorf("failed to get response balance: balance is nil")
+			}
+
+			tmpMetricVectors[FailedRedelegations].Set(response.Delegation.ValidatorAddress, 0)
+
+			// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
+			// that means a redelegation was not successful
+			if delegatedAmount > 0 && !contains(whitelistedValidators, response.Delegation.ValidatorAddress) {
+				tmpMetricVectors[FailedRedelegations].Set(response.Delegation.ValidatorAddress, 1)
+			}
 		}
 
-		tmpMetricVectors[FailedRedelegations].Set(delegation.Delegation.ValidatorAddress, 0)
-		// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
-		// that means a redelegation was not successful
-		if delegatedAmount > 0 && !contains(whitelistedValidators, delegation.Delegation.ValidatorAddress) {
-			tmpMetricVectors[FailedRedelegations].Set(delegation.Delegation.ValidatorAddress, 1)
+		if len(paginationKey) == 0 {
+			break
 		}
 	}
 
