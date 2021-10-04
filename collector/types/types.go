@@ -158,8 +158,8 @@ type AirDropRegistryConfig struct {
 }
 
 type ValidatorInfo struct {
-	Address        string
-	PubKey         string
+	Address        string //terravaloper
+	PubKey         string //terravalconspub for columbus-4, terravalcons for columbus-5
 	Moniker        string
 	CommissionRate float64
 	Jailed         bool
