@@ -172,7 +172,7 @@
           {
             "evaluator": {
               "params": [
-                0.023
+                0.02
               ],
               "type": "gt"
             },
@@ -195,7 +195,7 @@
           {
             "evaluator": {
               "params": [
-                0.83
+                0.74
               ],
               "type": "gt"
             },
@@ -1818,7 +1818,7 @@
           {
             "evaluator": {
               "params": [
-                100
+                89
               ],
               "type": "gt"
             },
@@ -1841,7 +1841,7 @@
           {
             "evaluator": {
               "params": [
-                3600
+                3204
               ],
               "type": "gt"
             },
