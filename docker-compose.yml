@@ -41,6 +41,7 @@ services:
       - ADDRESSES_UPDATE_GLOBAL_INDEX_BOT_ADDRESS
       - ADDRESSES_REWARDS_DISPATCHER_CONTRACT
       - BASSET_CONTRACTS_VERSION
+      - NETWORK_GENERATION
     logging:
       driver: "json-file"
       options:

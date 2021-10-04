@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/lidofinance/terra-monitors/collector/config"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -16,8 +18,8 @@ func (suite *OracleVotesMonitorTestSuite) SetupTest() {
 
 }
 
-func (suite *OracleVotesMonitorTestSuite) TestSuccessfulRequest() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_not_jailed.json")
+func (suite *OracleVotesMonitorTestSuite) testSuccessfulRequest(networkGenerations string) {
+	validatorInfoData, err := ioutil.ReadFile(fmt.Sprintf("./test_data/%s/slashing_validator_info_not_jailed.json", networkGenerations))
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")
@@ -36,7 +38,8 @@ func (suite *OracleVotesMonitorTestSuite) TestSuccessfulRequest() {
 		fmt.Sprintf("/oracle/voters/%s/miss", testValAddress): string(oracleMissedVotePeriods),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
-	cfg.BassetContractsVersion = "1"
+	cfg.BassetContractsVersion = config.V1Contracts
+	cfg.NetworkGeneration = networkGenerations
 
 	logger := NewTestLogger()
 	valRepository := NewValidatorsRepository(cfg, logger)
@@ -53,7 +56,7 @@ func (suite *OracleVotesMonitorTestSuite) TestSuccessfulRequest() {
 }
 
 func (suite *OracleVotesMonitorTestSuite) TestFailedValidatorsFeeRequest() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_not_jailed.json")
+	validatorInfoData, err := ioutil.ReadFile("./test_data/columbus-5/slashing_validator_info_not_jailed.json")
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/whitelisted_validators_response.json")
@@ -68,7 +71,8 @@ func (suite *OracleVotesMonitorTestSuite) TestFailedValidatorsFeeRequest() {
 		fmt.Sprintf("/oracle/parameters"):                     string(oracleParams),
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
-	cfg.BassetContractsVersion = "1"
+	cfg.BassetContractsVersion = config.V1Contracts
+	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
 
 	logger := NewTestLogger()
 	valRepository := NewValidatorsRepository(cfg, logger)

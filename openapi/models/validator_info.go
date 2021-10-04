@@ -25,15 +25,14 @@ type ValidatorInfo struct {
 
 	// consensus pubkey
 	// Required: true
-	ConsensusPubkey *string `json:"consensus_pubkey"`
+	ConsensusPubkey interface{} `json:"consensus_pubkey"`
 
 	// description
 	// Required: true
 	Description *ValidatorInfoDescription `json:"description"`
 
 	// jailed
-	// Required: true
-	Jailed *bool `json:"jailed"`
+	Jailed bool `json:"jailed,omitempty"`
 }
 
 // Validate validates this validator info
@@ -49,10 +48,6 @@ func (m *ValidatorInfo) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateDescription(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateJailed(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -82,8 +77,8 @@ func (m *ValidatorInfo) validateCommission(formats strfmt.Registry) error {
 
 func (m *ValidatorInfo) validateConsensusPubkey(formats strfmt.Registry) error {
 
-	if err := validate.Required("consensus_pubkey", "body", m.ConsensusPubkey); err != nil {
-		return err
+	if m.ConsensusPubkey == nil {
+		return errors.Required("consensus_pubkey", "body", nil)
 	}
 
 	return nil
@@ -102,15 +97,6 @@ func (m *ValidatorInfo) validateDescription(formats strfmt.Registry) error {
 			}
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (m *ValidatorInfo) validateJailed(formats strfmt.Registry) error {
-
-	if err := validate.Required("jailed", "body", m.Jailed); err != nil {
-		return err
 	}
 
 	return nil

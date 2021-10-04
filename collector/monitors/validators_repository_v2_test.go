@@ -19,7 +19,7 @@ func (suite *V2ValidatorsRepositoryTestSuite) SetupTest() {
 }
 
 func (suite *V2ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
-	validatorInfoData, err := ioutil.ReadFile("./test_data/slashing_validator_info_not_jailed.json")
+	validatorInfoData, err := ioutil.ReadFile("./test_data/columbus-5/slashing_validator_info_not_jailed.json")
 	suite.NoError(err)
 
 	whitelistedValidators, err := ioutil.ReadFile("./test_data/validators_registry_validators_response.json")
@@ -31,6 +31,7 @@ func (suite *V2ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V2Contracts
+	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
 
 	valRepository := NewValidatorsRepository(cfg, NewTestLogger())
 
@@ -41,13 +42,13 @@ func (suite *V2ValidatorsRepositoryTestSuite) TestSuccessfulRequest() {
 
 	expectedValidatorInfo := types.ValidatorInfo{
 		Address:        testValAddress,
-		PubKey:         testValPublicKey,
+		PubKey:         testConsAddress,
 		Moniker:        TestMoniker,
 		CommissionRate: TestCommissionRate,
 	}
 	validatorInfo, err := valRepository.GetValidatorInfo(context.Background(), testValAddress)
 	suite.NoError(err)
-	suite.Equal(validatorInfo, expectedValidatorInfo)
+	suite.Equal(expectedValidatorInfo, validatorInfo)
 }
 
 func (suite *ValidatorsCommissionTestSuite) TestFailedV2ValidatorsRepository() {
@@ -62,6 +63,7 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedV2ValidatorsRepository() {
 	})
 	cfg := NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V2Contracts
+	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
 
 	valRepository := NewValidatorsRepository(cfg, NewTestLogger())
 

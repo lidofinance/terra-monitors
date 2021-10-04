@@ -22,6 +22,7 @@ const (
 	FailedUpdateGlobalIndexTx
 )
 
+const UpdateGlobalIndexMsg = "update_global_index"
 const UpdateGlobalIndexBase64Encoded = "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0="
 
 const (
@@ -35,21 +36,23 @@ const (
 const threshold int = 10
 
 type UpdateGlobalIndexMonitor struct {
-	ContractAddress  string
-	metrics          map[MetricName]MetricValue
-	apiClient        *terraClient.TerraLiteForTerra
-	logger           *logrus.Logger
-	lastMaxCheckedID int
-	lock             sync.RWMutex
+	ContractAddress   string
+	metrics           map[MetricName]MetricValue
+	apiClient         *terraClient.TerraLiteForTerra
+	logger            *logrus.Logger
+	lastMaxCheckedID  int64
+	lock              sync.RWMutex
+	networkGeneration string
 }
 
 func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *UpdateGlobalIndexMonitor {
 	m := UpdateGlobalIndexMonitor{
-		ContractAddress: cfg.Addresses.UpdateGlobalIndexBotAddress,
-		metrics:         make(map[MetricName]MetricValue),
-		apiClient:       client.New(cfg.LCD, logger),
-		logger:          logger,
-		lock:            sync.RWMutex{},
+		ContractAddress:   cfg.Addresses.UpdateGlobalIndexBotAddress,
+		metrics:           make(map[MetricName]MetricValue),
+		apiClient:         client.New(cfg.LCD, logger),
+		logger:            logger,
+		lock:              sync.RWMutex{},
+		networkGeneration: cfg.NetworkGeneration,
 	}
 	m.InitMetrics()
 
@@ -80,7 +83,7 @@ func (m *UpdateGlobalIndexMonitor) InitMetrics() {
 }
 
 func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
-	var offset *float64
+	var offset *int64
 	var fetchedTxs int
 	var firstCheck bool
 	if m.lastMaxCheckedID == 0 {
@@ -88,8 +91,8 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	}
 
 	iterations := 0
-	var maxProcessedID int
-	var maxProcessedIDPerRequest int
+	var maxProcessedID int64
+	var maxProcessedIDPerRequest int64
 	var alreadyProcessedFound bool
 	for iterations < threshold {
 		p := transactions.GetV1TxsParams{}
@@ -108,7 +111,7 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 		if alreadyProcessedFound || firstCheck {
 			break
 		}
-		offset = resp.Payload.Next
+		offset = &resp.Payload.Next
 		iterations++
 	}
 	m.lastMaxCheckedID = maxProcessedID
@@ -120,7 +123,7 @@ func (m *UpdateGlobalIndexMonitor) Handler(ctx context.Context) error {
 	return nil
 }
 
-func maxInt(a, b int) int {
+func maxInt(a, b int64) int64 {
 	if a > b {
 		return a
 	}
@@ -129,20 +132,20 @@ func maxInt(a, b int) int {
 
 func (m *UpdateGlobalIndexMonitor) processTransactions(
 	txs []*models.GetTxListResultTxs,
-	previousMaxCheckedID int,
-) (newMaxCheckedID int, alreadyProcessedFound bool) {
+	previousMaxCheckedID int64,
+) (newMaxCheckedID int64, alreadyProcessedFound bool) {
 	// transactions are reverse ordered by ID field
 	for i, tx := range txs {
 		if i == 0 {
-			newMaxCheckedID = maxInt(int(*tx.ID), previousMaxCheckedID)
+			newMaxCheckedID = maxInt(tx.ID, previousMaxCheckedID)
 		}
-		if previousMaxCheckedID == int(*tx.ID) {
+		if previousMaxCheckedID == tx.ID {
 			// we have already checked this and earlier transactions
 			m.logger.Infoln("stopping processing, last checked transaction is found:", previousMaxCheckedID)
 			alreadyProcessedFound = true
 			break
 		}
-		switch isTxUpdateGlobalIndex(tx) {
+		switch isTxUpdateGlobalIndex(tx, m.networkGeneration) {
 		case SuccessfulUpdateGlobalIndexTX:
 			m.metrics[UpdateGlobalIndexSuccessfulTxSinceLastCheck].Add(1)
 		case FailedUpdateGlobalIndexTx:
@@ -174,7 +177,7 @@ func getTxRawLog(tx *models.GetTxListResultTxs) string {
 	return *tx.RawLog
 }
 
-func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVariants {
+func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs, networkGeneration string) UpdateGlobalIndexTxsVariants {
 	if tx == nil || tx.Tx == nil || tx.Tx.Value == nil || len(tx.Tx.Value.Msg) == 0 {
 		return NonUpdateGlobalIndexTX
 	}
@@ -182,9 +185,18 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 		if msg.Value == nil || msg.Value.ExecuteMsg == nil {
 			continue
 		}
-		if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) > 0 {
+		var isUpdateGlobalIndexMsg bool
+		switch networkGeneration {
+		case config.NetworkGenerationColumbus4:
+			isUpdateGlobalIndexMsg = isUpdateGlobalIndexMsgColumbus4(msg)
+		case config.NetworkGenerationColumbus5:
+			isUpdateGlobalIndexMsg = isUpdateGlobalIndexMsgColumbus5(msg)
+		default:
+			panic("unknown network generation. available variants: columbus-4 or columbus-5")
+		}
+		if isUpdateGlobalIndexMsg && len(tx.Logs) > 0 {
 			return SuccessfulUpdateGlobalIndexTX
-		} else if *msg.Value.ExecuteMsg == UpdateGlobalIndexBase64Encoded && len(tx.Logs) == 0 {
+		} else if isUpdateGlobalIndexMsg && len(tx.Logs) == 0 {
 			// https://fcd.terra.dev/v1/txs?offset=126987824
 			// tx with id = 126987823 is a failed tx due to out of gas
 			// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.
@@ -193,6 +205,34 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs) UpdateGlobalIndexTxsVa
 		}
 	}
 	return NonUpdateGlobalIndexTX
+}
+
+func isUpdateGlobalIndexMsgColumbus5(msg *models.GetTxListResultTxsTxValueMsg) bool {
+	// columbus-5 execute message format
+	// "execute_msg": {
+	//     "update_global_index": {}
+	//  },
+	m, ok := msg.Value.ExecuteMsg.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	if _, found := m[UpdateGlobalIndexMsg]; found {
+		return true
+	}
+	return false
+}
+
+func isUpdateGlobalIndexMsgColumbus4(msg *models.GetTxListResultTxsTxValueMsg) bool {
+	// columbus-4 execute message format
+	// "execute_msg": "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0=",
+	m, ok := msg.Value.ExecuteMsg.(string)
+	if ok {
+		return true
+	}
+	if m == UpdateGlobalIndexBase64Encoded {
+		return false
+	}
+	return false
 }
 
 func gasUsed(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {
