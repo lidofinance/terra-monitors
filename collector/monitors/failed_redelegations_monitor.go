@@ -3,9 +3,9 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/go-openapi/strfmt"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/client"
@@ -111,11 +111,10 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 				return fmt.Errorf("failed to validate response: delegaion is nil")
 			}
 
-			delegatedAmount := uint64(0)
+			delegatedAmount, ok := types.NewInt(0), false
 			if response.Balance != nil {
-				delegatedAmount, err = strconv.ParseUint(response.Balance.Amount, 10, 64)
-				if err != nil {
-					return fmt.Errorf("failed to parse response amount: %w", err)
+				if delegatedAmount, ok = types.NewIntFromString(response.Balance.Amount); !ok {
+					return fmt.Errorf("failed to parse delegation balance amount: %w", err)
 				}
 			} else {
 				return fmt.Errorf("failed to get response balance: balance is nil")
@@ -125,7 +124,7 @@ func (m *FailedRedelegationsMonitor) Handler(ctx context.Context) error {
 
 			// if delegated amount is greater than zero and the whitelisted validators don't contain a validator
 			// that means a redelegation was not successful
-			if delegatedAmount > 0 && !contains(whitelistedValidators, response.Delegation.ValidatorAddress) {
+			if !delegatedAmount.IsZero() && !contains(whitelistedValidators, response.Delegation.ValidatorAddress) {
 				tmpMetricVectors[FailedRedelegations].Set(response.Delegation.ValidatorAddress, 1)
 			}
 		}
