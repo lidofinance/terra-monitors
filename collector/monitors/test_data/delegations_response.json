@@ -1,32 +1,30 @@
 {
-  "height": "5889470",
-  "result": [
+  "delegation_responses": [
     {
-      "delegator_address": "terra1uh7q3nffa6lsqhketc6uy67hy8s9dyypzza33f",
-      "validator_address": "terravalcons1ezj3lps8nqwytt42at2sgt7seq9hk708g0spyk",
-      "shares": "1222281130.683709025052699519",
-      "balance": {
-        "denom": "uluna",
-        "amount": "1197958584"
-      }
-    },
-    {
-      "delegator_address": "terra1uh7q3nffa6lsqhketc6uy67hy8s9dyypzza33f",
-      "validator_address": "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdg38",
-      "shares": "1210145480.866867950114474089",
+      "delegation": {
+        "delegator_address": "terra1uh7q3nffa6lsqhketc6uy67hy8s9dyypzza33f",
+        "validator_address": "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdg38",
+        "shares": "1210145480.866867950114474089"
+      },
       "balance": {
         "denom": "uluna",
         "amount": "0"
       }
     },
     {
-      "delegator_address": "terra1uh7q3nffa6lsqhketc6uy67hy8s9dyypzza33f",
-      "validator_address": "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdt4x",
-      "shares": "1210145480.866867950114474089",
+      "delegation": {
+        "delegator_address": "terra1uh7q3nffa6lsqhketc6uy67hy8s9dyypzza33f",
+        "validator_address": "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdt4x",
+        "shares": "1210145480.866867950114474089"
+      },
       "balance": {
         "denom": "uluna",
         "amount": "354793"
       }
     }
-  ]
+  ],
+  "pagination": {
+    "next_key": null,
+    "total": "16"
+  }
 }
