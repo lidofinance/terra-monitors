@@ -52,7 +52,11 @@
         "message": "Commission of ${label} is greater than 10%!",
         "name": "Validators Commission Rate alert",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -200,7 +204,11 @@
         "message": "Validator ${label} missed more than 2% of vote periods!",
         "name": "Oracles Missed Votes Rate alert",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -325,7 +333,11 @@
         "message": "Failed relegation happened for validator ${label}",
         "name": "Failed Redelegations",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -584,7 +596,11 @@
         "handler": 1,
         "name": "update global index bot failed transactions",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -716,7 +732,11 @@
         "handler": 1,
         "name": "Operator bot balance is below 1500UST",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -872,12 +892,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub parameters epoch/unbonding period has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1004,12 +1028,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub er threshold has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1128,12 +1156,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub peg recovery has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1280,7 +1312,11 @@
         "handler": 1,
         "name": "one of the configs has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1408,12 +1444,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Whitelisted validators set has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1532,12 +1572,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Number of whitelisted is changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1675,7 +1719,11 @@
         "handler": 1,
         "name": "Some validators were jailed.",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1822,7 +1870,11 @@
         "handler": 1,
         "name": "Max number of missed blocks is above 200 in last 30 min",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1947,7 +1999,11 @@
         "handler": 1,
         "name": "Found tombstoned validators",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -2140,7 +2196,11 @@
         "handler": 1,
         "name": "stLuna/Luna exchange rate is out of range",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -2334,7 +2394,11 @@
         "handler": 1,
         "name": "bLuna/Luna exchange rate is out of range",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -2554,6 +2618,700 @@
       ],
       "timeFrom": null,
       "title": "terra monitor service log_level rate",
+      "type": "timeseries"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                10
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                20
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                30
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                40
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                50
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                60
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                70
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                80
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                90
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Oracles Missed Votes Rate alert",
+        "noDataState": "no_data",
+        "notifications": [
+          {
+            "uid": "telegram_lido_without_reminders"
+          }
+        ]
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 60
+      },
+      "id": 45,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "oracle_missed_votes_rate * 100",
+          "interval": "",
+          "legendFormat": "{{label}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 10,
+          "visible": true
+        }
+      ],
+      "title": "Oracles Missed Votes Rate (Only for threshold alerts)",
+      "type": "timeseries"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                100
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                200
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                300
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                400
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                500
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                600
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                700
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                800
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                900
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                1000
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                1500
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                2000
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Slashing: Missed Blocks (only for threshold alerts) alert",
+        "noDataState": "no_data",
+        "notifications": [
+          {
+            "uid": "telegram_lido_without_reminders"
+          }
+        ]
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 68
+      },
+      "id": 46,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "slashing_num_missed_blocks{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{label}}",
+          "refId": "C"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 100,
+          "visible": true
+        }
+      ],
+      "title": "Slashing: Missed Blocks (only for threshold alerts)",
       "type": "timeseries"
     }
   ],
