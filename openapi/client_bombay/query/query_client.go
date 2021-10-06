@@ -28,9 +28,48 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	DelegatorDelegations(params *DelegatorDelegationsParams, opts ...ClientOption) (*DelegatorDelegationsOK, error)
+
 	SigningInfo(params *SigningInfoParams, opts ...ClientOption) (*SigningInfoOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+  DelegatorDelegations delegators delegations queries all delegations of a given delegator address
+*/
+func (a *Client) DelegatorDelegations(params *DelegatorDelegationsParams, opts ...ClientOption) (*DelegatorDelegationsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDelegatorDelegationsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "DelegatorDelegations",
+		Method:             "GET",
+		PathPattern:        "/cosmos/staking/v1beta1/delegations/{delegator_addr}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &DelegatorDelegationsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DelegatorDelegationsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DelegatorDelegationsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
