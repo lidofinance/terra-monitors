@@ -172,7 +172,7 @@
           {
             "evaluator": {
               "params": [
-                0.02
+                0.019
               ],
               "type": "gt"
             },
@@ -195,7 +195,7 @@
           {
             "evaluator": {
               "params": [
-                0.74
+                0.71
               ],
               "type": "gt"
             },
@@ -1818,7 +1818,7 @@
           {
             "evaluator": {
               "params": [
-                89
+                85
               ],
               "type": "gt"
             },
@@ -1841,7 +1841,7 @@
           {
             "evaluator": {
               "params": [
-                3204
+                3085
               ],
               "type": "gt"
             },
@@ -2618,5 +2618,5 @@
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 12
+  "version": 1
 }
