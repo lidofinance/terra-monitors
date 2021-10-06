@@ -2627,318 +2627,6 @@
           {
             "evaluator": {
               "params": [
-                10
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                20
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                30
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                40
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                50
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                60
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                70
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                80
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                90
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "A",
-                "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          }
-        ],
-        "executionErrorState": "alerting",
-        "for": "5m",
-        "frequency": "1m",
-        "handler": 1,
-        "name": "Oracles Missed Votes Rate alert",
-        "noDataState": "no_data",
-        "notifications": [
-          {
-            "uid": "telegram_lido_without_reminders"
-          }
-        ]
-      },
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 60
-      },
-      "id": 45,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "oracle_missed_votes_rate * 100",
-          "interval": "",
-          "legendFormat": "{{label}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [
-        {
-          "colorMode": "critical",
-          "op": "gt",
-          "value": 10,
-          "visible": true
-        }
-      ],
-      "title": "Oracles Missed Votes Rate (Only for threshold alerts)",
-      "type": "timeseries"
-    },
-    {
-      "alert": {
-        "alertRuleTags": {},
-        "conditions": [
-          {
-            "evaluator": {
-              "params": [
                 100
               ],
               "type": "gt"
@@ -3214,8 +2902,8 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "5m",
-        "frequency": "1m",
+        "for": "0m",
+        "frequency": "30s",
         "handler": 1,
         "name": "Slashing: Missed Blocks (only for threshold alerts) alert",
         "noDataState": "no_data",
@@ -3280,7 +2968,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 68
+        "y": 60
       },
       "id": 46,
       "options": {
@@ -3312,6 +3000,318 @@
         }
       ],
       "title": "Slashing: Missed Blocks (only for threshold alerts)",
+      "type": "timeseries"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                10
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                20
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                30
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                40
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                50
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                60
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                70
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                80
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                90
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "0m",
+        "frequency": "30s",
+        "handler": 1,
+        "name": "Oracles Missed Votes Rate alert",
+        "noDataState": "no_data",
+        "notifications": [
+          {
+            "uid": "telegram_lido_without_reminders"
+          }
+        ]
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 68
+      },
+      "id": 45,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "oracle_missed_votes_rate * 100",
+          "interval": "",
+          "legendFormat": "{{label}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 10,
+          "visible": true
+        }
+      ],
+      "title": "Oracles Missed Votes Rate (Only for threshold alerts)",
       "type": "timeseries"
     }
   ],
