@@ -5,17 +5,15 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
-
-	"github.com/sirupsen/logrus"
-
-	"github.com/lidofinance/terra-monitors/internal/logging"
-
 	"github.com/lidofinance/terra-monitors/app"
 	"github.com/lidofinance/terra-monitors/collector"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/collector/monitors"
+	"github.com/lidofinance/terra-monitors/collector/monitors/delegations"
+	"github.com/lidofinance/terra-monitors/collector/monitors/signinfo"
 	"github.com/lidofinance/terra-monitors/extractor"
+	"github.com/lidofinance/terra-monitors/internal/logging"
+	"github.com/sirupsen/logrus"
 )
 
 var addr = flag.String("listen-address", ":8080",
@@ -36,6 +34,8 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
 
 	validatorsRepository := monitors.NewValidatorsRepository(cfg, c.GetLogger())
+	delegatorsRepository := delegations.New(cfg, c.GetLogger())
+
 	signInfoRepository := signinfo.NewSignInfoRepository(cfg, c.GetLogger())
 	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository, signInfoRepository)
 	c.RegisterMonitor(ctx, cfg, slashingMonitor)
@@ -45,6 +45,10 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 
 	hubParameters := monitors.NewHubParametersMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, &hubParameters)
+
+	delegationsDistributionMonitor := monitors.NewDelegationsDistributionMonitor(cfg, logger, validatorsRepository,
+		delegatorsRepository)
+	c.RegisterMonitor(ctx, cfg, delegationsDistributionMonitor)
 
 	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, configCRC32Monitor)
@@ -61,8 +65,12 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	balanceMonitor := monitors.NewOperatorBotBalanceMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, balanceMonitor)
 
-	failedRedelegationsMonitor := monitors.NewFailedRedelegationsMonitor(cfg, logger, validatorsRepository)
+	failedRedelegationsMonitor := monitors.NewFailedRedelegationsMonitor(cfg, logger, validatorsRepository, delegatorsRepository)
 	c.RegisterMonitor(ctx, cfg, failedRedelegationsMonitor)
+
+	missedBlocksMonitor := monitors.NewMissedBlocksMonitor(cfg, logger, validatorsRepository)
+
+	c.RegisterMonitor(ctx, cfg, missedBlocksMonitor)
 
 	return c, nil
 }

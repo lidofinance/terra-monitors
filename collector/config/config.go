@@ -16,11 +16,12 @@ const (
 )
 
 type CollectorConfig struct {
-	BassetContractsVersion string `envconfig:"default=2"` // available values: 1 and 2
-	LCD                    LCD
-	Addresses              Addresses
-	UpdateDataInterval     time.Duration `envconfig:"default=30s"`
-	NetworkGeneration      string        `envconfig:"default=columbus-4"` // available values: columbus-4, columbus-5
+	BassetContractsVersion        string `envconfig:"default=2"` // available values: 1 and 2
+	LCD                           LCD
+	Addresses                     Addresses
+	UpdateDataInterval            time.Duration `envconfig:"default=30s"`
+	DelegationsDistributionConfig DelegationsDistributionConfig
+	NetworkGeneration             string `envconfig:"default=columbus-4"` // available values: columbus-4, columbus-5
 }
 
 func NewCollectorConfig() (CollectorConfig, error) {
@@ -45,4 +46,8 @@ type Addresses struct {
 	RewardsDispatcherContract   string `envconfig:"default=terra_dummy_rewards_dispatcher"`  // TODO: actualize.
 	AirDropRegistryContract     string `envconfig:"default=terra_dummy_airdrop"`             // TODO: actualize.
 	UpdateGlobalIndexBotAddress string `envconfig:"default=terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy"`
+}
+
+type DelegationsDistributionConfig struct {
+	NumMedianAbsoluteDeviations int64 `envconfig:"default=3"`
 }

@@ -153,30 +153,7 @@
           {
             "evaluator": {
               "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "A",
-                "30m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                2
+                4
               ],
               "type": "gt"
             },
@@ -195,13 +172,59 @@
               "type": "last"
             },
             "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0.019
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "10m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0.71
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "6h",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
           }
         ],
         "executionErrorState": "keep_state",
         "for": "0m",
         "frequency": "1m",
         "handler": 1,
-        "message": "Validator ${label} missed more than 2% of vote periods!",
+        "message": "",
         "name": "Oracles Missed Votes Rate alert",
         "noDataState": "keep_state",
         "notifications": [
@@ -291,7 +314,7 @@
         {
           "colorMode": "critical",
           "op": "gt",
-          "value": 0,
+          "value": 4,
           "visible": true
         }
       ],
@@ -428,13 +451,102 @@
       "type": "timeseries"
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 46,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "delegations_distribution_imbalance",
+          "interval": "",
+          "legendFormat": "{{label}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "Delegations Distribution Monitor",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 42,
       "panels": [],
@@ -497,7 +609,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 9
+        "y": 17
       },
       "id": 6,
       "options": {
@@ -657,7 +769,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 9
+        "y": 17
       },
       "id": 4,
       "options": {
@@ -793,7 +905,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 9
+        "y": 17
       },
       "id": 40,
       "options": {
@@ -833,7 +945,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 25
       },
       "id": 24,
       "panels": [],
@@ -958,7 +1070,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 18
+        "y": 26
       },
       "id": 14,
       "options": {
@@ -1094,7 +1206,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 18
+        "y": 26
       },
       "id": 16,
       "options": {
@@ -1222,7 +1334,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 18
+        "y": 26
       },
       "id": 18,
       "options": {
@@ -1373,7 +1485,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 26
+        "y": 34
       },
       "id": 20,
       "options": {
@@ -1510,7 +1622,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 26
+        "y": 34
       },
       "id": 26,
       "options": {
@@ -1638,7 +1750,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 26
+        "y": 34
       },
       "id": 28,
       "options": {
@@ -1678,7 +1790,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 42
       },
       "id": 22,
       "panels": [],
@@ -1780,7 +1892,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 35
+        "y": 43
       },
       "id": 12,
       "options": {
@@ -1843,17 +1955,40 @@
           {
             "evaluator": {
               "params": [
-                0
+                85
               ],
               "type": "gt"
             },
             "operator": {
-              "type": "and"
+              "type": "or"
             },
             "query": {
               "params": [
                 "C",
-                "30m",
+                "10m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                3085
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "6h",
                 "now"
               ]
             },
@@ -1868,7 +2003,7 @@
         "for": "0m",
         "frequency": "30s",
         "handler": 1,
-        "name": "Max number of missed blocks is above 200 in last 30 min",
+        "name": "Max number of missed blocks is above 200",
         "noDataState": "no_data",
         "notifications": [
           {
@@ -1931,7 +2066,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 35
+        "y": 43
       },
       "id": 10,
       "options": {
@@ -2060,7 +2195,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 35
+        "y": 43
       },
       "id": 8,
       "options": {
@@ -2258,7 +2393,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 43
+        "y": 51
       },
       "id": 32,
       "options": {
@@ -2456,7 +2591,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 43
+        "y": 51
       },
       "id": 2,
       "options": {
@@ -2490,13 +2625,94 @@
       "type": "timeseries"
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 51
+      },
+      "id": 45,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "sum_over_time(missed_blocks_for_period[30d])",
+          "interval": "",
+          "legendFormat": "{{label}}",
+          "refId": "A"
+        }
+      ],
+      "title": "missed blocks for a month",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 51
+        "y": 59
       },
       "id": 36,
       "panels": [],
@@ -2592,7 +2808,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 52
+        "y": 60
       },
       "id": 34,
       "interval": "1m",
@@ -2968,9 +3184,9 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 60
+        "y": 68
       },
-      "id": 46,
+      "id": 47,
       "options": {
         "legend": {
           "calcs": [],
@@ -3281,9 +3497,9 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 68
+        "y": 76
       },
-      "id": 45,
+      "id": 48,
       "options": {
         "legend": {
           "calcs": [],
@@ -3330,5 +3546,5 @@
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 1
+  "version": 3
 }

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/lidofinance/terra-monitors/collector/monitors/delegations"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -46,7 +47,8 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationFailedRequest(
 
 	logger := NewTestLogger()
 	valRepository := NewValidatorsRepository(cfg, logger)
-	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository)
+	delRepository := delegations.New(cfg, logger)
+	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository, delRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
@@ -84,7 +86,8 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationSucceedRequest
 
 	logger := NewTestLogger()
 	valRepository := NewValidatorsRepository(cfg, logger)
-	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository)
+	delRepository := delegations.New(cfg, logger)
+	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository, delRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 

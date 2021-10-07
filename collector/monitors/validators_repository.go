@@ -77,3 +77,24 @@ func GetPubKeyIdentifier(networkGeneration string, pubkey interface{}) (string, 
 		panic("unknown network generation. available variants: columbus-4 or columbus-5")
 	}
 }
+
+// GetValConsAddr - get valconsaddr from pubkeyidentifier
+// pubkeyidentifier is either valconspub for columbus4 or valcons for columbus5
+func GetValConsAddr(networkGeneration string, pubkeyidentifier string) (string, error) {
+	switch networkGeneration {
+	case config.NetworkGenerationColumbus4:
+		valconsAddr, err := ValConsPubToAddr(pubkeyidentifier)
+		if err != nil {
+			return "", fmt.Errorf("failed to convert valconspub(%s) to valconsaddr: %w", pubkeyidentifier, err)
+		}
+		return valconsAddr, nil
+	case config.NetworkGenerationColumbus5:
+		valconsAddr, err := ValConsToAddr(pubkeyidentifier)
+		if err != nil {
+			return "", fmt.Errorf("failed to convert valcons(%s) to valconsaddr: %w", pubkeyidentifier, err)
+		}
+		return valconsAddr, nil
+	default:
+		panic("unknown network generation. available variants: columbus-4 or columbus-5")
+	}
+}

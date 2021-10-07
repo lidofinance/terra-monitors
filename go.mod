@@ -12,11 +12,14 @@ require (
 	github.com/go-openapi/strfmt v0.20.1
 	github.com/go-openapi/swag v0.19.15
 	github.com/go-openapi/validate v0.20.2
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/procfs v0.7.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
+	github.com/tendermint/go-amino v0.16.0
+	github.com/tendermint/tendermint v0.34.12
 	github.com/vrischmann/envconfig v1.3.0
 	go.mongodb.org/mongo-driver v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20210716203947-853a461950ff // indirect

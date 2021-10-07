@@ -41,6 +41,12 @@ BASSET_CONTRACTS_VERSION=1
 # default value is lido_terra
 # should be set explicitly to uniq values in case multiple monitoring instance works on same machine
 SERVICE_NAME=lido_terra_mainnet
+
+# This configuration controls the number of mean absolute deviations
+# (https://en.wikipedia.org/wiki/Median_absolute_deviation) that a validator's total delegations
+# amount should be grater than the median delegations amount. Higher values mean less monitor
+# sensitivity. A step of 0.25 is nice for calibration.
+DELEGATIONS_DISTRIBUTION_CONFIG_NUM_MEDIAN_ABSOLUTE_DEVIATIONS=3
 ```
 
 **N.B.: you can specify failover endpoints (sorted by priority, max to min) for the `LCD_ENDPOINTS` config:**
