@@ -149,30 +149,7 @@
           {
             "evaluator": {
               "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "A",
-                "30m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                2
+                4
               ],
               "type": "gt"
             },
@@ -191,13 +168,59 @@
               "type": "last"
             },
             "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0.019
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "10m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0.71
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "A",
+                "6h",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
           }
         ],
         "executionErrorState": "keep_state",
         "for": "0m",
         "frequency": "1m",
         "handler": 1,
-        "message": "Validator ${label} missed more than 2% of vote periods!",
+        "message": "",
         "name": "Oracles Missed Votes Rate alert",
         "noDataState": "keep_state",
         "notifications": []
@@ -283,7 +306,7 @@
         {
           "colorMode": "critical",
           "op": "gt",
-          "value": 0,
+          "value": 4,
           "visible": true
         }
       ],
@@ -1795,17 +1818,40 @@
           {
             "evaluator": {
               "params": [
-                0
+                85
               ],
               "type": "gt"
             },
             "operator": {
-              "type": "and"
+              "type": "or"
             },
             "query": {
               "params": [
                 "C",
-                "30m",
+                "10m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "diff"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                3085
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "or"
+            },
+            "query": {
+              "params": [
+                "C",
+                "6h",
                 "now"
               ]
             },
@@ -1820,7 +1866,7 @@
         "for": "0m",
         "frequency": "30s",
         "handler": 1,
-        "name": "Max number of missed blocks is above 200 in last 30 min",
+        "name": "Max number of missed blocks is above 200",
         "noDataState": "no_data",
         "notifications": []
       },
