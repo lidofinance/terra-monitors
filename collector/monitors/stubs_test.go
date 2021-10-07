@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gorilla/mux"
+
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/logging"
 	"github.com/sirupsen/logrus"
@@ -78,28 +80,28 @@ func NewServerWithResponse(resp string) *httptest.Server {
 }
 
 func NewServerWithRoutedResponse(routeToResponse map[string]string) *httptest.Server {
-	mux := http.NewServeMux()
+	rtr := mux.NewRouter()
 
 	for route, response := range routeToResponse {
 		responseValue := response
 
 		// A bit ugly, but gets the job done.
 		if strings.Contains(response, "error") {
-			mux.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
+			rtr.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Add("Content-Type", "application/json")
 				w.WriteHeader(400)
 				_, _ = fmt.Fprintf(w, `%s`, responseValue)
 
 			})
 		} else {
-			mux.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
+			rtr.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Add("Content-Type", "application/json")
 				_, _ = fmt.Fprintln(w, responseValue)
 			})
 		}
 	}
 
-	return httptest.NewServer(mux)
+	return httptest.NewServer(rtr)
 }
 
 func NewServerWithRandomJson() *httptest.Server {

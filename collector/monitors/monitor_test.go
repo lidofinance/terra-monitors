@@ -73,4 +73,5 @@ func TestLocales(t *testing.T) {
 	suite.Run(t, new(FailedRedelegationsMonitorTestSuite))
 	suite.Run(t, new(FailoverTestSuite))
 	suite.Run(t, new(MissedBlocksMonitorTestSuite))
+	suite.Run(t, new(DelegationsDistributionTestSuite))
 }
