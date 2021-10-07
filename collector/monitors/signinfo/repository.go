@@ -14,6 +14,7 @@ type Repository interface {
 	Init(ctx context.Context, PubKeyOrConsAddr string) error
 	GetMissedBlockCounter() float64
 	GetTombstoned() bool
+	GetAddress() string
 }
 
 func NewSignInfoRepository(cfg config.CollectorConfig, logger *logrus.Logger) Repository {
