@@ -3,8 +3,8 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"strconv"
 
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
@@ -64,12 +64,17 @@ func (m *OperatorBotBalanceMonitor) Handler(ctx context.Context) error {
 	coins := resp.GetPayload().Result
 	for _, coin := range coins {
 		if coin.Denom == UUSDDenom {
-			amount, err := strconv.ParseFloat(coin.Amount, 64)
+			amount, err := types.NewDecFromStr(coin.Amount)
 			if err != nil {
-				// if for some reason we cannot parse uusd float amount, just leave previous value
-				return fmt.Errorf("failed to parse coins uusd amount: %w", err)
+				return fmt.Errorf("failed to parse coins uusd amount: %s", coin.Amount)
 			}
-			m.balanceUST.Set(amount / 1_000_000)
+
+			amountFloat, err := amount.Float64()
+			if err != nil {
+				return fmt.Errorf("failed to parse coins uusd amount: %s: %s", coin.Amount, err)
+			}
+
+			m.balanceUST.Set(float64(amountFloat / 1_000_000))
 			m.logger.Infof("successfully retrieved \"%s\" account balance info\n", m.BotAddress)
 			return nil
 		}
