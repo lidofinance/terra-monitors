@@ -8,7 +8,7 @@ gen_columbus_5:
 	mkdir -p ./openapi/ && swagger generate client -f swagger.bombay.yaml -t ./openapi/ -c client_bombay
 
 dev_server: gen_client
-	go run main.go
+	go run ./cmd/terra-monitors/main.go
 
 start:
 	docker-compose --env-file ./docker/env/.lido_terra.env up -d --build
