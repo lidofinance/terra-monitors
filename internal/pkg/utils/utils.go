@@ -35,7 +35,7 @@ func ValConsPubToAddr(valconspub string) (string, error) {
 }
 
 func GetTerraMonitorsPath() (string, error) {
-	const dirName = "terra-monitors/"
+	const dirName = "/terra-monitors/"
 
 	dir, err := os.Getwd()
 	if err != nil {
@@ -44,5 +44,5 @@ func GetTerraMonitorsPath() (string, error) {
 
 	path := strings.Split(dir, dirName)
 
-	return fmt.Sprintf("%s/%s/tests/", path[0], dirName), nil
+	return fmt.Sprintf("%s%stests/", path[0], dirName), nil
 }
