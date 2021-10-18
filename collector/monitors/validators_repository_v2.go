@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
 
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/collector/types"
 	"github.com/lidofinance/terra-monitors/openapi/client"
 	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
@@ -67,9 +67,14 @@ func (r *V2ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 		return types.ValidatorInfo{}, fmt.Errorf("failed to validate ValidatorInfo for validator %s: %w", address, err)
 	}
 
-	commissionRate, err := strconv.ParseFloat(*validatorInfoResponse.GetPayload().Result.Commission.CommissionRates.Rate, 64)
+	commissionRate, err := cosmostypes.NewDecFromStr(*validatorInfoResponse.GetPayload().Result.Commission.CommissionRates.Rate)
 	if err != nil {
 		return types.ValidatorInfo{}, fmt.Errorf("failed to parse validator's comission rate: %w", err)
+	}
+
+	commissionRateValue, err := commissionRate.Float64()
+	if err != nil {
+		return types.ValidatorInfo{}, fmt.Errorf("failed to parse float validator's comission rate: %w", err)
 	}
 
 	consPubKeyAddress, err := GetPubKeyIdentifier(r.networkGeneration, validatorInfoResponse.GetPayload().Result.ConsensusPubkey)
@@ -81,7 +86,7 @@ func (r *V2ValidatorsRepository) GetValidatorInfo(ctx context.Context, address s
 		Address:        address,
 		Moniker:        validatorInfoResponse.GetPayload().Result.Description.Moniker,
 		PubKey:         consPubKeyAddress,
-		CommissionRate: commissionRate,
+		CommissionRate: commissionRateValue,
 		Jailed:         validatorInfoResponse.GetPayload().Result.Jailed,
 	}, nil
 }

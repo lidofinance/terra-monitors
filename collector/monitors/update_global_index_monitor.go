@@ -3,9 +3,9 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/collector/config"
 	"github.com/lidofinance/terra-monitors/internal/client"
 	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
@@ -240,11 +240,17 @@ func gasUsed(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {
 		return 0
 	}
 
-	gasUsed, err := strconv.ParseFloat(*tx.GasUsed, 64)
+	gasUsed, err := cosmostypes.NewDecFromStr(*tx.GasUsed)
 	if err != nil && logger != nil {
 		logger.Errorln("failed to parse gasUsed:", err)
 	}
-	return gasUsed
+
+	gasUsedValue, err := gasUsed.Float64()
+	if err != nil {
+		logger.Errorln("failed to parse gasUsed:", err)
+	}
+
+	return gasUsedValue
 }
 
 func gasWanted(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {
@@ -252,11 +258,17 @@ func gasWanted(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {
 		return 0
 	}
 
-	gasWanted, err := strconv.ParseFloat(*tx.GasWanted, 64)
+	gasWanted, err := cosmostypes.NewDecFromStr(*tx.GasWanted)
 	if err != nil && logger != nil {
 		logger.Errorln("failed to parse gasWanted:", err)
 	}
-	return gasWanted
+
+	gasWantedValue, err := gasWanted.Float64()
+	if err != nil {
+		logger.Errorln("failed to parse gasWanted:", err)
+	}
+
+	return gasWantedValue
 }
 
 func uusdFee(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {
@@ -280,14 +292,21 @@ func uusdFee(logger *logrus.Logger, tx *models.GetTxListResultTxs) float64 {
 			continue
 		}
 		if *amount.Denom == UUSDDenom {
-			uusdFeeAmount, err := strconv.ParseFloat(*amount.Amount, 64)
+			uusdFeeAmount, err := cosmostypes.NewDecFromStr(*amount.Amount)
 			if err != nil && logger != nil {
 				logger.Errorln("failed to parse uusdFeeAmount:", err)
 				continue
 			}
-			fee += uusdFeeAmount
+
+			uusdFeeAmountValue, err := uusdFeeAmount.Float64()
+			if err != nil {
+				logger.Errorln("failed to parse uusdFeeAmount:", err)
+				continue
+			}
+
+			fee += uusdFeeAmountValue
 		} else {
-			_, err := strconv.ParseFloat(*amount.Amount, 64)
+			_, err := cosmostypes.NewDecFromStr(*amount.Amount)
 			if err != nil && logger != nil {
 				logger.Errorln("failed to parse unaccountedFee:", err)
 				continue
