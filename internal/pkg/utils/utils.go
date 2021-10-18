@@ -44,5 +44,5 @@ func GetTerraMonitorsPath() (string, error) {
 
 	path := strings.Split(dir, dirName)
 
-	return fmt.Sprintf("%s/%s/test/", path[0], dirName), nil
+	return fmt.Sprintf("%s/%s/tests/", path[0], dirName), nil
 }
