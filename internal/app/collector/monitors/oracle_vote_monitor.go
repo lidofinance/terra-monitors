@@ -3,9 +3,9 @@ package monitors
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/client"
@@ -88,7 +88,13 @@ func (m *OracleVotesMonitor) Handler(ctx context.Context) error {
 		if err := missedVotePeriodsResponse.GetPayload().Validate(nil); err != nil {
 			return fmt.Errorf("failed to validate missedVotePeriodsResponse: %w", err)
 		}
-		oracleMissedVotePeriods, err := strconv.ParseFloat(missedVotePeriodsResponse.GetPayload().Result, 64)
+
+		oracleMissedVotePeriods, err := cosmostypes.NewDecFromStr(missedVotePeriodsResponse.GetPayload().Result)
+		if err != nil {
+			return fmt.Errorf("failed to parse oracleMissedVotePeriods: %w", err)
+		}
+
+		oracleMissedVotePeriodsValue, err := oracleMissedVotePeriods.Float64()
 		if err != nil {
 			return fmt.Errorf("failed to parse oracleMissedVotePeriods: %w", err)
 		}
@@ -102,17 +108,28 @@ func (m *OracleVotesMonitor) Handler(ctx context.Context) error {
 		// missedVotesRate = (missedPeriods / votePeriodsPerWindow) * 100%
 		// If missedVotesRate greater than (100% - params.VoteThreshold) validator will be slashed
 		// More info: https://docs.terra.money/dev/spec-oracle.html#slashing
-		slashWindow, err := strconv.ParseFloat(oracleParams.SlashWindow, 64)
+		slashWindow, err := cosmostypes.NewDecFromStr(oracleParams.SlashWindow)
 		if err != nil {
 			return fmt.Errorf("failed to parse SlashWindow: %w", err)
 		}
-		votePeriod, err := strconv.ParseFloat(oracleParams.VotePeriod, 64)
+
+		slashWindowValue, err := slashWindow.Float64()
+		if err != nil {
+			return fmt.Errorf("failed to parse slashWindow: %w", err)
+		}
+
+		votePeriod, err := cosmostypes.NewDecFromStr(oracleParams.VotePeriod)
 		if err != nil {
 			return fmt.Errorf("failed to parse VotePeriod: %w", err)
 		}
 
-		votePeriodsPerSlashWindow := slashWindow / votePeriod
-		missedVotesRate := oracleMissedVotePeriods / votePeriodsPerSlashWindow
+		votePeriodValue, err := votePeriod.Float64()
+		if err != nil {
+			return fmt.Errorf("failed to parse votePeriod: %w", err)
+		}
+
+		votePeriodsPerSlashWindow := slashWindowValue / votePeriodValue
+		missedVotesRate := oracleMissedVotePeriodsValue / votePeriodsPerSlashWindow
 
 		tmpMetricVectors[OracleMissedVoteRate].Set(validatorInfo.Moniker, missedVotesRate)
 	}

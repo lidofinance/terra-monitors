@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"sync"
 
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/client"
@@ -85,14 +85,21 @@ func (h *BlunaTokenInfoMonitor) Handler(ctx context.Context) error {
 }
 
 func (h *BlunaTokenInfoMonitor) setStringMetric(m MetricName, rawValue string) {
-	v, err := strconv.ParseFloat(rawValue, 64)
+	v, err := cosmostypes.NewDecFromStr(rawValue)
 	if err != nil {
 		h.logger.Errorf("failed to set value \"%s\" to metric \"%s\": %+v\n", rawValue, m, err)
 	}
+
+	value, err := v.Float64()
+	if err != nil {
+		h.logger.Errorf("failed to get float64 value from string \"%s\" for metric \"%s\": %+v\n", rawValue, m, err)
+	}
+
 	if h.metrics[m] == nil {
 		h.metrics[m] = &SimpleMetricValue{}
 	}
-	h.metrics[m].Set(v)
+
+	h.metrics[m].Set(value)
 }
 
 func (h *BlunaTokenInfoMonitor) GetMetrics() map[MetricName]MetricValue {
