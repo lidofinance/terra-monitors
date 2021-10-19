@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/hex"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -42,9 +43,11 @@ func GetTerraMonitorsPath() (string, error) {
 		return "", err
 	}
 
+	log.Println(dir)
+
 	dir = strings.Replace(dir, "cmd/terra-monitors", "", 1)
 
-	path := strings.Split(dir, dirName)
+	path := strings.SplitAfter(dir, dirName)
 
-	return fmt.Sprintf("%s%stests/", path[0], dirName), nil
+	return fmt.Sprintf("%stests/", path[0]), nil
 }
