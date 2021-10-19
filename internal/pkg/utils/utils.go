@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -36,18 +35,32 @@ func ValConsPubToAddr(valconspub string) (string, error) {
 }
 
 func GetTerraMonitorsPath() (string, error) {
-	const dirName = "/terra-monitors/"
+	dir, err := getCurrentDir()
+	if err != nil {
+		return "", nil
+	}
 
+	path, err := getTerraMonitorsPath(dir)
+	if err != nil {
+		return "", nil
+	}
+
+	return path, nil
+}
+
+func getCurrentDir() (string, error) {
 	dir, err := os.Getwd()
 	if err != nil {
 		return "", err
 	}
 
-	log.Println(dir)
+	return dir, err
+}
 
-	dir = strings.Replace(dir, "cmd/terra-monitors", "", 1)
+func getTerraMonitorsPath(dir string) (string, error) {
+	const dirName = "internal/"
 
-	path := strings.SplitAfter(dir, dirName)
+	path := strings.Split(dir, dirName)
 
 	return fmt.Sprintf("%stests/", path[0]), nil
 }
