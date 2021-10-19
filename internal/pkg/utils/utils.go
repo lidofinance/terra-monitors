@@ -42,7 +42,9 @@ func GetTerraMonitorsPath() (string, error) {
 		return "", err
 	}
 
-	path := strings.SplitAfter(dir, dirName)
+	dir = strings.Replace(dir, "cmd/terra-monitors", "", 1)
+
+	path := strings.Split(dir, dirName)
 
 	return fmt.Sprintf("%s%stests/", path[0], dirName), nil
 }
