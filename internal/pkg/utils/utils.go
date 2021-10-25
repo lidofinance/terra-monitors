@@ -37,12 +37,12 @@ func ValConsPubToAddr(valconspub string) (string, error) {
 func GetTerraMonitorsPath() (string, error) {
 	dir, err := getCurrentDir()
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	path, err := getTerraMonitorsPath(dir)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return path, nil
