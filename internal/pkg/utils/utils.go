@@ -40,12 +40,7 @@ func GetTerraMonitorsPath() (string, error) {
 		return "", err
 	}
 
-	path, err := getTerraMonitorsPath(dir)
-	if err != nil {
-		return "", err
-	}
-
-	return path, nil
+	return getTerraMonitorsPath(dir), nil
 }
 
 func getCurrentDir() (string, error) {
@@ -54,13 +49,13 @@ func getCurrentDir() (string, error) {
 		return "", err
 	}
 
-	return dir, err
+	return dir, nil
 }
 
-func getTerraMonitorsPath(dir string) (string, error) {
+func getTerraMonitorsPath(dir string) string {
 	const dirName = "internal/"
 
 	path := strings.Split(dir, dirName)
 
-	return fmt.Sprintf("%stests/", path[0]), nil
+	return fmt.Sprintf("%stests/", path[0])
 }
