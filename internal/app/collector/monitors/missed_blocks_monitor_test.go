@@ -24,17 +24,6 @@ func (suite *MissedBlocksMonitorTestSuite) SetupTest() {
 
 }
 
-func (suite *MissedBlocksMonitorTestSuite) TestValConsPub() {
-	valcons := "terravalcons1qw4gg8v3jt0tfaq2qv337sa22slj3dxu73tyql"
-	valconspub := "terravalconspub1zcjduepq5zcrunelz9yy09ksug5tcvx7r46mslnxk9gxqp8xflmwm3md8aesw6u3a8"
-
-	expectedValConsAddr, err := utils.ValConsToAddr(valcons)
-	suite.NoError(err)
-	actualValConsAddr, err := utils.ValConsPubToAddr(valconspub)
-	suite.NoError(err)
-	suite.Equal(expectedValConsAddr, actualValConsAddr)
-}
-
 func (suite *MissedBlocksMonitorTestSuite) TestMissedBlocks() {
 	suite.testMissedBlocks(config.NetworkGenerationColumbus5)
 }
