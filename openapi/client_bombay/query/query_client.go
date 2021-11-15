@@ -30,7 +30,11 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	DelegatorDelegations(params *DelegatorDelegationsParams, opts ...ClientOption) (*DelegatorDelegationsOK, error)
 
+	OracleParams(params *OracleParamsParams, opts ...ClientOption) (*OracleParamsOK, error)
+
 	SigningInfo(params *SigningInfoParams, opts ...ClientOption) (*SigningInfoOK, error)
+
+	SlashingParams(params *SlashingParamsParams, opts ...ClientOption) (*SlashingParamsOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -73,6 +77,43 @@ func (a *Client) DelegatorDelegations(params *DelegatorDelegationsParams, opts .
 }
 
 /*
+  OracleParams params queries all parameters
+*/
+func (a *Client) OracleParams(params *OracleParamsParams, opts ...ClientOption) (*OracleParamsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewOracleParamsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "OracleParams",
+		Method:             "GET",
+		PathPattern:        "/terra/oracle/v1beta1/params",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &OracleParamsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*OracleParamsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*OracleParamsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   SigningInfo signings info queries the signing info of given cons address
 */
 func (a *Client) SigningInfo(params *SigningInfoParams, opts ...ClientOption) (*SigningInfoOK, error) {
@@ -106,6 +147,43 @@ func (a *Client) SigningInfo(params *SigningInfoParams, opts ...ClientOption) (*
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*SigningInfoDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  SlashingParams params queries the parameters of slashing module
+*/
+func (a *Client) SlashingParams(params *SlashingParamsParams, opts ...ClientOption) (*SlashingParamsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewSlashingParamsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "SlashingParams",
+		Method:             "GET",
+		PathPattern:        "/cosmos/slashing/v1beta1/params",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &SlashingParamsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*SlashingParamsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*SlashingParamsDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

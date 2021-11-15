@@ -70,8 +70,13 @@ func createCollector(cfg config.CollectorConfig, logger *logrus.Logger) (collect
 	c.RegisterMonitor(ctx, cfg, failedRedelegationsMonitor)
 
 	missedBlocksMonitor := monitors.NewMissedBlocksMonitor(cfg, logger, validatorsRepository)
-
 	c.RegisterMonitor(ctx, cfg, missedBlocksMonitor)
+
+	slashingParamsMonitor := monitors.NewSlashingParamsMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, slashingParamsMonitor)
+
+	oracleParamsMonitor := monitors.NewOracleParamsMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, oracleParamsMonitor)
 
 	return c, nil
 }
