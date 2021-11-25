@@ -3,12 +3,12 @@ package monitors
 import (
 	"context"
 	"fmt"
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/client"
 	"github.com/lidofinance/terra-monitors/openapi/client_bombay"
 	"github.com/lidofinance/terra-monitors/openapi/client_bombay/query"
 	"github.com/sirupsen/logrus"
-	"strconv"
 )
 
 const (
@@ -64,12 +64,17 @@ func (s *SlashingParamsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to validate slashing params: %w", err)
 	}
 
-	bw, err := strconv.ParseFloat(resp.GetPayload().Params.SignedBlocksWindow, 64)
+	bw, err := cosmostypes.NewDecFromStr(resp.GetPayload().Params.SignedBlocksWindow)
 	if err != nil {
 		return fmt.Errorf("failed to parse signed blocks window: %w", err)
 	}
 
-	s.metrics[SlashingSignedBlocksWindow].Set(bw)
+	blocksWindow, err := bw.Float64()
+	if err != nil {
+		return fmt.Errorf("failed to convert signed blocks window value from cosmostypes.Dec to float64: %w", err)
+	}
+
+	s.metrics[SlashingSignedBlocksWindow].Set(blocksWindow)
 	return nil
 }
 

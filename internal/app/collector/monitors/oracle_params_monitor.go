@@ -3,12 +3,12 @@ package monitors
 import (
 	"context"
 	"fmt"
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/client"
 	"github.com/lidofinance/terra-monitors/openapi/client_bombay"
 	"github.com/lidofinance/terra-monitors/openapi/client_bombay/query"
 	"github.com/sirupsen/logrus"
-	"strconv"
 )
 
 const (
@@ -64,12 +64,17 @@ func (s *OracleParamsMonitor) Handler(ctx context.Context) error {
 		return fmt.Errorf("failed to validate oracle params: %w", err)
 	}
 
-	sw, err := strconv.ParseFloat(resp.GetPayload().Params.SlashWindow, 64)
+	sw, err := cosmostypes.NewDecFromStr(resp.GetPayload().Params.SlashWindow)
 	if err != nil {
 		return fmt.Errorf("failed to parse missed votes window: %w", err)
 	}
 
-	s.metrics[OracleMissedVotesWindow].Set(sw)
+	votesWindow, err := sw.Float64()
+	if err != nil {
+		return fmt.Errorf("failed to convert missed votes value from cosmostypes.Dec to float64: %w", err)
+	}
+
+	s.metrics[OracleMissedVotesWindow].Set(votesWindow)
 	return nil
 }
 
