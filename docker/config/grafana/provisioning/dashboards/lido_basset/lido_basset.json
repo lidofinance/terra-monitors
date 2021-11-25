@@ -439,13 +439,169 @@
       "type": "timeseries"
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 48,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "slashing_signed_blocks_window",
+          "interval": "",
+          "legendFormat": "Slashing signed blocks window",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "oracle_missed_votes_window",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Oracle missed votes window ",
+          "refId": "B"
+        }
+      ],
+      "title": "Slashing parameters",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 46,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "delegations_distribution_imbalance",
+          "interval": "",
+          "legendFormat": "{{label}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "gt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "Delegations Distribution Monitor",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 42,
       "panels": [],
@@ -508,7 +664,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 9
+        "y": 17
       },
       "id": 6,
       "options": {
@@ -664,7 +820,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 9
+        "y": 17
       },
       "id": 4,
       "options": {
@@ -796,7 +952,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 9
+        "y": 17
       },
       "id": 40,
       "options": {
@@ -836,7 +992,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 25
       },
       "id": 24,
       "panels": [],
@@ -957,7 +1113,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 18
+        "y": 26
       },
       "id": 14,
       "options": {
@@ -1089,7 +1245,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 18
+        "y": 26
       },
       "id": 16,
       "options": {
@@ -1213,7 +1369,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 18
+        "y": 26
       },
       "id": 18,
       "options": {
@@ -1360,7 +1516,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 26
+        "y": 34
       },
       "id": 20,
       "options": {
@@ -1493,7 +1649,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 26
+        "y": 34
       },
       "id": 26,
       "options": {
@@ -1617,7 +1773,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 26
+        "y": 34
       },
       "id": 28,
       "options": {
@@ -1657,7 +1813,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 42
       },
       "id": 22,
       "panels": [],
@@ -1755,7 +1911,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 35
+        "y": 43
       },
       "id": 12,
       "options": {
@@ -1925,7 +2081,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 35
+        "y": 43
       },
       "id": 10,
       "options": {
@@ -2050,7 +2206,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 35
+        "y": 43
       },
       "id": 8,
       "options": {
@@ -2244,7 +2400,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 43
+        "y": 51
       },
       "id": 32,
       "options": {
@@ -2438,7 +2594,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 43
+        "y": 51
       },
       "id": 2,
       "options": {
@@ -2527,7 +2683,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 43
+        "y": 51
       },
       "id": 45,
       "options": {
@@ -2559,7 +2715,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 51
+        "y": 59
       },
       "id": 36,
       "panels": [],
@@ -2655,7 +2811,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 52
+        "y": 60
       },
       "id": 34,
       "interval": "1m",
@@ -2682,95 +2838,6 @@
       "timeFrom": null,
       "title": "terra monitor service log_level rate",
       "type": "timeseries"
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 0
-      },
-      "id": 46,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "delegations_distribution_imbalance",
-          "interval": "",
-          "legendFormat": "{{label}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [
-        {
-          "colorMode": "critical",
-          "op": "gt",
-          "value": 0,
-          "visible": true
-        }
-      ],
-      "title": "Delegations Distribution Monitor",
-      "type": "timeseries"
     }
   ],
   "refresh": "5s",
@@ -2788,6 +2855,5 @@
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-
-  "version": 10
+  "version": 17
 }

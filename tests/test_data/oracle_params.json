@@ -1,0 +1,89 @@
+{
+  "params": {
+    "vote_period": "5",
+    "vote_threshold": "0.500000000000000000",
+    "reward_band": "0.120000000000000000",
+    "reward_distribution_window": "9400000",
+    "whitelist": [
+      {
+        "name": "ukrw",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "usdr",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "uusd",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "umnt",
+        "tobin_tax": "0.020000000000000000"
+      },
+      {
+        "name": "ueur",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "ucny",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "ujpy",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "ugbp",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "uinr",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "ucad",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "uchf",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "uhkd",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "usgd",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "uaud",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "uthb",
+        "tobin_tax": "0.007500000000000000"
+      },
+      {
+        "name": "usek",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "udkk",
+        "tobin_tax": "0.003500000000000000"
+      },
+      {
+        "name": "uidr",
+        "tobin_tax": "0.007500000000000000"
+      },
+      {
+        "name": "uphp",
+        "tobin_tax": "0.007500000000000000"
+      }
+    ],
+    "slash_fraction": "0.000100000000000000",
+    "slash_window": "432000",
+    "min_valid_per_window": "0.050000000000000000"
+  }
+}
