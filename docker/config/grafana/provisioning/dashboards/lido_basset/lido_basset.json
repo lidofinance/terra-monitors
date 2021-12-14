@@ -2009,7 +2009,7 @@
             "query": {
               "params": [
                 "A",
-                "6h",
+                "1m",
                 "now"
               ]
             },
@@ -2024,7 +2024,7 @@
         "for": "0m",
         "frequency": "30s",
         "handler": 1,
-        "name": "Max number of missed blocks is above 200",
+        "name": "Number of missed blocks is growing by 100",
         "noDataState": "no_data",
         "notifications": [
           {
