@@ -52,7 +52,11 @@
         "message": "Commission of ${label} is greater than 10%!",
         "name": "Validators Commission Rate alert",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -223,7 +227,11 @@
         "message": "",
         "name": "Oracles Missed Votes Rate alert",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -348,7 +356,11 @@
         "message": "Failed relegation happened for validator ${label}",
         "name": "Failed Redelegations",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -763,7 +775,11 @@
         "handler": 1,
         "name": "update global index bot failed transactions",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -895,7 +911,11 @@
         "handler": 1,
         "name": "Operator bot balance is below 1500UST",
         "noDataState": "keep_state",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1051,12 +1071,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub parameters epoch/unbonding period has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1183,12 +1207,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub er threshold has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1307,12 +1335,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Hub peg recovery has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1459,7 +1491,11 @@
         "handler": 1,
         "name": "one of the configs has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1587,12 +1623,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Whitelisted validators set has been changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1711,12 +1751,16 @@
           }
         ],
         "executionErrorState": "alerting",
-        "for": "",
+        "for": "0m",
         "frequency": "1m",
         "handler": 1,
         "name": "Number of whitelisted is changed",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1854,7 +1898,11 @@
         "handler": 1,
         "name": "Some validators were jailed.",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -1951,63 +1999,17 @@
           {
             "evaluator": {
               "params": [
-                200
+                0
               ],
               "type": "gt"
             },
             "operator": {
-              "type": "and"
+              "type": "or"
             },
             "query": {
               "params": [
-                "C",
+                "A",
                 "1m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "max"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                85
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "C",
-                "10m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "diff"
-            },
-            "type": "query"
-          },
-          {
-            "evaluator": {
-              "params": [
-                3085
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "or"
-            },
-            "query": {
-              "params": [
-                "C",
-                "6h",
                 "now"
               ]
             },
@@ -2022,9 +2024,13 @@
         "for": "0m",
         "frequency": "30s",
         "handler": 1,
-        "name": "Max number of missed blocks is above 200",
+        "name": "Number of missed blocks is growing by 100",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido_no_reminder_no_recover"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -2102,13 +2108,21 @@
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "(slashing_num_missed_blocks - slashing_num_missed_blocks % 100) / 100",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "{{label}} 100blocks step",
+          "refId": "A"
         }
       ],
       "thresholds": [
         {
           "colorMode": "critical",
           "op": "gt",
-          "value": 200,
+          "value": 0,
           "visible": true
         }
       ],
@@ -2149,7 +2163,11 @@
         "handler": 1,
         "name": "Found tombstoned validators",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -2536,7 +2554,11 @@
         "handler": 1,
         "name": "bLuna/Luna exchange rate is out of range",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
       },
       "datasource": null,
       "fieldConfig": {
@@ -2855,5 +2877,5 @@
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 17
+  "version": 1
 }
