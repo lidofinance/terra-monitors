@@ -6,12 +6,14 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/tendermint_rpc"
-	"github.com/lidofinance/terra-monitors/openapi/models"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/tendermint_rpc"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/models"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,8 +27,8 @@ type MissedBlocksMonitor struct {
 	validators             map[string]string // map valoper address -> valcons address
 	latestCommittedChecked int
 	metricVectors          map[MetricName]*MetricVector
-	apiClient              *terraClient.TerraLiteForTerra
-	validatorsRepository   validators.ValidatorsRepository
+	apiClient              *client.TerraRESTApis
+	validatorsRepository   repositories.ValidatorsRepository
 	logger                 *logrus.Logger
 	lock                   sync.RWMutex
 }
@@ -34,13 +36,13 @@ type MissedBlocksMonitor struct {
 func NewMissedBlocksMonitor(
 	cfg config.CollectorConfig,
 	logger *logrus.Logger,
-	repository validators.ValidatorsRepository,
+	repository repositories.ValidatorsRepository,
 ) *MissedBlocksMonitor {
 	m := &MissedBlocksMonitor{
 		networkGeneration:    cfg.NetworkGeneration,
 		validators:           make(map[string]string),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            client.New(cfg.LCD, logger),
+		apiClient:            utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		validatorsRepository: repository,
 		logger:               logger,
 		lock:                 sync.RWMutex{},
@@ -168,7 +170,7 @@ func (m *MissedBlocksMonitor) Handler(ctx context.Context) error {
 		for _, block := range blocks {
 			consAddress, found := m.validators[validatorInfo.Address]
 			if !found {
-				consAddress, err = validators.GetValConsAddr(m.networkGeneration, validatorInfo.PubKey)
+				consAddress, err = repositories.GetValConsAddr(m.networkGeneration, validatorInfo.PubKey)
 				if err != nil {
 					m.logger.Errorf("failed to convert pubkey identifier(%s) to addr : %+v", validatorInfo.PubKey, err)
 					continue

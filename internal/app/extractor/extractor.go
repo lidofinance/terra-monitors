@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtractor {
+func NewPromExtractor(c *collector.Collector, logger *logrus.Logger) PromExtractor {
 	p := PromExtractor{}
 	p.collector = c
 	p.Gauges = make(map[monitors.MetricName]prometheus.Gauge)
@@ -27,7 +27,7 @@ func NewPromExtractor(c collector.Collector, logger *logrus.Logger) PromExtracto
 }
 
 type PromExtractor struct {
-	collector          collector.Collector
+	collector          *collector.Collector
 	Gauges             map[monitors.MetricName]prometheus.Gauge
 	GaugeVectors       map[monitors.MetricName]*prometheus.GaugeVec
 	GaugeMetrics       []monitors.MetricName

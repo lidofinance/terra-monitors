@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/stubs"
@@ -41,15 +41,18 @@ func (suite *OracleVotesMonitorTestSuite) testSuccessfulRequest(networkGeneratio
 	testServer := stubs.NewServerWithRoutedResponse(map[string]string{
 		fmt.Sprintf("/staking/validators/%s", types.TestValAddress): string(validatorInfoData),
 		fmt.Sprintf("/wasm/contracts/%s/store", types.HubContract):  string(whitelistedValidators),
-		fmt.Sprintf("/oracle/parameters"):                           string(oracleParams),
+		"/oracle/parameters": string(oracleParams),
 		fmt.Sprintf("/oracle/voters/%s/miss", types.TestValAddress): string(oracleMissedVotePeriods),
 	})
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = networkGenerations
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+
 	m := NewOracleVotesMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -78,14 +81,17 @@ func (suite *OracleVotesMonitorTestSuite) TestFailedValidatorsFeeRequest() {
 	testServer := stubs.NewServerWithRoutedResponse(map[string]string{
 		fmt.Sprintf("/staking/validators/%s", types.TestValAddress): string(validatorInfoData),
 		fmt.Sprintf("/wasm/contracts/%s/store", types.HubContract):  string(whitelistedValidators),
-		fmt.Sprintf("/oracle/parameters"):                           string(oracleParams),
+		"/oracle/parameters": string(oracleParams),
 	})
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+
 	m := NewOracleVotesMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)

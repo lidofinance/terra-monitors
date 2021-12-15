@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/stubs"
 	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -38,9 +39,12 @@ func (suite *ValidatorsCommissionTestSuite) TestSuccessfulRequest() {
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
-
-	valRepository := validators.NewValidatorsRepository(cfg, stubs.NewTestLogger())
 	logger := stubs.NewTestLogger()
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+
 	m := NewValidatorsFeeMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -70,9 +74,12 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedValidatorsFeeRequest() {
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
-
-	valRepository := validators.NewValidatorsRepository(cfg, stubs.NewTestLogger())
 	logger := stubs.NewTestLogger()
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+
 	m := NewValidatorsFeeMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
 	suite.Error(err)
@@ -94,8 +101,11 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedV2ValidatorsRepository() {
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V2Contracts
 	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
+	logger := stubs.NewTestLogger()
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
 
-	valRepository := validators.NewValidatorsRepository(cfg, stubs.NewTestLogger())
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
 
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
 	suite.Nil(validators)
@@ -121,8 +131,11 @@ func (suite *ValidatorsCommissionTestSuite) TestFailedValidatorsRepository() {
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = config.NetworkGenerationColumbus5
+	logger := stubs.NewTestLogger()
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
 
-	valRepository := validators.NewValidatorsRepository(cfg, stubs.NewTestLogger())
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
 
 	validators, err := valRepository.GetValidatorsAddresses(context.Background())
 	suite.Nil(validators)

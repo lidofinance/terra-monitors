@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 
-	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/wasm"
+
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,7 +25,7 @@ func NewRewardStateMonitor(cfg config.CollectorConfig, logger *logrus.Logger) Re
 		State:           &types.RewardStateResponse{},
 		ContractAddress: cfg.Addresses.RewardContract,
 		metrics:         make(map[MetricName]MetricValue),
-		apiClient:       client.New(cfg.LCD, logger),
+		apiClient:       utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:          logger,
 	}
 	m.InitMetrics()
@@ -35,7 +37,7 @@ type RewardStateMonitor struct {
 	State           *types.RewardStateResponse
 	ContractAddress string
 	metrics         map[MetricName]MetricValue
-	apiClient       *terraClient.TerraLiteForTerra
+	apiClient       *client.TerraRESTApis
 	logger          *logrus.Logger
 }
 

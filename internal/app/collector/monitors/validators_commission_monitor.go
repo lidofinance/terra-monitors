@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,8 +21,8 @@ const (
 type ValidatorsCommissionMonitor struct {
 	metrics              map[MetricName]MetricValue
 	metricVectors        map[MetricName]*MetricVector
-	apiClient            *terraClient.TerraLiteForTerra
-	validatorsRepository validators.ValidatorsRepository
+	apiClient            *client.TerraRESTApis
+	validatorsRepository repositories.ValidatorsRepository
 	logger               *logrus.Logger
 	lock                 sync.RWMutex
 }
@@ -28,12 +30,12 @@ type ValidatorsCommissionMonitor struct {
 func NewValidatorsFeeMonitor(
 	cfg config.CollectorConfig,
 	logger *logrus.Logger,
-	repository validators.ValidatorsRepository,
+	repository repositories.ValidatorsRepository,
 ) *ValidatorsCommissionMonitor {
 	m := ValidatorsCommissionMonitor{
 		metrics:              make(map[MetricName]MetricValue),
 		metricVectors:        make(map[MetricName]*MetricVector),
-		apiClient:            client.New(cfg.LCD, logger),
+		apiClient:            utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		validatorsRepository: repository,
 		logger:               logger,
 	}

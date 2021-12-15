@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/signinfo"
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
+	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/stubs"
 	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
 
-	"github.com/lidofinance/terra-monitors/internal/app/config"
+	"github.com/lidofinance/terra-repositories/signinfo"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -24,7 +25,6 @@ func (suite *SlashingMonitorTestSuite) SetupTest() {
 }
 
 func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestWithSlashing() {
-	suite.testSuccessfulRequestWithSlashing(config.NetworkGenerationColumbus4)
 	suite.testSuccessfulRequestWithSlashing(config.NetworkGenerationColumbus5)
 }
 
@@ -44,12 +44,10 @@ func (suite *SlashingMonitorTestSuite) testSuccessfulRequestWithSlashing(network
 
 	var signingInfoEndpoint string
 	switch networkGeneration {
-	case config.NetworkGenerationColumbus4:
-		signingInfoEndpoint = fmt.Sprintf("/slashing/validators/%s/signing_info", types.TestValPublicKey)
 	case config.NetworkGenerationColumbus5:
 		signingInfoEndpoint = fmt.Sprintf("/cosmos/slashing/v1beta1/signing_infos/%s", types.TestConsAddress)
 	default:
-		panic("unknown network generation. available variants: columbus-4 or columbus-5")
+		panic("unknown network generation. available variants: columbus-5")
 	}
 
 	testServer := stubs.NewServerWithRoutedResponse(map[string]string{
@@ -60,10 +58,12 @@ func (suite *SlashingMonitorTestSuite) testSuccessfulRequestWithSlashing(network
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = networkGeneration
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
-	signInfoRepository := signinfo.NewSignInfoRepository(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+	signInfoRepository := signinfo.New(apiClient)
 
 	m := NewSlashingMonitor(cfg, logger, valRepository, signInfoRepository)
 	err = m.Handler(context.Background())
@@ -86,7 +86,6 @@ func (suite *SlashingMonitorTestSuite) testSuccessfulRequestWithSlashing(network
 }
 
 func (suite *SlashingMonitorTestSuite) TestSuccessfulRequestNoSlashing() {
-	suite.testSuccessfulRequestNoSlashing(config.NetworkGenerationColumbus4)
 	suite.testSuccessfulRequestNoSlashing(config.NetworkGenerationColumbus5)
 }
 
@@ -106,12 +105,10 @@ func (suite *SlashingMonitorTestSuite) testSuccessfulRequestNoSlashing(networkGe
 
 	var signingInfoEndpoint string
 	switch networkGeneration {
-	case config.NetworkGenerationColumbus4:
-		signingInfoEndpoint = fmt.Sprintf("/slashing/validators/%s/signing_info", types.TestValPublicKey)
 	case config.NetworkGenerationColumbus5:
 		signingInfoEndpoint = fmt.Sprintf("/cosmos/slashing/v1beta1/signing_infos/%s", types.TestConsAddress)
 	default:
-		panic("unknown network generation. available variants: columbus-4 or columbus-5")
+		panic("unknown network generation. available variants: columbus-5")
 	}
 
 	testServer := stubs.NewServerWithRoutedResponse(map[string]string{
@@ -122,10 +119,12 @@ func (suite *SlashingMonitorTestSuite) testSuccessfulRequestNoSlashing(networkGe
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = networkGeneration
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
-	signInfoRepository := signinfo.NewSignInfoRepository(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+	signInfoRepository := signinfo.New(apiClient)
 
 	m := NewSlashingMonitor(cfg, logger, valRepository, signInfoRepository)
 	err = m.Handler(context.Background())
@@ -149,7 +148,6 @@ func (suite *SlashingMonitorTestSuite) testSuccessfulRequestNoSlashing(networkGe
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestFailedSlashingRequest() {
-	suite.testFailedSlashingRequest(config.NetworkGenerationColumbus4)
 	suite.testFailedSlashingRequest(config.NetworkGenerationColumbus5)
 }
 
@@ -169,12 +167,10 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) testFailedSlashingRequest(networ
 
 	var signingInfoEndpoint string
 	switch networkGeneration {
-	case config.NetworkGenerationColumbus4:
-		signingInfoEndpoint = fmt.Sprintf("/slashing/validators/%s/signing_info", types.TestValPublicKey)
 	case config.NetworkGenerationColumbus5:
 		signingInfoEndpoint = fmt.Sprintf("/cosmos/slashing/v1beta1/signing_infos/%s", types.TestConsAddress)
 	default:
-		panic("unknown network generation. available variants: columbus-4 or columbus-5")
+		panic("unknown network generation. available variants: columbus-5")
 	}
 
 	testServer := stubs.NewServerWithRoutedResponse(map[string]string{
@@ -185,10 +181,12 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) testFailedSlashingRequest(networ
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = networkGeneration
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
-	signInfoRepository := signinfo.NewSignInfoRepository(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+	signInfoRepository := signinfo.New(apiClient)
 
 	m := NewSlashingMonitor(cfg, logger, valRepository, signInfoRepository)
 	err = m.Handler(context.Background())

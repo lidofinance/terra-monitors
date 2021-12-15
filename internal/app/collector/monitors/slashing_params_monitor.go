@@ -3,11 +3,14 @@ package monitors
 import (
 	"context"
 	"fmt"
-	cosmostypes "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	"github.com/lidofinance/terra-monitors/openapi/client_bombay"
-	"github.com/lidofinance/terra-monitors/openapi/client_bombay/query"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/query"
+
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,7 +21,7 @@ const (
 type SlashingParamsMonitor struct {
 	metrics   map[MetricName]MetricValue
 	logger    *logrus.Logger
-	apiClient *client_bombay.TerraLiteForTerra
+	apiClient *client.TerraRESTApis
 }
 
 func NewSlashingParamsMonitor(
@@ -28,7 +31,7 @@ func NewSlashingParamsMonitor(
 	m := &SlashingParamsMonitor{
 		metrics:   make(map[MetricName]MetricValue),
 		logger:    logger,
-		apiClient: client.NewBombay(cfg.LCD, logger),
+		apiClient: utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 	}
 
 	m.InitMetrics()

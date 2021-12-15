@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"sync"
 
-	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/transactions"
-	"github.com/lidofinance/terra-monitors/openapi/models"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/transactions"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/models"
+
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -38,7 +40,7 @@ const threshold int = 10
 type UpdateGlobalIndexMonitor struct {
 	ContractAddress   string
 	metrics           map[MetricName]MetricValue
-	apiClient         *terraClient.TerraLiteForTerra
+	apiClient         *client.TerraRESTApis
 	logger            *logrus.Logger
 	lastMaxCheckedID  int64
 	lock              sync.RWMutex
@@ -49,7 +51,7 @@ func NewUpdateGlobalIndexMonitor(cfg config.CollectorConfig, logger *logrus.Logg
 	m := UpdateGlobalIndexMonitor{
 		ContractAddress:   cfg.Addresses.UpdateGlobalIndexBotAddress,
 		metrics:           make(map[MetricName]MetricValue),
-		apiClient:         client.New(cfg.LCD, logger),
+		apiClient:         utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:            logger,
 		lock:              sync.RWMutex{},
 		networkGeneration: cfg.NetworkGeneration,
@@ -187,21 +189,20 @@ func isTxUpdateGlobalIndex(tx *models.GetTxListResultTxs, networkGeneration stri
 		}
 		var isUpdateGlobalIndexMsg bool
 		switch networkGeneration {
-		case config.NetworkGenerationColumbus4:
-			isUpdateGlobalIndexMsg = isUpdateGlobalIndexMsgColumbus4(msg)
 		case config.NetworkGenerationColumbus5:
 			isUpdateGlobalIndexMsg = isUpdateGlobalIndexMsgColumbus5(msg)
 		default:
-			panic("unknown network generation. available variants: columbus-4 or columbus-5")
+			panic("unknown network generation. available variants: columbus-5")
 		}
-		if isUpdateGlobalIndexMsg && len(tx.Logs) > 0 {
+		if isUpdateGlobalIndexMsg {
+			if len(tx.Logs) == 0 {
+				// https://fcd.terra.dev/v1/txs?offset=126987824
+				// tx with id = 126987823 is a failed tx due to out of gas
+				// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.
+				// The second one - "raw_log" contains human-readable message with error
+				return FailedUpdateGlobalIndexTx
+			}
 			return SuccessfulUpdateGlobalIndexTX
-		} else if isUpdateGlobalIndexMsg && len(tx.Logs) == 0 {
-			// https://fcd.terra.dev/v1/txs?offset=126987824
-			// tx with id = 126987823 is a failed tx due to out of gas
-			// as we can see there are two signs of failed transaction. The first one - there is no "logs" field in json response.
-			// The second one - "raw_log" contains human-readable message with error
-			return FailedUpdateGlobalIndexTx
 		}
 	}
 	return NonUpdateGlobalIndexTX
@@ -218,19 +219,6 @@ func isUpdateGlobalIndexMsgColumbus5(msg *models.GetTxListResultTxsTxValueMsg) b
 	}
 	if _, found := m[UpdateGlobalIndexMsg]; found {
 		return true
-	}
-	return false
-}
-
-func isUpdateGlobalIndexMsgColumbus4(msg *models.GetTxListResultTxsTxValueMsg) bool {
-	// columbus-4 execute message format
-	// "execute_msg": "eyJ1cGRhdGVfZ2xvYmFsX2luZGV4Ijp7fX0=",
-	m, ok := msg.Value.ExecuteMsg.(string)
-	if ok {
-		return true
-	}
-	if m == UpdateGlobalIndexBase64Encoded {
-		return false
 	}
 	return false
 }

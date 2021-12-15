@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/delegations"
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/pkg/stubs"
 	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-repositories/delegations"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -37,17 +38,19 @@ func (suite *DelegationsDistributionTestSuite) TestDelegationsDistributionNoPani
 	suite.NoError(err)
 
 	testServer := stubs.NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/validators/{address:[a-z0-9]+}"):                   string(validatorInfoData),
+		"/staking/validators/{address:[a-z0-9]+}":                                string(validatorInfoData),
 		fmt.Sprintf("/cosmos/staking/v1beta1/delegations/%s", types.HubContract): string(delegatedValidators),
 	})
 
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "2"
 	cfg.NetworkGeneration = "columbus-5"
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
-	delRepository := delegations.New(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+	delRepository := delegations.New(apiClient)
 	m := NewDelegationsDistributionMonitor(cfg, logger, valRepository, delRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -68,17 +71,19 @@ func (suite *DelegationsDistributionTestSuite) TestDelegationsDistributionPanic(
 	suite.NoError(err)
 
 	testServer := stubs.NewServerWithRoutedResponse(map[string]string{
-		fmt.Sprintf("/staking/validators/{address:[a-z0-9]+}"):                   string(validatorInfoData),
+		"/staking/validators/{address:[a-z0-9]+}":                                string(validatorInfoData),
 		fmt.Sprintf("/cosmos/staking/v1beta1/delegations/%s", types.HubContract): string(delegatedValidators),
 	})
 
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "2"
 	cfg.NetworkGeneration = "columbus-5"
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
-	delRepository := delegations.New(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+	delRepository := delegations.New(apiClient)
 	m := NewDelegationsDistributionMonitor(cfg, logger, valRepository, delRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
