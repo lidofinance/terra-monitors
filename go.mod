@@ -6,15 +6,13 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cosmos/cosmos-sdk v0.44.4
 	github.com/gorilla/mux v1.8.0
-	github.com/lidofinance/terra-fcd-rest-client v0.0.0-20211215133111-236902ebdb03
-	github.com/lidofinance/terra-repositories v0.0.0-20211215133229-0ca7af2f8814
+	github.com/lidofinance/terra-fcd-rest-client v0.0.0-20211216152113-d81abb9b5b2f
+	github.com/lidofinance/terra-repositories v0.0.0-20211216152128-33a198aeb9d9
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/procfs v0.7.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tendermint/go-amino v0.16.0 // indirect
-	github.com/tendermint/tendermint v0.34.14 // indirect
 	github.com/vrischmann/envconfig v1.3.0
 	golang.org/x/net v0.0.0-20210716203947-853a461950ff // indirect
 )
