@@ -1,13 +1,4 @@
-gen_client: gen_columbus_4 gen_columbus_5
-
-gen_columbus_4:
-	mkdir -p ./openapi/ && swagger generate client -f swagger.yaml -t ./openapi/
-
-
-gen_columbus_5:
-	mkdir -p ./openapi/ && swagger generate client -f swagger.bombay.yaml -t ./openapi/ -c client_bombay
-
-dev_server: gen_client
+dev_server:
 	go run ./cmd/terra-monitors/main.go
 
 start:
