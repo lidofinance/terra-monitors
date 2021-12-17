@@ -16,9 +16,9 @@ GF_SERVER_ROOT_URL=http://swelf-host:3000
 # Grafana frontend port - optional value, default value is 3000
 GRAFANA_PORT=3000 
 
-# LCD - light client daemon, https://docs.terra.money/terracli/lcd.html
-LCD_ENDPOINTS=fcd.terra.dev
-LCD_SCHEMES=https
+# Source - full/light client daemon
+SOURCE_ENDPOINTS=bombay-fcd.terra.dev
+SOURCE_SCHEMES=http,https
 # terra-monitor data update interval
 UPDATE_DATA_INTERVAL=30s
 
@@ -49,10 +49,10 @@ SERVICE_NAME=lido_terra_mainnet
 DELEGATIONS_DISTRIBUTION_CONFIG_NUM_MEDIAN_ABSOLUTE_DEVIATIONS=3
 ```
 
-**N.B.: you can specify failover endpoints (sorted by priority, max to min) for the `LCD_ENDPOINTS` config:**
+**N.B.: you can specify failover endpoints (sorted by priority, max to min) for the `SOURCE_ENDPOINTS` config:**
 
 ```
-LCD_ENDPOINTS=fcd.terra.dev,scp.terra.dev
+SOURCE_ENDPOINTS=fcd.terra.dev,scp.terra.dev
 ```
 
 To run the service with env file - `./docker/env/.lido_terra.env`, `./docker/env/.lido_terra.env` is not being tracked by a git, and could be changed for any purpose.
