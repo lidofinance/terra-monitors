@@ -122,7 +122,7 @@ func (suite *UpdateGlobalIndexMonitorTestSuite) testThresholdTxRequest(networkGe
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestThresholdTxRequest() {
-	// suite.testThresholdTxRequest(config.NetworkGenerationColumbus5)
+	suite.testThresholdTxRequest(config.NetworkGenerationColumbus5)
 }
 
 func (suite *UpdateGlobalIndexMonitorTestSuite) TestAlreadyCheckedTxRequest() {
