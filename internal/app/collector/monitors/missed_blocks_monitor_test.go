@@ -7,12 +7,14 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/stubs"
 	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
-	"github.com/lidofinance/terra-monitors/openapi/models"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/models"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -69,9 +71,11 @@ func (suite *MissedBlocksMonitorTestSuite) testMissedBlocks(networkGeneration st
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = config.V1Contracts
 	cfg.NetworkGeneration = networkGeneration
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
 
 	m := NewMissedBlocksMonitor(cfg, logger, valRepository)
 	err = m.Handler(context.Background())
@@ -86,5 +90,4 @@ func (suite *MissedBlocksMonitorTestSuite) testMissedBlocks(networkGeneration st
 	// "Test validator2" has not signed the block
 	// we have checked 10 blocks and  all 11 with no "Test validators2" sign
 	suite.Equal(10.0, metricVectors[MissedBlocksForPeriod].Get("Test validator2"))
-
 }

@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
-	"github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/wasm"
+
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +23,7 @@ type HubStateMonitorV2 struct {
 	State      *types.HubStateResponseV2
 	HubAddress string
 	metrics    map[MetricName]MetricValue
-	apiClient  *client.TerraLiteForTerra
+	apiClient  *client.TerraRESTApis
 	logger     *logrus.Logger
 }
 

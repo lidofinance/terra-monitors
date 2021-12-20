@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/delegations"
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
-
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client_bombay"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-repositories/delegations"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,11 +24,11 @@ type FailedRedelegationsMonitor struct {
 
 	metrics       map[MetricName]MetricValue
 	metricVectors map[MetricName]*MetricVector
-	apiClient     *terraClient.TerraLiteForTerra
+	apiClient     *client.TerraRESTApis
 	logger        *logrus.Logger
 
-	validatorsRepository  validators.ValidatorsRepository
-	delegationsRepository delegations.Repository
+	validatorsRepository  repositories.ValidatorsRepository
+	delegationsRepository *delegations.Repository
 
 	hubAddress string
 }
@@ -35,13 +36,13 @@ type FailedRedelegationsMonitor struct {
 func NewFailedRedelegationsMonitor(
 	cfg config.CollectorConfig,
 	logger *logrus.Logger,
-	repository validators.ValidatorsRepository,
-	delegationsRepository delegations.Repository,
+	repository repositories.ValidatorsRepository,
+	delegationsRepository *delegations.Repository,
 ) *FailedRedelegationsMonitor {
 	m := FailedRedelegationsMonitor{
 		metrics:       make(map[MetricName]MetricValue),
 		metricVectors: make(map[MetricName]*MetricVector),
-		apiClient:     client.NewBombay(cfg.LCD, logger),
+		apiClient:     utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:        logger,
 
 		validatorsRepository:  repository,

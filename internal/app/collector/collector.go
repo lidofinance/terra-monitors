@@ -6,45 +6,107 @@ import (
 	"time"
 
 	"github.com/lidofinance/terra-monitors/internal/app/collector/monitors"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-repositories/delegations"
+	"github.com/lidofinance/terra-repositories/signinfo"
+
 	"github.com/sirupsen/logrus"
 )
 
-type Collector interface {
-	Get(metric monitors.MetricName) (float64, error)
-	GetVector(metric monitors.MetricName) (*monitors.MetricVector, error)
-	ProvidedMetrics() []monitors.MetricName
-	ProvidedMetricVectors() []monitors.MetricName
-}
-
-func NewLCDCollector(cfg config.CollectorConfig, logger *logrus.Logger) LCDCollector {
-	return LCDCollector{
+func New(cfg config.CollectorConfig, logger *logrus.Logger) (*Collector, error) {
+	c := &Collector{
 		Metrics:       make(map[monitors.MetricName]monitors.Monitor),
 		MetricVectors: make(map[monitors.MetricName]monitors.Monitor),
 		logger:        logger,
-		apiClient:     client.New(cfg.LCD, logger),
+		apiClient:     utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 	}
+	ctx := context.Background()
+
+	hubStateMonitor := monitors.NewHubStateMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, hubStateMonitor)
+
+	rewardStateMonitor := monitors.NewRewardStateMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, &rewardStateMonitor)
+
+	blunaTokenInfoMonitor := monitors.NewBlunaTokenInfoMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, blunaTokenInfoMonitor)
+
+	valRepoCfg := repositories.ValidatorsRepositoryConfig{
+		BAssetContractsVersion:     cfg.BassetContractsVersion,
+		HubContract:                cfg.Addresses.HubContract,
+		ValidatorsRegistryContract: cfg.Addresses.ValidatorsRegistryContract,
+	}
+	validatorsRepository, err := repositories.NewValidatorsRepository(valRepoCfg, c.apiClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialise a validators repository: %v", err)
+	}
+	delegatorsRepository := delegations.New(c.apiClient)
+	signInfoRepository := signinfo.New(c.apiClient)
+
+	slashingMonitor := monitors.NewSlashingMonitor(cfg, logger, validatorsRepository, signInfoRepository)
+	c.RegisterMonitor(ctx, cfg, slashingMonitor)
+
+	updateGlobalIndexMonitor := monitors.NewUpdateGlobalIndexMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, updateGlobalIndexMonitor)
+
+	hubParameters := monitors.NewHubParametersMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, &hubParameters)
+
+	delegationsDistributionMonitor := monitors.NewDelegationsDistributionMonitor(cfg, logger, validatorsRepository,
+		delegatorsRepository)
+	c.RegisterMonitor(ctx, cfg, delegationsDistributionMonitor)
+
+	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, configCRC32Monitor)
+
+	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, &whitelistedValidatorsMonitor)
+
+	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, validatorsFeeMonitor)
+
+	oracleVotesMonitor := monitors.NewOracleVotesMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, oracleVotesMonitor)
+
+	balanceMonitor := monitors.NewOperatorBotBalanceMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, balanceMonitor)
+
+	failedRedelegationsMonitor := monitors.NewFailedRedelegationsMonitor(cfg, logger, validatorsRepository, delegatorsRepository)
+	c.RegisterMonitor(ctx, cfg, failedRedelegationsMonitor)
+
+	missedBlocksMonitor := monitors.NewMissedBlocksMonitor(cfg, logger, validatorsRepository)
+	c.RegisterMonitor(ctx, cfg, missedBlocksMonitor)
+
+	slashingParamsMonitor := monitors.NewSlashingParamsMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, slashingParamsMonitor)
+
+	oracleParamsMonitor := monitors.NewOracleParamsMonitor(cfg, logger)
+	c.RegisterMonitor(ctx, cfg, oracleParamsMonitor)
+
+	return c, nil
 }
 
-type LCDCollector struct {
+type Collector struct {
 	Metrics       map[monitors.MetricName]monitors.Monitor
 	MetricVectors map[monitors.MetricName]monitors.Monitor
 	Monitors      []monitors.Monitor
 	logger        *logrus.Logger
-	apiClient     *terraClient.TerraLiteForTerra
+	apiClient     *client.TerraRESTApis
 }
 
-func (c LCDCollector) GetApiClient() *terraClient.TerraLiteForTerra {
+func (c Collector) GetApiClient() *client.TerraRESTApis {
 	return c.apiClient
 }
 
-func (c LCDCollector) GetLogger() *logrus.Logger {
+func (c Collector) GetLogger() *logrus.Logger {
 	return c.logger
 }
 
-func (c LCDCollector) ProvidedMetrics() []monitors.MetricName {
+func (c Collector) ProvidedMetrics() []monitors.MetricName {
 	var metrics []monitors.MetricName
 	for m := range c.Metrics {
 		metrics = append(metrics, m)
@@ -52,7 +114,7 @@ func (c LCDCollector) ProvidedMetrics() []monitors.MetricName {
 	return metrics
 }
 
-func (c LCDCollector) ProvidedMetricVectors() []monitors.MetricName {
+func (c Collector) ProvidedMetricVectors() []monitors.MetricName {
 	var metrics []monitors.MetricName
 	for m := range c.MetricVectors {
 		metrics = append(metrics, m)
@@ -60,7 +122,7 @@ func (c LCDCollector) ProvidedMetricVectors() []monitors.MetricName {
 	return metrics
 }
 
-func (c LCDCollector) Get(metric monitors.MetricName) (float64, error) {
+func (c Collector) Get(metric monitors.MetricName) (float64, error) {
 	monitor, found := c.Metrics[metric]
 	if !found {
 		return 0, fmt.Errorf("monitor for metric \"%s\" not found", metric)
@@ -68,7 +130,7 @@ func (c LCDCollector) Get(metric monitors.MetricName) (float64, error) {
 	return monitor.GetMetrics()[metric].Get(), nil
 }
 
-func (c LCDCollector) GetVector(metric monitors.MetricName) (*monitors.MetricVector, error) {
+func (c Collector) GetVector(metric monitors.MetricName) (*monitors.MetricVector, error) {
 	monitor, found := c.MetricVectors[metric]
 	if !found {
 		return nil, fmt.Errorf("monitor for metric vector \"%s\" not found", metric)
@@ -85,7 +147,7 @@ func findMaps(key monitors.MetricName, maps ...map[monitors.MetricName]monitors.
 	return nil, false
 }
 
-func (c *LCDCollector) RegisterMonitor(ctx context.Context, cfg config.CollectorConfig, m monitors.Monitor) {
+func (c *Collector) RegisterMonitor(ctx context.Context, cfg config.CollectorConfig, m monitors.Monitor) {
 	for metric := range m.GetMetrics() {
 		if wantedMonitor, found := findMaps(metric, c.Metrics, c.MetricVectors); found {
 			panic(fmt.Sprintf("register monitor %s failed. metrics collision. Monitor %s has declared metric %s", m.Name(), wantedMonitor.Name(), metric))

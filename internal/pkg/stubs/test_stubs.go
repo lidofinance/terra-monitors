@@ -13,12 +13,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gorilla/mux"
-
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/logging"
 	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,7 +35,7 @@ func NewTestCollectorConfig(urlsWithScheme ...string) config.CollectorConfig {
 	}
 
 	cfg := config.CollectorConfig{
-		LCD: config.LCD{
+		Source: config.Source{
 			Endpoints: endpoints,
 			Schemes:   []string{"http"},
 		},
@@ -50,6 +51,14 @@ func NewTestCollectorConfig(urlsWithScheme ...string) config.CollectorConfig {
 	}
 
 	return cfg
+}
+
+func BuildValidatorsRepositoryConfig(cfg config.CollectorConfig) repositories.ValidatorsRepositoryConfig {
+	return repositories.ValidatorsRepositoryConfig{
+		BAssetContractsVersion:     cfg.BassetContractsVersion,
+		HubContract:                cfg.Addresses.HubContract,
+		ValidatorsRegistryContract: cfg.Addresses.ValidatorsRegistryContract,
+	}
 }
 
 func NewTestLogger() *logrus.Logger {

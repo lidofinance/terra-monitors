@@ -6,11 +6,13 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/delegations"
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/pkg/stubs"
 	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-repositories/delegations"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -51,10 +53,12 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationFailedRequest(
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "2"
 	cfg.NetworkGeneration = "columbus-5"
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
-	delRepository := delegations.New(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+	delRepository := delegations.New(apiClient)
 	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository, delRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
@@ -93,10 +97,12 @@ func (suite *FailedRedelegationsMonitorTestSuite) TestRedelegationSucceedRequest
 	cfg := stubs.NewTestCollectorConfig(testServer.URL)
 	cfg.BassetContractsVersion = "2"
 	cfg.NetworkGeneration = "columbus-5"
-
 	logger := stubs.NewTestLogger()
-	valRepository := validators.NewValidatorsRepository(cfg, logger)
-	delRepository := delegations.New(cfg, logger)
+	apiClient := utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger)
+
+	valRepository, err := repositories.NewValidatorsRepository(stubs.BuildValidatorsRepositoryConfig(cfg), apiClient)
+	suite.NoError(err)
+	delRepository := delegations.New(apiClient)
 	m := NewFailedRedelegationsMonitor(cfg, logger, valRepository, delRepository)
 	err = m.Handler(context.Background())
 	suite.NoError(err)
