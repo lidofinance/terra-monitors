@@ -229,7 +229,7 @@
         "noDataState": "keep_state",
         "notifications": [
           {
-            "uid": "telegram_lido"
+            "uid": "webhook_lido"
           }
         ]
       },
