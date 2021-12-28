@@ -11,17 +11,16 @@ const (
 	V1Contracts = "1"
 	V2Contracts = "2"
 
-	NetworkGenerationColumbus4 = "columbus-4"
 	NetworkGenerationColumbus5 = "columbus-5"
 )
 
 type CollectorConfig struct {
 	BassetContractsVersion        string `envconfig:"default=2"` // available values: 1 and 2
-	LCD                           LCD
+	Source                        Source
 	Addresses                     Addresses
 	UpdateDataInterval            time.Duration `envconfig:"default=30s"`
 	DelegationsDistributionConfig DelegationsDistributionConfig
-	NetworkGeneration             string `envconfig:"default=columbus-4"` // available values: columbus-4, columbus-5
+	NetworkGeneration             string `envconfig:"default=columbus-5"` // available values: columbus-5
 }
 
 func NewCollectorConfig() (CollectorConfig, error) {
@@ -33,7 +32,7 @@ func NewCollectorConfig() (CollectorConfig, error) {
 	return config, nil
 }
 
-type LCD struct {
+type Source struct {
 	Endpoints []string `envconfig:"default=fcd.terra.dev"`
 	Schemes   []string `envconfig:"default=https"`
 }

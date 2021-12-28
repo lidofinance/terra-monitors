@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"hash/crc32"
 
-	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/wasm"
+
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,7 +29,7 @@ type HubParametersMonitor struct {
 	metrics         map[MetricName]MetricValue
 	State           *types.HubParameters
 	ContractAddress string
-	apiClient       *terraClient.TerraLiteForTerra
+	apiClient       *client.TerraRESTApis
 	logger          *logrus.Logger
 }
 
@@ -36,7 +38,7 @@ func NewHubParametersMonitor(cfg config.CollectorConfig, logger *logrus.Logger) 
 		metrics:         make(map[MetricName]MetricValue),
 		State:           &types.HubParameters{},
 		ContractAddress: cfg.Addresses.HubContract,
-		apiClient:       client.New(cfg.LCD, logger),
+		apiClient:       utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:          logger,
 	}
 	m.InitMetrics()

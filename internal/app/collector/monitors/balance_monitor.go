@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/bank"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/bank"
+
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,7 +20,7 @@ var (
 
 type OperatorBotBalanceMonitor struct {
 	BotAddress string
-	apiClient  *terraClient.TerraLiteForTerra
+	apiClient  *client.TerraRESTApis
 	logger     *logrus.Logger
 	balanceUST SimpleMetricValue
 }
@@ -26,7 +28,7 @@ type OperatorBotBalanceMonitor struct {
 func NewOperatorBotBalanceMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *OperatorBotBalanceMonitor {
 	m := OperatorBotBalanceMonitor{
 		BotAddress: cfg.Addresses.UpdateGlobalIndexBotAddress,
-		apiClient:  client.New(cfg.LCD, logger),
+		apiClient:  utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:     logger,
 		balanceUST: SimpleMetricValue{},
 	}

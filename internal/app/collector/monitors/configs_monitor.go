@@ -9,9 +9,11 @@ import (
 
 	"github.com/lidofinance/terra-monitors/internal/app/collector/types"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
-	"github.com/lidofinance/terra-monitors/internal/pkg/client"
-	terraClient "github.com/lidofinance/terra-monitors/openapi/client"
-	"github.com/lidofinance/terra-monitors/openapi/client/wasm"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
+
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/wasm"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,7 +30,7 @@ type ConfigsCRC32Monitor struct {
 	Contracts        map[string]string
 	metrics          map[MetricName]MetricValue
 	metricVectors    map[MetricName]*MetricVector
-	apiClient        *terraClient.TerraLiteForTerra
+	apiClient        *client.TerraRESTApis
 	logger           *logrus.Logger
 	lock             sync.RWMutex
 	contractsVersion string
@@ -43,7 +45,7 @@ func NewConfigsCRC32Monitor(cfg config.CollectorConfig, logger *logrus.Logger) *
 		},
 		metrics:          make(map[MetricName]MetricValue),
 		metricVectors:    make(map[MetricName]*MetricVector),
-		apiClient:        client.New(cfg.LCD, logger),
+		apiClient:        utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:           logger,
 		lock:             sync.RWMutex{},
 		contractsVersion: cfg.BassetContractsVersion,

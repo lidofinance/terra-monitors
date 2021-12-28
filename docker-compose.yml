@@ -29,6 +29,7 @@ services:
     image: prom/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=70d
     volumes:
       - ./docker/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -37,8 +38,8 @@ services:
   lido_terra:
     build: .
     environment:
-      - LCD_ENDPOINTS
-      - LCD_SCHEMES
+      - SOURCE_ENDPOINTS
+      - SOURCE_SCHEMES
       - UPDATE_DATA_INTERVAL
       - ADDRESSES_HUB_CONTRACT
       - ADDRESSES_REWARD_CONTRACT

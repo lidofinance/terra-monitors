@@ -1,37 +1,36 @@
 package utils
 
 import (
-	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/types/bech32"
-	"github.com/tendermint/go-amino"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/factory"
+
+	"github.com/lidofinance/terra-monitors/internal/app/config"
+
+	"github.com/sirupsen/logrus"
 )
 
-func ValConsToAddr(valcons string) (string, error) {
-	_, addr, err := bech32.DecodeAndConvert(valcons)
-	return strings.ToUpper(hex.EncodeToString(addr)), err
+// SourceToEndpoints parses the source parameters and creates a list of endpoints based on it.
+func SourceToEndpoints(source config.Source) []factory.Endpoint {
+	endpoints := make([]factory.Endpoint, 0, len(source.Endpoints))
+	for _, endpoint := range source.Endpoints {
+		endpoints = append(endpoints, factory.Endpoint{
+			Host:    endpoint,
+			Schemes: source.Schemes,
+		})
+	}
+	return endpoints
 }
 
-func ValConsPubToAddr(valconspub string) (string, error) {
-	_, data, err := bech32.DecodeAndConvert(valconspub)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode terravalconspub: %w", err)
+// BuildClient based on the endpoints, creates either a simple terra REST API client or a failover one.
+func BuildClient(endpoints []factory.Endpoint, logger *logrus.Logger) *client.TerraRESTApis {
+	if len(endpoints) == 1 {
+		return factory.NewClient(endpoints[0], client.DefaultBasePath)
 	}
-	cdc := amino.NewCodec()
-	cdc.RegisterInterface((*crypto.PubKey)(nil), nil)
-	cdc.RegisterConcrete(ed25519.PubKey{},
-		ed25519.PubKeyName, nil)
-	var pubKey crypto.PubKey
-	err = cdc.UnmarshalBinaryBare(data, &pubKey)
-	if err != nil {
-		return "", fmt.Errorf("failed to unmarshal binary data to ed25519 pubkey: %w", err)
-	}
-	return pubKey.Address().String(), nil
+	return factory.NewFailoverClient(logger, endpoints, client.DefaultBasePath)
 }
 
 func GetTerraMonitorsPath() (string, error) {

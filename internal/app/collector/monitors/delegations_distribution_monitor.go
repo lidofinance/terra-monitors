@@ -6,10 +6,12 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/delegations"
-	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories/validators"
+	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/math"
+
+	"github.com/lidofinance/terra-repositories/delegations"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,8 +26,8 @@ type DelegationsDistributionMonitor struct {
 	metricVectors map[MetricName]*MetricVector
 	logger        *logrus.Logger
 
-	validatorsRepository  validators.ValidatorsRepository
-	delegationsRepository delegations.Repository
+	validatorsRepository  repositories.ValidatorsRepository
+	delegationsRepository *delegations.Repository
 
 	hubAddress string
 	nMads      int64
@@ -34,8 +36,8 @@ type DelegationsDistributionMonitor struct {
 func NewDelegationsDistributionMonitor(
 	cfg config.CollectorConfig,
 	logger *logrus.Logger,
-	validatorsRepository validators.ValidatorsRepository,
-	delegationsRepository delegations.Repository,
+	validatorsRepository repositories.ValidatorsRepository,
+	delegationsRepository *delegations.Repository,
 ) *DelegationsDistributionMonitor {
 	m := &DelegationsDistributionMonitor{
 		lock: sync.RWMutex{},
