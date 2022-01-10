@@ -49,6 +49,6 @@ notifiers:
     settings:
       uploadImage: true
       httpMethod: POST
-      url: http://192.168.1.144:17575/webhook
+      url: $WEBHOOK_URL
     # Secure settings that will be encrypted in the database (supported since Grafana v7.2).
     # See `Supported Settings` section for secure settings supported for each notifier.

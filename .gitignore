@@ -15,7 +15,7 @@
 # vendor/
 .golangci.yml
 .vscode
-.telegram.env
+.notifiers.env
 .lido_terra.env
 
 .idea/
