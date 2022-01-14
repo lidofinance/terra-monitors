@@ -229,6 +229,9 @@
         "noDataState": "keep_state",
         "notifications": [
           {
+            "uid": "webhook_lido"
+          },
+          {
             "uid": "telegram_lido"
           }
         ]
