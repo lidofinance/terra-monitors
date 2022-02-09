@@ -2,7 +2,7 @@
 
 Before running the service you have to fill .env file `./docker/env/.notifiers.env` with the following variables:
 ```shell
-cat ./docker/env/.notifiers.env 
+cat ./docker/env/.notifiers.env
 TELEGRAM_BOTTOKEN=<telegram_bottoken>
 TELEGRAM_CHAT_ID=<telegram_chat_id>
 WEBHOOK_URL=<webhook_notifications_channel_endpoint>

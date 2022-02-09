@@ -3,17 +3,27 @@ package monitors
 import (
 	"context"
 
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
 	"github.com/sirupsen/logrus"
+)
+
+var (
+	LastTransactionHeight MetricName = "last_transaction_height"
 )
 
 type TransactionsMonitor struct {
 	lastTransactionHeight SimpleMetricValue
+	apiClient             *client.TerraRESTApis
+	logger                *logrus.Logger
 }
 
 func NewTransactionsMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *TransactionsMonitor {
 	m := TransactionsMonitor{
 		lastTransactionHeight: SimpleMetricValue{},
+		apiClient:             utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
+		logger:                logger,
 	}
 	return &m
 }
