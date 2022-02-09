@@ -20,7 +20,8 @@ type CollectorConfig struct {
 	Addresses                     Addresses
 	UpdateDataInterval            time.Duration `envconfig:"default=30s"`
 	DelegationsDistributionConfig DelegationsDistributionConfig
-	NetworkGeneration             string `envconfig:"default=columbus-5"` // available values: columbus-5
+	NetworkGeneration             string   `envconfig:"default=columbus-5"` // available values: columbus-5
+	MonitoredAccountAddresses     []string `envconfig:"default=[]"`
 }
 
 func NewCollectorConfig() (CollectorConfig, error) {
