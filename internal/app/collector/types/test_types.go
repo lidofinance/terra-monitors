@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	MonitoredAccountAddresses = []string{"terravaloper1259cmu5zyklsdkmgstxhwqpe0utfe5hhyty0at"}
+	MonitoredAccountAddresses = []string{"terra1glpjvujn0gjdjqra2ejgu7um2yd9fu63n7h29u"}
 )
 
 const (

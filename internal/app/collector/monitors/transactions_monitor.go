@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
 	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/transactions"
@@ -15,7 +16,7 @@ import (
 )
 
 var (
-	LastTransactionHeight MetricName = "last_transaction_height"
+	MonitoredTransactionId MetricName = "monitored_transaction_id"
 )
 
 type TransactionsMonitor struct {
@@ -30,10 +31,11 @@ func NewTransactionsMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *
 	m := TransactionsMonitor{
 		apiClient:     utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:        logger,
-		addresses:     cfg.MonitoredAccountAddresses,
+		addresses:     cfg.Addresses.MonitoredAccounts,
 		metricVectors: make(map[MetricName]*MetricVector),
 		lock:          sync.RWMutex{},
 	}
+	m.logger.Infof("Initialized transactions monitor for addresses: %v", m.addresses)
 	m.InitMetrics()
 
 	return &m
@@ -60,19 +62,19 @@ func (m *TransactionsMonitor) Handler(ctx context.Context) error {
 	for _, address := range m.addresses {
 		txs, err := m.queryTxs(ctx, address)
 		if err != nil {
-			m.logger.Errorf("Could not query transactions for %v. Error: %v", address, err)
+			m.logger.Errorf("Could not query transactions for %s. Error: %v", address, err)
 			return err
 		}
 
-		height, err := fetchHeightFromLastTx(txs)
+		txID, err := fetchIDFromLastTx(txs)
 		if err != nil {
-			m.logger.Errorf("Could not height from transactions for %v. Error: %v", address, err)
+			m.logger.Errorf("Could not fetch ID from transactions for %v. Error: %v", address, err)
 			return err
 		}
 
-		tmpMetricVectors[LastTransactionHeight].Set(address, *height)
+		tmpMetricVectors[MonitoredTransactionId].Set(address, *txID)
 
-		m.logger.Infof("Successfully retrieved last transaction height for %v", address)
+		m.logger.Infof("Successfully retrieved last transaction txID for %v", address)
 	}
 
 	m.lock.Lock()
@@ -87,19 +89,18 @@ func (m *TransactionsMonitor) InitMetrics() {
 }
 
 func (m *TransactionsMonitor) providedMetricVectors() []MetricName {
-	return []MetricName{LastTransactionHeight}
+	return []MetricName{MonitoredTransactionId}
 }
 
 func (m *TransactionsMonitor) queryTxs(ctx context.Context, address string) (*models.GetTxListResult, error) {
-	// TODO: why limit in float?
-	var limit float64 = 1
-	p := transactions.GetV1TxsParams{}
-	txsParams := p.
-		// WithChainID(). TODO: set ChainId?
-		WithContext(ctx).
-		WithLimit(&limit).
-		WithAccount(&address)
-	txs, err := m.apiClient.Transactions.GetV1Txs(txsParams)
+	var limit float64 = 10
+	txsParams := transactions.GetV1TxsParams{}
+
+	txsParams.SetContext(ctx)
+	txsParams.SetLimit(&limit)
+	txsParams.SetAccount(&address)
+	txsParams.SetTimeout(10 * time.Second)
+	txs, err := m.apiClient.Transactions.GetV1Txs(&txsParams)
 	fmt.Printf("%v", txs)
 
 	if err != nil {
@@ -109,19 +110,11 @@ func (m *TransactionsMonitor) queryTxs(ctx context.Context, address string) (*mo
 	return txs.GetPayload(), nil
 }
 
-func fetchHeightFromLastTx(txs *models.GetTxListResult) (*float64, error) {
+func fetchIDFromLastTx(txs *models.GetTxListResult) (*float64, error) {
 	if len(txs.Txs) == 0 {
 		return nil, errors.New("empty transaction list")
 	}
 
-	tx := txs.Txs[0]
-
-	// FIXME: Is it transaction total height or block height????
-	var height float64
-	_, err := fmt.Sscanf(*tx.Height, "%g", &height)
-	if err != nil {
-		return nil, err
-	}
-
-	return &height, nil // Interested only in first transaction TODO: breaks only first loop?
+	txId := float64(txs.Txs[0].ID)
+	return &txId, nil
 }

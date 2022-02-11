@@ -47,8 +47,8 @@ func NewTestCollectorConfig(urlsWithScheme ...string) config.CollectorConfig {
 			RewardsDispatcherContract:   types.RewardDispatcherContract,
 			ValidatorsRegistryContract:  types.ValidatorsRegistryContract,
 			AirDropRegistryContract:     types.AirDropRegistryContract,
+			MonitoredAccounts:           types.MonitoredAccountAddresses,
 		},
-		MonitoredAccountAddresses: types.MonitoredAccountAddresses,
 	}
 
 	return cfg

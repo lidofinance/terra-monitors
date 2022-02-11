@@ -32,10 +32,10 @@ func (suite *TransactionsMonitorTestSuite) TestTransactionsHeightFound() {
 	err = m.Handler(context.Background())
 	suite.NoError(err)
 
-	expectedHeight := 6201254
-	testAddress := cfg.MonitoredAccountAddresses[0]
-	actualHeight := m.metricVectors[LastTransactionHeight].Get(testAddress)
-	suite.InDelta(expectedHeight, actualHeight, 1e-6)
+	expectedID := 214871418
+	testAddress := cfg.Addresses.MonitoredAccounts[0]
+	actualID := m.metricVectors[MonitoredTransactionId].Get(testAddress)
+	suite.InDelta(expectedID, actualID, 1e-6)
 }
 
 func (suite *TransactionsMonitorTestSuite) TestTransactionsHeightNotFound() {
