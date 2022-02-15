@@ -3,7 +3,6 @@ package monitors
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -101,7 +100,6 @@ func (m *TransactionsMonitor) queryTxs(ctx context.Context, address string) (*mo
 	txsParams.SetAccount(&address)
 	txsParams.SetTimeout(10 * time.Second)
 	txs, err := m.apiClient.Transactions.GetV1Txs(&txsParams)
-	fmt.Printf("%v", txs)
 
 	if err != nil {
 		return nil, err
