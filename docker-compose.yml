@@ -11,13 +11,6 @@ services:
     environment:
       - GF_RENDERING_SERVER_URL=http://renderer:8081/render
       - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
-      - GF_EXTERNAL_IMAGE_STORAGE_PROVIDER=s3
-      - GF_EXTERNAL_IMAGE_STORAGE_S3_ENDPOINT=${S3_ENDPOINT}
-      - GF_EXTERNAL_IMAGE_STORAGE_S3_PATH_STYLE_ACCESS=true
-      - GF_EXTERNAL_IMAGE_STORAGE_S3_BUCKET=${S3_BUCKET}
-      - GF_EXTERNAL_IMAGE_STORAGE_S3_REGION=${S3_REGION}
-      - GF_EXTERNAL_IMAGE_STORAGE_S3_ACCESS_KEY=${S3_ACCESS_KEY}
-      - GF_EXTERNAL_IMAGE_STORAGE_S3_SECRET_KEY=${S3_SECRET_KEY}
     volumes:
       - ./docker/config/grafana/provisioning:/etc/grafana/provisioning
       - grafana-storage:/var/lib/grafana
@@ -71,39 +64,9 @@ services:
       - ./docker/config/promtail/promtail.yml:/etc/promtail/promtail.yml
     command: -config.file=/etc/promtail/promtail.yml --config.expand-env=true
 
-  minio:
-    image: minio/minio
-    ports:
-      - "${MINIO_PORT:-9000}:9000"
-      - "${MINIO_CONSOLE_PORT:-9001}:9001"
-    volumes:
-      - minio-data:/data
-    environment:
-      - "MINIO_ROOT_USER=${MINIO_ACCESS_KEY}"
-      - "MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}"
-    command: server /data --console-address :9001
-
-  createbuckets:
-    image: minio/mc
-    depends_on:
-      - minio
-    environment:
-      - MINIO_PORT=${MINIO_PORT}
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-      - S3_BUCKET=${S3_BUCKET}
-    entrypoint: >
-      /bin/sh -c "
-      until (/usr/bin/mc config host add myminio http://minio:$${MINIO_PORT} $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY}) do echo '...waiting...' && sleep 1; done;
-      /usr/bin/mc mb myminio/$${S3_BUCKET};
-      /usr/bin/mc policy set public myminio/$${S3_BUCKET};
-      exit 0;
-      "
-
 
 volumes:
   prometheus-data:
   grafana-storage:
   promtail-data:
   loki-data:
-  minio-data:
