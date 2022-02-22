@@ -71,7 +71,7 @@ func (m *TransactionsMonitor) Handler(ctx context.Context) error {
 			return err
 		}
 
-		tmpMetricVectors[MonitoredTransactionId].Set(address, *txID)
+		tmpMetricVectors[MonitoredTransactionId].Set(address, txID)
 
 		m.logger.Infof("Successfully retrieved last transaction txID for %v", address)
 	}
@@ -100,7 +100,6 @@ func (m *TransactionsMonitor) queryTxs(ctx context.Context, address string) (*mo
 	txsParams.SetAccount(&address)
 	txsParams.SetTimeout(10 * time.Second)
 	txs, err := m.apiClient.Transactions.GetV1Txs(&txsParams)
-
 	if err != nil {
 		return nil, err
 	}
@@ -108,11 +107,11 @@ func (m *TransactionsMonitor) queryTxs(ctx context.Context, address string) (*mo
 	return txs.GetPayload(), nil
 }
 
-func fetchIDFromLastTx(txs *models.GetTxListResult) (*float64, error) {
+func fetchIDFromLastTx(txs *models.GetTxListResult) (float64, error) {
 	if len(txs.Txs) == 0 {
-		return nil, errors.New("empty transaction list")
+		return 0, errors.New("empty transaction list")
 	}
 
 	txId := float64(txs.Txs[0].ID)
-	return &txId, nil
+	return txId, nil
 }
