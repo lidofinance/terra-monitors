@@ -2032,6 +2032,9 @@
         "notifications": [
           {
             "uid": "telegram_lido_no_reminder_no_recover"
+          },
+          {
+            "uid": "webhook_lido"
           }
         ]
       },
