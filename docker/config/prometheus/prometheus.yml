@@ -8,4 +8,4 @@ scrape_configs:
   - job_name: lido_terra
     scrape_interval: 1m
     static_configs:
-    - targets: ['lido_terra:8080']
+    - targets: ['lido_terra:8080', 'governance_bot:8080']
