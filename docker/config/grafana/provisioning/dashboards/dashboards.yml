@@ -9,3 +9,11 @@ providers:
   editable: true
   options:
     path: /etc/grafana/provisioning/dashboards/lido_basset
+- name: 'Lido governance bot Dashboard'
+  orgId: 1
+  folder: 'lido'
+  type: file
+  disableDeletion: true
+  editable: true
+  options:
+    path: /etc/grafana/provisioning/dashboards/lido_governance_bot
