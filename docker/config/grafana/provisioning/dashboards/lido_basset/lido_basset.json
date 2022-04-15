@@ -18,6 +18,20 @@
   "links": [],
   "panels": [
     {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 53,
+      "panels": [],
+      "title": "Validators/Delegations/Slashing overview",
+      "type": "row"
+    },
+    {
       "alert": {
         "alertRuleTags": {},
         "conditions": [
@@ -113,7 +127,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 30,
       "options": {
@@ -291,7 +305,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 0
+        "y": 1
       },
       "id": 38,
       "options": {
@@ -420,7 +434,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 0
+        "y": 1
       },
       "id": 44,
       "options": {
@@ -481,7 +495,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "id": 48,
       "options": {
@@ -576,7 +590,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 8
+        "y": 9
       },
       "id": 46,
       "options": {
@@ -616,11 +630,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 17
       },
       "id": 24,
       "panels": [],
-      "title": "contracts parameters monitoring",
+      "title": "Contracts parameters monitoring",
       "type": "row"
     },
     {
@@ -741,7 +755,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 17
+        "y": 18
       },
       "id": 14,
       "options": {
@@ -877,7 +891,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 17
+        "y": 18
       },
       "id": 16,
       "options": {
@@ -1005,7 +1019,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 17
+        "y": 18
       },
       "id": 18,
       "options": {
@@ -1156,7 +1170,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 25
+        "y": 26
       },
       "id": 20,
       "options": {
@@ -1293,7 +1307,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 25
+        "y": 26
       },
       "id": 26,
       "options": {
@@ -1421,7 +1435,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 25
+        "y": 26
       },
       "id": 28,
       "options": {
@@ -1461,11 +1475,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 34
       },
       "id": 22,
       "panels": [],
-      "title": "contracts state monitoring",
+      "title": "Contracts state monitoring",
       "type": "row"
     },
     {
@@ -1563,7 +1577,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 34
+        "y": 35
       },
       "id": 12,
       "options": {
@@ -1694,7 +1708,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 34
+        "y": 35
       },
       "id": 10,
       "options": {
@@ -1831,7 +1845,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 34
+        "y": 35
       },
       "id": 8,
       "options": {
@@ -2025,7 +2039,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 42
+        "y": 43
       },
       "id": 32,
       "options": {
@@ -2223,7 +2237,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 42
+        "y": 43
       },
       "id": 2,
       "options": {
@@ -2312,7 +2326,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 42
+        "y": 43
       },
       "id": 45,
       "options": {
@@ -2344,7 +2358,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 51
       },
       "id": 36,
       "panels": [],
@@ -2440,7 +2454,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 51
+        "y": 52
       },
       "id": 34,
       "interval": "1m",
@@ -2467,6 +2481,195 @@
       "timeFrom": null,
       "title": "terra monitor service log_level rate",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 60
+      },
+      "id": 55,
+      "panels": [],
+      "title": "Other",
+      "type": "row"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "15m",
+        "frequency": "24h",
+        "handler": 1,
+        "message": "Validator ${label} has too many missed governance votes",
+        "name": "Too many governance votes missed for validator",
+        "noDataState": "no_data",
+        "notifications": [
+          {
+            "uid": "telegram_lido"
+          }
+        ]
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 12
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 61
+      },
+      "id": 51,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "missed_votes_count{}",
+          "interval": "",
+          "legendFormat": "{{label}} missed",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "missed_votes_limit{}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{label}} limit",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "missed_votes_limit - missed_votes_count",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "C"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "op": "lt",
+          "value": 0,
+          "visible": true
+        }
+      ],
+      "title": "Governance votes missed",
+      "type": "timeseries"
     }
   ],
   "refresh": "5s",
@@ -2477,12 +2680,12 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Lido monitors",
   "uid": "xxixR7Z7z",
-  "version": 1
+  "version": 12
 }

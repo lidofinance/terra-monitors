@@ -18,7 +18,7 @@ func (suite *FailoverTestSuite) SetupTest() {
 
 }
 
-func (suite *BalanceMonitorTestSuite) TestFailover() {
+func (suite *FailoverTestSuite) TestFailover() {
 	// N.B.: this test reuses an existing Balance test.
 	dir, err := utils.GetTerraMonitorsPath()
 	suite.NoError(err)

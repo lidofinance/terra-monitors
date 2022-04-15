@@ -319,7 +319,7 @@
         ],
         "executionErrorState": "alerting",
         "for": "5m",
-        "frequency": "1m",
+        "frequency": "24h",
         "handler": 1,
         "name": "Operator bot balance is below 1500UST",
         "noDataState": "keep_state",
@@ -731,8 +731,8 @@
       "gridPos": {
         "h": 8,
         "w": 8,
-        "x": 16,
-        "y": 10
+        "x": 8,
+        "y": 18
       },
       "id": 4,
       "options": {
@@ -781,5 +781,5 @@
   "timezone": "",
   "title": "Bots",
   "uid": "06gp6MU7k",
-  "version": 5
+  "version": 4
 }

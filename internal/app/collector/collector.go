@@ -87,6 +87,9 @@ func New(cfg config.CollectorConfig, logger *logrus.Logger) (*Collector, error) 
 	oracleParamsMonitor := monitors.NewOracleParamsMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, oracleParamsMonitor)
 
+	missingVotesMonitor := monitors.NewMissingVotesGovernanceMonitor(cfg, logger, c.apiClient)
+	c.RegisterMonitor(ctx, cfg, missingVotesMonitor)
+
 	return c, nil
 }
 

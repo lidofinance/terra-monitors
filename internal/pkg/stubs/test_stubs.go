@@ -48,6 +48,11 @@ func NewTestCollectorConfig(urlsWithScheme ...string) config.CollectorConfig {
 			ValidatorsRegistryContract:  types.ValidatorsRegistryContract,
 			AirDropRegistryContract:     types.AirDropRegistryContract,
 		},
+		MissingVotesGovernanceMonitor: config.MissingVotesGovernanceMonitor{
+			LookbackLimit:       types.MissingVotesGovernanceLookbackLimit,
+			AlertLimit:          types.MissingVotesGovernanceAlertLimit,
+			MonitoredValidators: types.MissingVotesGovernanceMonitoredValidators,
+		},
 	}
 
 	return cfg
