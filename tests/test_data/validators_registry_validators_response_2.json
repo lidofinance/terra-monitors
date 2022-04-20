@@ -1,0 +1,13 @@
+{
+  "height": "1",
+  "result":  [
+      {
+        "address": "terravaloper123gn6j23lmexu0qx5qhmgxgunmjcqsx8gmsyse",
+        "total_delegated":"100"
+      },
+      {
+        "address": "terravaloper15zcjduavxc5mkp8qcqs9eyhwlqwdlrzy6jln3m",
+        "total_delegated":"100"
+      }
+    ]
+}

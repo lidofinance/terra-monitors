@@ -3,6 +3,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
 	"strconv"
 	"sync"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/governance"
 	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/models"
 	"github.com/lidofinance/terra-repositories/proposals"
+	"github.com/lidofinance/terra-repositories/validators"
 
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/sirupsen/logrus"
@@ -21,27 +23,30 @@ var (
 )
 
 type MissingVotesGovernanceMonitor struct {
-	apiClient           *client.TerraRESTApis
-	repository          *proposals.Repository
-	logger              *logrus.Logger
-	lookbackLimit       int // M
-	alertLimit          int // N
-	monitoredValidators []string
-	metricVectors       map[MetricName]*MetricVector
-	lock                sync.RWMutex
+	apiClient            *client.TerraRESTApis
+	proposalsRepository  *proposals.Repository
+	validatorsRepository *validators.V2Repository
+	logger               *logrus.Logger
+	// lookbackLimit is how many proposals to look for in the past
+	lookbackLimit int
+	// alertLimit is how many votes can be missed before alerting
+	alertLimit    int
+	metricVectors map[MetricName]*MetricVector
+	lock          sync.RWMutex
 }
 
 func NewMissingVotesGovernanceMonitor(cfg config.CollectorConfig, logger *logrus.Logger, apiClient *client.TerraRESTApis) *MissingVotesGovernanceMonitor {
 	proposalsRepository := proposals.New(apiClient)
+	validatorsRepository := validators.NewV2Repository(cfg.Addresses.ValidatorsRegistryContract, apiClient)
 	m := MissingVotesGovernanceMonitor{
-		repository:          proposalsRepository,
-		apiClient:           apiClient,
-		logger:              logger,
-		lookbackLimit:       cfg.MissingVotesGovernanceMonitor.LookbackLimit,
-		alertLimit:          cfg.MissingVotesGovernanceMonitor.AlertLimit,
-		monitoredValidators: cfg.MissingVotesGovernanceMonitor.MonitoredValidators,
-		metricVectors:       make(map[MetricName]*MetricVector),
-		lock:                sync.RWMutex{},
+		proposalsRepository:  proposalsRepository,
+		validatorsRepository: validatorsRepository,
+		apiClient:            apiClient,
+		logger:               logger,
+		lookbackLimit:        cfg.MissingVotesGovernanceMonitor.LookbackLimit,
+		alertLimit:           cfg.MissingVotesGovernanceMonitor.AlertLimit,
+		metricVectors:        make(map[MetricName]*MetricVector),
+		lock:                 sync.RWMutex{},
 	}
 	m.InitMetrics()
 
@@ -144,35 +149,33 @@ func (m *MissingVotesGovernanceMonitor) FetchLastProposals(ctx context.Context) 
 }
 
 func (m *MissingVotesGovernanceMonitor) FetchNotVotedValidators(ctx context.Context, proposalID int) ([]string, error) {
-	proposalVotes, err := m.repository.GetVotes(ctx, proposalID)
+	proposalVotes, err := m.proposalsRepository.GetVotes(ctx, proposalID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get votes for %d: %w", proposalID, err)
 	}
 
-	votedValidatorsSubset := make([]string, 0, len(proposalVotes))
+	votedValidators := make([]string, 0, len(proposalVotes))
 	for _, item := range proposalVotes {
-		votedValidatorsSubset = append(votedValidatorsSubset, *item.Voter.AccountAddress)
+		votedValidators = append(votedValidators, *item.Voter.AccountAddress)
 	}
 
-	shouldVote := m.monitoredValidators
+	shouldVoteValidatorsValoper, err := m.validatorsRepository.GetValidatorsAddresses(ctx)
+	shouldVoteValidators := make([]string, 0, len(shouldVoteValidatorsValoper))
+	for _, item := range shouldVoteValidatorsValoper {
+		address, err := utils.ValoperToAccAddress(item)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert valoperAddress to address for %s: %w", item, err)
+		}
+		shouldVoteValidators = append(shouldVoteValidators, address)
+	}
 
-	return difference(shouldVote, votedValidatorsSubset), nil
+	if err != nil {
+		return nil, fmt.Errorf("failed to get lido validators from the contract: %w", err)
+	}
+
+	return utils.StringsSetsDifference(shouldVoteValidators, votedValidators), nil
 }
 
 func (m *MissingVotesGovernanceMonitor) providedMetricVectors() []MetricName {
 	return []MetricName{MissedVotesMetric, AlertLimitMetric}
-}
-
-func difference(a, b []string) []string {
-	mb := make(map[string]struct{}, len(b))
-	for _, x := range b {
-		mb[x] = struct{}{}
-	}
-	var diff []string
-	for _, x := range a {
-		if _, found := mb[x]; !found {
-			diff = append(diff, x)
-		}
-	}
-	return diff
 }

@@ -25,7 +25,6 @@ const (
 )
 
 var (
-	MissingVotesGovernanceLookbackLimit       = 10
-	MissingVotesGovernanceAlertLimit          = 10
-	MissingVotesGovernanceMonitoredValidators = []string{"terra17kj7euq7cyedllkm5z57svvq2quxmvzq9gxfy2", "terra1ya8mnvt0c6rahzvgj4ezwkt49rsscn6lkeklul"}
+	MissingVotesGovernanceLookbackLimit = 10
+	MissingVotesGovernanceAlertLimit    = 10
 )

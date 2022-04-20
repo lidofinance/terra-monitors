@@ -28,3 +28,22 @@ func TestTerraMonitorsPath(t *testing.T) {
 		t.Errorf("expected: %s, got: %s", expected, path)
 	}
 }
+
+func TestAddr(t *testing.T) {
+	valoper := "terravaloper1khfcg09plqw84jxy5e7fj6ag4s2r9wqsgm7k94"
+	want := "terra1khfcg09plqw84jxy5e7fj6ag4s2r9wqsg5jt4x"
+	got, err := ValoperToAccAddress(valoper)
+	if err != nil {
+		t.Fatalf("error is not nil: %v\n", err)
+	}
+
+	if got != want {
+		t.Fatalf("got \"%s\" but want \"%s\"\n", got, want)
+	}
+
+	incorrectValoper := "terravaloper1khfcg09plqw84jxy5e7fj6ag4s2r9wqsgm7k95"
+	_, err = ValoperToAccAddress(incorrectValoper)
+	if err == nil {
+		t.Fatalf("error is nil\n")
+	}
+}
