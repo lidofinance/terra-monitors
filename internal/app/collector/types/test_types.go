@@ -27,5 +27,5 @@ const (
 var (
 	MissingVotesGovernanceLookbackLimit       = 10
 	MissingVotesGovernanceAlertLimit          = 10
-	MissingVotesGovernanceMonitoredValidators = []string{"terra17kj7euq7cyedllkm5z57svvq2quxmvzq9gxfy2", "terra1xal43l3e62an3q0mky99chn9ga4j5yhnfkegx8", "terra1lph93xlfjek830h0659p0wuewu56gkjayvjucj", "terra1spvnfmgklu6ynaph007h7zszmu5sgu97k7877c", "terra1zd2dg4y3734lfywkke40dvecu8nkzd2fxp8f0v", "terra1gu9h26qeyf4etuzke3h7qq6x9rjpw4xqkprntq", "terra1xqt30x2updtqseetay5c3r7znjqfltuwc68h82", "terra1qqu376azltyc5wnsje5qgwru5mtj2yqdhj0cwl", "terra1cdzstr5qhe9wvm4ec0jmpjgprv2hpuqkx9klzn", "terra1ya8mnvt0c6rahzvgj4ezwkt49rsscn6l8k9yhv", "terra1ya8mnvt0c6rahzvgj4ezwkt49rsscn6lkeklul"}
+	MissingVotesGovernanceMonitoredValidators = []string{"terra17kj7euq7cyedllkm5z57svvq2quxmvzq9gxfy2", "terra1ya8mnvt0c6rahzvgj4ezwkt49rsscn6lkeklul"}
 )

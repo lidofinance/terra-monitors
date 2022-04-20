@@ -43,7 +43,6 @@ func NewMissingVotesGovernanceMonitor(cfg config.CollectorConfig, logger *logrus
 		metricVectors:       make(map[MetricName]*MetricVector),
 		lock:                sync.RWMutex{},
 	}
-	m.logger.Infof("Initialized last governance voted monitor with lookback of: %v, alertLimit: %v", m.lookbackLimit, m.alertLimit)
 	m.InitMetrics()
 
 	return &m
@@ -71,7 +70,7 @@ func (m *MissingVotesGovernanceMonitor) Handler(ctx context.Context) error {
 
 	proposalList, err := m.FetchLastProposals(ctx)
 	if err != nil {
-		m.logger.Errorf("Could not get proposalList. Error: %v", err)
+		m.logger.Errorf("could not get proposalList: %s", err)
 		return err
 	}
 
@@ -79,13 +78,13 @@ func (m *MissingVotesGovernanceMonitor) Handler(ctx context.Context) error {
 	for _, item := range proposalList {
 		proposalID, err := strconv.Atoi(*item.ID)
 		if err != nil {
-			m.logger.Errorf("Could not convert ID to integer. ID: %v", item.ID)
+			m.logger.Errorf("could not convert ID %s to integer: ", *item.ID)
 			return err
 		}
 
 		notVotedForProposal, err := m.FetchNotVotedValidators(ctx, proposalID)
 		if err != nil {
-			m.logger.Errorf("Could not get proposal for %v. Error: %v", item.ID, err)
+			m.logger.Errorf("could not get proposal for %s: %s", *item.ID, err)
 			return err
 		}
 
@@ -112,10 +111,6 @@ func (m *MissingVotesGovernanceMonitor) InitMetrics() {
 	initMetrics(nil, m.providedMetricVectors(), nil, m.metricVectors)
 }
 
-func (m *MissingVotesGovernanceMonitor) providedMetricVectors() []MetricName {
-	return []MetricName{MissedVotesMetric, AlertLimitMetric}
-}
-
 func (m *MissingVotesGovernanceMonitor) FetchLastProposals(ctx context.Context) ([]*models.GetProposalListResultProposals, error) {
 	resp, err := m.apiClient.Governance.GetV1GovProposals(
 		&governance.GetV1GovProposalsParams{
@@ -123,12 +118,12 @@ func (m *MissingVotesGovernanceMonitor) FetchLastProposals(ctx context.Context) 
 		},
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get proposals with {%s}", err)
+		return nil, fmt.Errorf("failed to get proposals: %w", err)
 	}
 
 	err = resp.GetPayload().Validate(nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to validate proposals with {%s}", err)
+		return nil, fmt.Errorf("failed to validate proposals: %w", err)
 	}
 
 	proposalsList := resp.GetPayload().Proposals
@@ -149,22 +144,23 @@ func (m *MissingVotesGovernanceMonitor) FetchLastProposals(ctx context.Context) 
 }
 
 func (m *MissingVotesGovernanceMonitor) FetchNotVotedValidators(ctx context.Context, proposalID int) ([]string, error) {
-	res := make([]string, 0)
-
 	proposalVotes, err := m.repository.GetVotes(ctx, proposalID)
 	if err != nil {
-		return res, fmt.Errorf("failed to get votes with {%s}", err)
+		return nil, fmt.Errorf("failed to get votes for %d: %w", proposalID, err)
 	}
 
-	votedValidatorsSubset := make([]string, 0)
+	votedValidatorsSubset := make([]string, 0, len(proposalVotes))
 	for _, item := range proposalVotes {
 		votedValidatorsSubset = append(votedValidatorsSubset, *item.Voter.AccountAddress)
 	}
 
 	shouldVote := m.monitoredValidators
-	res = difference(shouldVote, votedValidatorsSubset)
 
-	return res, nil
+	return difference(shouldVote, votedValidatorsSubset), nil
+}
+
+func (m *MissingVotesGovernanceMonitor) providedMetricVectors() []MetricName {
+	return []MetricName{MissedVotesMetric, AlertLimitMetric}
 }
 
 func difference(a, b []string) []string {
