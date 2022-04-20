@@ -21,6 +21,7 @@ type CollectorConfig struct {
 	UpdateDataInterval            time.Duration `envconfig:"default=30s"`
 	DelegationsDistributionConfig DelegationsDistributionConfig
 	NetworkGeneration             string `envconfig:"default=columbus-5"` // available values: columbus-5
+	MissingVotesGovernanceMonitor MissingVotesGovernanceMonitor
 }
 
 func NewCollectorConfig() (CollectorConfig, error) {
@@ -49,4 +50,9 @@ type Addresses struct {
 
 type DelegationsDistributionConfig struct {
 	NumMedianAbsoluteDeviations int64 `envconfig:"default=3"`
+}
+
+type MissingVotesGovernanceMonitor struct {
+	LookbackLimit int `envconfig:"default=30"`
+	AlertLimit    int `envconfig:"default=5"`
 }

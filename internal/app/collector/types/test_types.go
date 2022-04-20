@@ -23,3 +23,8 @@ const (
 	TestMoniker        = "Test validator"
 	TestCommissionRate = 0.08
 )
+
+var (
+	MissingVotesGovernanceLookbackLimit = 10
+	MissingVotesGovernanceAlertLimit    = 10
+)

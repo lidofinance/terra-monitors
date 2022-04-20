@@ -1,0 +1,153 @@
+{
+  "minDeposit": [
+      {
+          "denom": "uluna",
+          "amount": "50000000"
+      }
+  ],
+  "maxDepositPeriod": "1209600000000000",
+  "votingPeriod": "604800000000000",
+  "proposals": [
+      {
+          "id": "721",
+          "proposer": {
+              "accountAddress": "terra1cw6ua5dzph4a8yye2fga85tc3am5y58s4v9sga"
+          },
+          "type": "Community-pool Spend",
+          "status": "Passed",
+          "submitTime": "2022-03-22T08:55:16.671Z",
+          "title": "UST Goes Interchain: Part Five - Everything Else",
+          "description": "Platypus, Aave, StakeDAO, Ondo, DebtDAO, Excalibur, Beethoven, Pangolin and TJ\nhttps://agora.terra.money/t/ust-goes-interchain-reasonable-strats-part-five/5024",
+          "deposit": {
+              "depositEndTime": "2022-04-05T08:55:16.671Z",
+              "totalDeposit": [
+                  {
+                      "denom": "uluna",
+                      "amount": "50000000"
+                  }
+              ],
+              "minDeposit": [
+                  {
+                      "denom": "uluna",
+                      "amount": "50000000"
+                  }
+              ]
+          },
+          "vote": {
+              "id": "721",
+              "distribution": {
+                  "No": "51492011",
+                  "Yes": "148926274697101",
+                  "Abstain": "4534177467549",
+                  "NoWithVeto": "0"
+              },
+              "count": {
+                  "No": 0,
+                  "Yes": 93,
+                  "Abstain": 1,
+                  "NoWithVeto": 0
+              },
+              "total": "153460503656661.0000000000",
+              "votingEndTime": "2022-03-29T08:59:19.810Z",
+              "stakedLuna": "312751062977819.0000000000",
+              "voters": {
+                  "terra103zslwa3j8y6503hw3942ft4763lkry0crttw2": "Yes"
+              }
+          }
+      },
+      {
+          "id": "720",
+          "proposer": {
+              "accountAddress": "terra1cw6ua5dzph4a8yye2fga85tc3am5y58s4v9sga"
+          },
+          "type": "Community-pool Spend",
+          "status": "Passed",
+          "submitTime": "2022-03-22T08:52:44.533Z",
+          "title": "UST Goes Interchain: Part Five - Curve & Convex",
+          "description": "https://agora.terra.money/t/ust-goes-interchain-reasonable-strats-part-five/5024",
+          "deposit": {
+              "depositEndTime": "2022-04-05T08:52:44.533Z",
+              "totalDeposit": [
+                  {
+                      "denom": "uluna",
+                      "amount": "50000000"
+                  }
+              ],
+              "minDeposit": [
+                  {
+                      "denom": "uluna",
+                      "amount": "50000000"
+                  }
+              ]
+          },
+          "vote": {
+              "id": "720",
+              "distribution": {
+                  "No": "51492011",
+                  "Yes": "149911092755889",
+                  "Abstain": "4536349101039",
+                  "NoWithVeto": "0"
+              },
+              "count": {
+                  "No": 0,
+                  "Yes": 97,
+                  "Abstain": 0,
+                  "NoWithVeto": 0
+              },
+              "total": "154447493348939.0000000000",
+              "votingEndTime": "2022-03-29T08:58:40.560Z",
+              "stakedLuna": "312746916256854.0000000000",
+              "voters": {
+                  "terra108lmrztvc3pc3w774shgvpry4d3lf79k2nhxrw": "Yes"
+              }
+          }
+      },
+      {
+          "id": "599",
+          "proposer": {
+              "accountAddress": "terra1gawu5a5gmxtfsrkjh034rfy5eclp49seuyxuz8"
+          },
+          "type": "Community-pool Spend",
+          "status": "Passed",
+          "submitTime": "2022-03-19T03:17:47.659Z",
+          "title": "Allocate Earmarked Community Pool Funds to Ozone",
+          "description": "Allocate earmarked community pool funds to Ozone\n\nhttps://agora.terra.money/t/proposal-community-pool-spend-allocate-earmarked-community-pool-funds-to-ozone/4697",
+          "deposit": {
+              "depositEndTime": "2022-04-02T03:17:47.659Z",
+              "totalDeposit": [
+                  {
+                      "denom": "uluna",
+                      "amount": "50000000"
+                  }
+              ],
+              "minDeposit": [
+                  {
+                      "denom": "uluna",
+                      "amount": "50000000"
+                  }
+              ]
+          },
+          "vote": {
+              "id": "599",
+              "distribution": {
+                  "No": "7795563138997",
+                  "Yes": "141953760948340",
+                  "Abstain": "35943071068252",
+                  "NoWithVeto": "0"
+              },
+              "count": {
+                  "No": 4,
+                  "Yes": 87,
+                  "Abstain": 5,
+                  "NoWithVeto": 0
+              },
+              "total": "185692395155589.0000000000",
+              "votingEndTime": "2022-03-26T03:17:47.659Z",
+              "stakedLuna": "311887385008319.0000000000",
+              "voters": {
+                  "terra1004akfq6judjzpg074xmgpa2uj3t5l7sxjy2w0": "Yes"
+              }
+          }
+      }
+  ]
+}

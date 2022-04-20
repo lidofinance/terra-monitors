@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"os"
 	"strings"
 
@@ -12,6 +13,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 )
+
+const HRPAccount = "terra"
 
 // SourceToEndpoints parses the source parameters and creates a list of endpoints based on it.
 func SourceToEndpoints(source config.Source) []factory.Endpoint {
@@ -40,6 +43,34 @@ func GetTerraMonitorsPath() (string, error) {
 	}
 
 	return getTerraMonitorsPath(dir), nil
+}
+
+func ValoperToAccAddress(valoper string) (string, error) {
+	_, data, err := bech32.DecodeAndConvert(valoper)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode valoper address: %w", err)
+	}
+
+	acc, err := bech32.ConvertAndEncode(HRPAccount, data)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode terra address: %w", err)
+	}
+
+	return acc, nil
+}
+
+func StringsSetsDifference(a, b []string) []string {
+	mb := make(map[string]struct{}, len(b))
+	for _, x := range b {
+		mb[x] = struct{}{}
+	}
+	var diff []string
+	for _, x := range a {
+		if _, found := mb[x]; !found {
+			diff = append(diff, x)
+		}
+	}
+	return diff
 }
 
 func getCurrentDir() (string, error) {

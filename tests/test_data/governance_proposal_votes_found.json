@@ -1,0 +1,13 @@
+{
+    "totalCnt": 94,
+    "page": 1,
+    "limit": 10,
+    "votes": [
+        {
+            "answer": "Yes",
+            "voter": {
+                "accountAddress": "terra123gn6j23lmexu0qx5qhmgxgunmjcqsx8g5ueq2"
+            }
+        }
+    ]
+}
