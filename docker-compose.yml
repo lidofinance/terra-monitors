@@ -28,6 +28,8 @@ services:
       - prometheus-data:/prometheus
     depends_on:
       - lido_terra
+    extra_hosts:
+      - "governance_bot:${EXTERNAL_TERRA_BOTS_HOST}"
   lido_terra:
     build: .
     environment:
