@@ -45,6 +45,7 @@ type Addresses struct {
 	RewardsDispatcherContract   string `envconfig:"default=terra_dummy_rewards_dispatcher"`  // TODO: actualize.
 	AirDropRegistryContract     string `envconfig:"default=terra_dummy_airdrop"`             // TODO: actualize.
 	UpdateGlobalIndexBotAddress string `envconfig:"default=terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy"`
+	MonitoredAccounts           []string
 }
 
 type DelegationsDistributionConfig struct {

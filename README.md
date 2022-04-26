@@ -2,7 +2,7 @@
 
 Before running the service you have to fill .env file `./docker/env/.notifiers.env` with the following variables:
 ```shell
-cat ./docker/env/.notifiers.env 
+cat ./docker/env/.notifiers.env
 TELEGRAM_BOTTOKEN=<telegram_bottoken>
 TELEGRAM_CHAT_ID=<telegram_chat_id>
 WEBHOOK_URL=<webhook_notifications_channel_endpoint>
@@ -30,6 +30,9 @@ ADDRESSES_BLUNA_TOKEN_INFO_CONTRACT=terra1kc87mu460fwkqte29rquh4hc20m54fxwtsx7gp
 ADDRESSES_VALIDATORS_REGISTRY_CONTRACT=terra_dummy_validators_registry
 ADDRESSES_REWARDS_DISPATCHER_CONTRACT=terra_dummy_rewards_dispatcher
 ADDRESSES_AIR_DROP_REGISTRY_CONTRACT=terra_dummy_airdrop
+
+# accounts that you want to alert any transactions from
+ADDRESSES_MONITORED_ACCOUNTS=terra_dummy_1,terra_dummy_2
 
 # monitored bot, executing update_global_index message on the hub contract
 # https://www.notion.so/bAsset-index-updating-bot-f64ebb5ec6704f05a840d93f28b1e3be

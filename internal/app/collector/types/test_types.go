@@ -12,6 +12,10 @@ const (
 	AirDropRegistryContract     = "dummy_airdropRegistry"
 )
 
+var (
+	MonitoredAccountAddresses = []string{"terra1glpjvujn0gjdjqra2ejgu7um2yd9fu63n7h29u"}
+)
+
 const (
 	TestValAddress   = "terravalcons1ezj3lps8nqwytt42at2sgt7seq9hk708g0spyk"
 	TestValAddress2  = "terravaloper1qxqrtvg3smlfdfhvwcdzh0huh4f50kfs6gdt4x"

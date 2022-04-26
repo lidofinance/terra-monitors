@@ -1,0 +1,5 @@
+{
+  "type": "API_ERROR",
+  "message": "syntax error at or near \")\"",
+  "code": "42601"
+}
