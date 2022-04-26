@@ -31,6 +31,9 @@ ADDRESSES_VALIDATORS_REGISTRY_CONTRACT=terra_dummy_validators_registry
 ADDRESSES_REWARDS_DISPATCHER_CONTRACT=terra_dummy_rewards_dispatcher
 ADDRESSES_AIR_DROP_REGISTRY_CONTRACT=terra_dummy_airdrop
 
+# accounts that you want to alert any transactions from
+ADDRESSES_MONITORED_ACCOUNTS=terra_dummy_1,terra_dummy_2
+
 # monitored bot, executing update_global_index message on the hub contract
 # https://www.notion.so/bAsset-index-updating-bot-f64ebb5ec6704f05a840d93f28b1e3be
 ADDRESSES_UPDATE_GLOBAL_INDEX_BOT_ADDRESS=terra1eqpx4zr2vm9jwu2vas5rh6704f6zzglsayf2fy
