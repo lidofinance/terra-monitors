@@ -39,6 +39,7 @@ func New(cfg config.CollectorConfig, logger *logrus.Logger) (*Collector, error) 
 		BAssetContractsVersion:     cfg.BassetContractsVersion,
 		HubContract:                cfg.Addresses.HubContract,
 		ValidatorsRegistryContract: cfg.Addresses.ValidatorsRegistryContract,
+		UseActiveSetValidatorsList: true, // TODO make envconfig
 	}
 	validatorsRepository, err := repositories.NewValidatorsRepository(valRepoCfg, c.apiClient)
 	if err != nil {
@@ -63,9 +64,6 @@ func New(cfg config.CollectorConfig, logger *logrus.Logger) (*Collector, error) 
 	configCRC32Monitor := monitors.NewConfigsCRC32Monitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, configCRC32Monitor)
 
-	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(cfg, logger, validatorsRepository)
-	c.RegisterMonitor(ctx, cfg, &whitelistedValidatorsMonitor)
-
 	validatorsFeeMonitor := monitors.NewValidatorsFeeMonitor(cfg, logger, validatorsRepository)
 	c.RegisterMonitor(ctx, cfg, validatorsFeeMonitor)
 
@@ -86,6 +84,19 @@ func New(cfg config.CollectorConfig, logger *logrus.Logger) (*Collector, error) 
 
 	oracleParamsMonitor := monitors.NewOracleParamsMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, oracleParamsMonitor)
+
+	repoConfig := repositories.ValidatorsRepositoryConfig{
+		BAssetContractsVersion:     cfg.BassetContractsVersion,
+		HubContract:                cfg.Addresses.HubContract,
+		ValidatorsRegistryContract: cfg.Addresses.ValidatorsRegistryContract,
+		UseActiveSetValidatorsList: false,
+	}
+	repo, err := repositories.NewValidatorsRepository(repoConfig, c.apiClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialise a whitelisted validators repository: %v", err)
+	}
+	whitelistedValidatorsMonitor := monitors.NewWhitelistedValidatorsMonitor(cfg, logger, repo)
+	c.RegisterMonitor(ctx, cfg, &whitelistedValidatorsMonitor)
 
 	return c, nil
 }

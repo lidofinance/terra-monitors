@@ -129,7 +129,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "validators_commission * 100",
+          "expr": "terra_validators_commission * 100 and terra_whitelisted_validators",
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "A"
@@ -307,7 +307,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "oracle_missed_votes_rate * 100",
+          "expr": "terra_oracle_missed_votes_rate * 100 and terra_whitelisted_validators",
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "A"
@@ -436,7 +436,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "failed_redelegations",
+          "expr": "terra_failed_redelegations",
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "A"
@@ -503,14 +503,14 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "slashing_signed_blocks_window",
+          "expr": "terra_slashing_signed_blocks_window",
           "interval": "",
           "legendFormat": "Slashing signed blocks window",
           "refId": "A"
         },
         {
           "exemplar": true,
-          "expr": "oracle_missed_votes_window",
+          "expr": "terra_oracle_missed_votes_window",
           "hide": false,
           "interval": "",
           "legendFormat": "Oracle missed votes window ",
@@ -592,7 +592,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "delegations_distribution_imbalance",
+          "expr": "terra_delegations_distribution_imbalance",
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "A"
@@ -757,14 +757,14 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "hub_parameters_epoch_period{}",
+          "expr": "terra_hub_parameters_epoch_period{}",
           "interval": "",
           "legendFormat": "Epoch period",
           "refId": "A"
         },
         {
           "exemplar": true,
-          "expr": "hub_parameters_unbonding_period{}",
+          "expr": "terra_hub_parameters_unbonding_period{}",
           "hide": false,
           "interval": "",
           "legendFormat": "Unbonding period",
@@ -893,7 +893,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "hub_parameters_er_threshold{}",
+          "expr": "terra_hub_parameters_er_threshold{}",
           "interval": "",
           "legendFormat": "Er threshold",
           "refId": "A"
@@ -1021,7 +1021,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "hub_parameters_peg_recovery_fee{}",
+          "expr": "terra_hub_parameters_peg_recovery_fee{}",
           "interval": "",
           "legendFormat": "Peg recovery fee",
           "refId": "A"
@@ -1172,7 +1172,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "hub_parameters_crc32{}",
+          "expr": "terra_hub_parameters_crc32{}",
           "hide": false,
           "interval": "",
           "legendFormat": "hub parameters",
@@ -1180,7 +1180,7 @@
         },
         {
           "exemplar": true,
-          "expr": "config_crc32",
+          "expr": "terra_config_crc32",
           "hide": false,
           "interval": "",
           "legendFormat": "{{label}}",
@@ -1309,7 +1309,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "whitelisted_validators_crc32{}",
+          "expr": "terra_whitelisted_validators_crc32{}",
           "interval": "",
           "legendFormat": "whitelisted validators crc32",
           "refId": "A"
@@ -1437,7 +1437,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "whitelisted_validators_num",
+          "expr": "terra_whitelisted_validators_num",
           "interval": "",
           "legendFormat": "number of whitelisted validators",
           "refId": "A"
@@ -1579,7 +1579,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "slashing_num_jailed_validators{}",
+          "expr": "terra_slashing_num_jailed_validators{}",
           "interval": "",
           "legendFormat": "currently jailed validators",
           "refId": "A"
@@ -1710,7 +1710,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "slashing_num_missed_blocks{}",
+          "expr": "terra_slashing_num_missed_blocks and terra_whitelisted_validators",
           "hide": false,
           "interval": "",
           "legendFormat": "{{label}}",
@@ -1718,7 +1718,7 @@
         },
         {
           "exemplar": true,
-          "expr": "(slashing_num_missed_blocks - slashing_num_missed_blocks % 100) / 100",
+          "expr": "(terra_slashing_num_missed_blocks - terra_slashing_num_missed_blocks % 100) / 100",
           "hide": true,
           "interval": "",
           "legendFormat": "{{label}} 100blocks step",
@@ -1847,7 +1847,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "slashing_num_tombstoned_validators{}",
+          "expr": "terra_slashing_num_tombstoned_validators{}",
           "interval": "",
           "legendFormat": "currently tombstoned validators",
           "refId": "A"
@@ -2041,7 +2041,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "stluna_exchange_rate{}",
+          "expr": "terra_stluna_exchange_rate{}",
           "interval": "",
           "legendFormat": "stLuna exchange rate",
           "refId": "A"
@@ -2239,7 +2239,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "bluna_exchange_rate{}",
+          "expr": "terra_bluna_exchange_rate{}",
           "interval": "",
           "legendFormat": "bLuna exchange rate",
           "refId": "A"
@@ -2328,7 +2328,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum_over_time(missed_blocks_for_period[30d])",
+          "expr": "sum_over_time(terra_missed_blocks_for_period[30d]) and terra_whitelisted_validators",
           "interval": "",
           "legendFormat": "{{label}}",
           "refId": "A"

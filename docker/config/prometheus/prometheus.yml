@@ -1,6 +1,7 @@
 # my global config
+---
 global:
-  scrape_interval:     1m # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  scrape_interval: 1m # Set the scrape interval to every 15 seconds. Default is every 1 minute.
   evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
   scrape_timeout: 30s
 
@@ -8,4 +9,30 @@ scrape_configs:
   - job_name: lido_terra
     scrape_interval: 1m
     static_configs:
-    - targets: ['lido_terra:8080', 'governance_bot:8080']
+      - targets: ["lido_terra:8080", "governance_bot:8080"]
+
+# Remote write configuration (for Google BigQuery).
+remote_write:
+  - url: "http://bq_adapter:9201/write"
+    remote_timeout: 2m
+    # Cleanup metrics to send
+    write_relabel_configs:
+      - source_labels: [__name__]
+        regex: ^terra_.*
+        action: keep
+      - regex: (job|instance)
+        action: labeldrop
+    # Config stolen from github
+    queue_config:
+      capacity: 500
+      max_shards: 200
+      min_shards: 1
+      max_samples_per_send: 100
+      batch_send_deadline: 5s
+      min_backoff: 30ms
+      max_backoff: 100ms
+
+# Remote read configuration (for Google BigQuery).
+remote_read:
+  - url: "http://bq_adapter:9201/read"
+    remote_timeout: 1m

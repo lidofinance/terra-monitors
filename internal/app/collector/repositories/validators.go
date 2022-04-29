@@ -30,9 +30,15 @@ type ValidatorsRepositoryConfig struct {
 	// ValidatorsRegistryContract refers to the contract containing information about whitelisted
 	// validators for the 2nd version of the bAsset contracts.
 	ValidatorsRegistryContract string
+    // Use active set validators repository
+    UseActiveSetValidatorsList bool
 }
 
 func NewValidatorsRepository(cfg ValidatorsRepositoryConfig, apiClient *client.TerraRESTApis) (ValidatorsRepository, error) {
+    if cfg.UseActiveSetValidatorsList {
+        return validators.NewActiveSetValidatorsRepository(apiClient), nil
+    }
+
 	switch cfg.BAssetContractsVersion {
 	case BAssetContractsVersion1:
 		return validators.NewV1Repository(cfg.HubContract, apiClient), nil

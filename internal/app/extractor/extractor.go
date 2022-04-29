@@ -35,10 +35,15 @@ type PromExtractor struct {
 	log                *logrus.Logger
 }
 
+// Return fully qualified metric name to be able distinguish from system ones
+func (p *PromExtractor) metricName(name monitors.MetricName) string {
+    return "terra_" + string(name)
+}
+
 func (p *PromExtractor) addGauge(name monitors.MetricName) {
 	p.Gauges[name] = prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Name: string(name),
+			Name: p.metricName(name),
 		})
 
 	prometheus.MustRegister(p.Gauges[name])
@@ -48,7 +53,7 @@ func (p *PromExtractor) addGauge(name monitors.MetricName) {
 func (p *PromExtractor) addGaugeVector(name monitors.MetricName) {
 	p.GaugeVectors[name] = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: string(name),
+			Name: p.metricName(name),
 		},
 		[]string{"label"},
 	)

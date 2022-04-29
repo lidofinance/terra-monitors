@@ -6,8 +6,8 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cosmos/cosmos-sdk v0.44.4
 	github.com/gorilla/mux v1.8.0
-	github.com/lidofinance/terra-fcd-rest-client v0.0.0-20211216152113-d81abb9b5b2f
-	github.com/lidofinance/terra-repositories v0.0.0-20211216152128-33a198aeb9d9
+	github.com/lidofinance/terra-fcd-rest-client v0.0.0-20220421205957-4371f29c2276
+	github.com/lidofinance/terra-repositories v0.0.0-20220429175633-9b70ba08bf9a
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/procfs v0.7.0 // indirect
@@ -28,3 +28,6 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 replace github.com/tendermint/tendermint => github.com/tendermint/tendermint v0.34.12
 
 replace github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
+
+// fork because of lack of access rights
+replace github.com/lidofinance/terra-fcd-rest-client => github.com/madlabman/terra-fcd-rest-client v0.0.0-20220429174644-9c0ccb9ee3ab

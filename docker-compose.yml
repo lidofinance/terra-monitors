@@ -1,5 +1,7 @@
+---
 version: "3"
 services:
+
   grafana:
     image: grafana/grafana:8.0.5
     ports:
@@ -14,10 +16,12 @@ services:
     volumes:
       - ./docker/config/grafana/provisioning:/etc/grafana/provisioning
       - grafana-storage:/var/lib/grafana
+
   renderer:
     image: grafana/grafana-image-renderer:latest
     environment:
       ENABLE_METRICS: 'true'
+
   prometheus:
     image: prom/prometheus
     command:
@@ -28,6 +32,14 @@ services:
       - prometheus-data:/prometheus
     depends_on:
       - lido_terra
+      - bq_adapter
+
+  bq_adapter:
+    image: quay.io/kohlstechnology/prometheus_bigquery_remote_storage_adapter:v0.4.6
+    env_file: ./docker/env/.bq_adapter.env
+    volumes:
+      - $SA_JSON_PATH:/secrets/sa.json:ro
+
   lido_terra:
     build: .
     environment:
@@ -47,6 +59,7 @@ services:
       driver: "json-file"
       options:
         tag: ${SERVICE_NAME:-lido_terra}
+
   loki:
     image: grafana/loki:2.3.0
     volumes:

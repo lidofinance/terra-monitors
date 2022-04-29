@@ -19,10 +19,12 @@ import (
 const (
 	WhitelistedValidatorsCRC32 MetricName = "whitelisted_validators_crc32"
 	WhitelistedValidatorsNum   MetricName = "whitelisted_validators_num"
+	WhitelistedValidators      MetricName = "whitelisted_validators"
 )
 
 type WhitelistedValidatorsMonitor struct {
 	metrics              map[MetricName]MetricValue
+	metricVectors        map[MetricName]*MetricVector
 	apiClient            *client.TerraRESTApis
 	logger               *logrus.Logger
 	validatorsRepository repositories.ValidatorsRepository
@@ -35,6 +37,7 @@ func NewWhitelistedValidatorsMonitor(
 ) WhitelistedValidatorsMonitor {
 	m := WhitelistedValidatorsMonitor{
 		metrics:              make(map[MetricName]MetricValue),
+		metricVectors:        make(map[MetricName]*MetricVector),
 		apiClient:            utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
 		logger:               logger,
 		validatorsRepository: repository,
@@ -55,13 +58,14 @@ func (m *WhitelistedValidatorsMonitor) providedMetrics() []MetricName {
 	}
 }
 
-func (m *WhitelistedValidatorsMonitor) InitMetrics() {
-	for _, metric := range m.providedMetrics() {
-		if m.metrics[metric] == nil {
-			m.metrics[metric] = &SimpleMetricValue{}
-		}
-		m.metrics[metric].Set(0)
+func (m *WhitelistedValidatorsMonitor) providedMetricVectors() []MetricName {
+	return []MetricName{
+		WhitelistedValidators,
 	}
+}
+
+func (m *WhitelistedValidatorsMonitor) InitMetrics() {
+	initMetrics(m.providedMetrics(), m.providedMetricVectors(), m.metrics, m.metricVectors)
 }
 
 func (m WhitelistedValidatorsMonitor) GetMetrics() map[MetricName]MetricValue {
@@ -69,7 +73,7 @@ func (m WhitelistedValidatorsMonitor) GetMetrics() map[MetricName]MetricValue {
 }
 
 func (m WhitelistedValidatorsMonitor) GetMetricVectors() map[MetricName]*MetricVector {
-	return nil
+	return m.metricVectors
 }
 
 func (m *WhitelistedValidatorsMonitor) Handler(ctx context.Context) error {
@@ -82,6 +86,16 @@ func (m *WhitelistedValidatorsMonitor) Handler(ctx context.Context) error {
 	sort.Strings(validators)
 	m.metrics[WhitelistedValidatorsCRC32].Set(float64(crc32.ChecksumIEEE([]byte(strings.Join(validators, "")))))
 	m.metrics[WhitelistedValidatorsNum].Set(float64(len(validators)))
-	m.logger.Infoln("updated ", m.Name())
+
+	for _, validator := range validators {
+		info, err := m.validatorsRepository.GetValidatorInfo(ctx, validator)
+		if err != nil {
+			return fmt.Errorf("failed to get whiltelisted validator %s info: %w", validator, err)
+		}
+
+		m.metricVectors[WhitelistedValidators].Set(info.Moniker, 1)
+	}
+
+	m.logger.Infoln("updated", m.Name())
 	return nil
 }
