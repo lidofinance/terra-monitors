@@ -8,7 +8,7 @@ TELEGRAM_CHAT_ID=<telegram_chat_id>
 WEBHOOK_URL=<webhook_notifications_channel_endpoint>
 ```
 
-Variables required to service work.\
+Variables required for service to work.\
 You should pass the .env file and pass it to docker-compose service with `--env-file` argument.
 ```shell
 # custom endpoint for alert messages 
@@ -48,6 +48,9 @@ SERVICE_NAME=lido_terra_mainnet
 # amount should be grater than the median delegations amount. Higher values mean less monitor
 # sensitivity. A step of 0.25 is nice for calibration.
 DELEGATIONS_DISTRIBUTION_CONFIG_NUM_MEDIAN_ABSOLUTE_DEVIATIONS=3
+
+# Configures /etc/hosts inside prometheus to allow referencing governance bot by same name instead of IP address
+EXTERNAL_TERRA_BOTS_HOST=1.1.1.1
 ```
 
 **N.B.: you can specify failover endpoints (sorted by priority, max to min) for the `SOURCE_ENDPOINTS` config:**
