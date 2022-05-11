@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/monitors"
 	"github.com/lidofinance/terra-monitors/internal/app/collector/repositories"
 	"github.com/lidofinance/terra-monitors/internal/app/config"
 	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
-
-	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
 	"github.com/lidofinance/terra-repositories/delegations"
 	"github.com/lidofinance/terra-repositories/signinfo"
 
@@ -86,6 +85,9 @@ func New(cfg config.CollectorConfig, logger *logrus.Logger) (*Collector, error) 
 
 	oracleParamsMonitor := monitors.NewOracleParamsMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, oracleParamsMonitor)
+
+	stakedLunaMonitor := monitors.NewStakedLunaAmountMonitor(logger)
+	c.RegisterMonitor(ctx, cfg, stakedLunaMonitor)
 
 	return c, nil
 }
