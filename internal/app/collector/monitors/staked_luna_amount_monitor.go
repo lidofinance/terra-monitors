@@ -2,39 +2,35 @@ package monitors
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"sync"
-	"time"
 
+	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client"
 	"github.com/lidofinance/terra-fcd-rest-client/columbus-5/client/staking"
+	"github.com/lidofinance/terra-monitors/internal/app/config"
+	"github.com/lidofinance/terra-monitors/internal/pkg/utils"
 
 	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sirupsen/logrus"
 )
 
 const (
-	stakedLunaAmount   MetricName = "staked_uluna_amount"
-	stakingPoolInfoUrl string     = "https://fcd.terra.dev/staking/pool"
+	stakedLunaAmount MetricName = "staked_uluna_amount"
 )
 
 type StakedLunaAmountMonitor struct {
-	metrics map[MetricName]MetricValue
-	client  *http.Client
-	logger  *logrus.Logger
-	lock    sync.RWMutex
+	metrics   map[MetricName]MetricValue
+	apiClient *client.TerraRESTApis
+	logger    *logrus.Logger
+	lock      sync.RWMutex
 }
 
-func NewStakedLunaAmountMonitor(logger *logrus.Logger) *StakedLunaAmountMonitor {
+func NewStakedLunaAmountMonitor(cfg config.CollectorConfig, logger *logrus.Logger) *StakedLunaAmountMonitor {
 	m := StakedLunaAmountMonitor{
-		metrics: make(map[MetricName]MetricValue),
-		client: &http.Client{
-			Timeout: 30 * time.Second,
-		},
-		logger: logger,
-		lock:   sync.RWMutex{},
+		metrics:   make(map[MetricName]MetricValue),
+		apiClient: utils.BuildClient(utils.SourceToEndpoints(cfg.Source), logger),
+		logger:    logger,
+		lock:      sync.RWMutex{},
 	}
 	m.InitMetrics()
 	return &m
@@ -58,27 +54,14 @@ func (m *StakedLunaAmountMonitor) Handler(ctx context.Context) error {
 	p := staking.GetStakingPoolParams{}
 	p.SetContext(ctx)
 
-	resp, err := m.client.Get(stakingPoolInfoUrl)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
+	resp, err := m.apiClient.Staking.GetStakingPool(&p)
 	if err != nil {
-		return fmt.Errorf("get staking pool request failed: %w", err)
-	}
-
-	d, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read get staking pool resp body: %w", err)
-	}
-
-	var pool stakingPoolInfoResp
-	if err := json.Unmarshal(d, &pool); err != nil {
-		return fmt.Errorf("failed to unmarshal staking pool resp to stakingPoolInfoResp: %w", err)
+		return fmt.Errorf("failed to process GetStakingPool request: %w", err)
 	}
 
 	m.lock.RLock()
 	defer m.lock.RUnlock()
-	m.setStringMetric(stakedLunaAmount, pool.Result.BondedTokens)
+	m.setStringMetric(stakedLunaAmount, resp.Payload.Result.BondedTokens)
 	m.logger.Infoln("updated StakedLunaAmount")
 	return nil
 }
@@ -115,12 +98,4 @@ func (m *StakedLunaAmountMonitor) GetMetricVectors() map[MetricName]*MetricVecto
 
 func (m *StakedLunaAmountMonitor) SetLogger(l *logrus.Logger) {
 	m.logger = l
-}
-
-type stakingPoolInfoResp struct {
-	Height string `json:"height"`
-	Result struct {
-		NotBondedTokens string `json:"not_bonded_tokens"`
-		BondedTokens    string `json:"bonded_tokens"`
-	} `json:"result"`
 }

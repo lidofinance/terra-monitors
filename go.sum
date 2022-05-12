@@ -628,6 +628,10 @@ github.com/libp2p/go-buffer-pool v0.0.2/go.mod h1:MvaB6xw5vOrDl8rYZGLFdKAuk/hRoR
 github.com/lidofinance/terra-fcd-rest-client v0.0.0-20211213162754-cf6489ae3534/go.mod h1:KLcUnf1uqndQVd4mr196Nj+07lEfKGj4RUxxuBEx8TA=
 github.com/lidofinance/terra-fcd-rest-client v0.0.0-20211216152113-d81abb9b5b2f h1:ujMvDoizzQ/pwTVy2eQAAOxkTR55hSeSxxFXNmI3Ve4=
 github.com/lidofinance/terra-fcd-rest-client v0.0.0-20211216152113-d81abb9b5b2f/go.mod h1:KLcUnf1uqndQVd4mr196Nj+07lEfKGj4RUxxuBEx8TA=
+github.com/lidofinance/terra-fcd-rest-client v0.0.0-20220512112516-5f4b197afefe h1:epEv6jpsYfoKYfdzKocOoG2I9J1cfQ6jvPqOD/FflYw=
+github.com/lidofinance/terra-fcd-rest-client v0.0.0-20220512112516-5f4b197afefe/go.mod h1:KLcUnf1uqndQVd4mr196Nj+07lEfKGj4RUxxuBEx8TA=
+github.com/lidofinance/terra-fcd-rest-client v0.0.0-20220512130920-2131001551bd h1:qWA0e6Q/UVjib/Po/lmGdAfBurCPV+q24WGnQwD/uzY=
+github.com/lidofinance/terra-fcd-rest-client v0.0.0-20220512130920-2131001551bd/go.mod h1:KLcUnf1uqndQVd4mr196Nj+07lEfKGj4RUxxuBEx8TA=
 github.com/lidofinance/terra-repositories v0.0.0-20211216152128-33a198aeb9d9 h1:Hwh6u+yn87Hkxys+rH8jvI/hGKCXpABtL6IUWFMl4zw=
 github.com/lidofinance/terra-repositories v0.0.0-20211216152128-33a198aeb9d9/go.mod h1:8SJTLh0zjvuV/P7rJvPbccYXxSa2bPPpTL7QCdCYLPo=
 github.com/lightstep/lightstep-tracer-common/golang/gogo v0.0.0-20190605223551-bc2310a04743/go.mod h1:qklhhLq1aX+mtWk9cPHPzaBjWImj5ULL6C7HFJtXQMM=

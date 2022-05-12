@@ -86,7 +86,7 @@ func New(cfg config.CollectorConfig, logger *logrus.Logger) (*Collector, error) 
 	oracleParamsMonitor := monitors.NewOracleParamsMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, oracleParamsMonitor)
 
-	stakedLunaMonitor := monitors.NewStakedLunaAmountMonitor(logger)
+	stakedLunaMonitor := monitors.NewStakedLunaAmountMonitor(cfg, logger)
 	c.RegisterMonitor(ctx, cfg, stakedLunaMonitor)
 
 	return c, nil
