@@ -527,7 +527,7 @@
           {
             "evaluator": {
               "params": [
-                300
+                600
               ],
               "type": "gt"
             },
@@ -552,7 +552,7 @@
         "for": "0s",
         "frequency": "10m",
         "handler": 1,
-        "message": "WARNING: staked Luna amount has grown greater than 300m",
+        "message": "WARNING: staked Luna amount has grown greater than 600m",
         "name": "Luna staking pool amount",
         "noDataState": "alerting",
         "notifications": [
