@@ -6,7 +6,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cosmos/cosmos-sdk v0.44.4
 	github.com/gorilla/mux v1.8.0
-	github.com/lidofinance/terra-fcd-rest-client v0.0.0-20211216152113-d81abb9b5b2f
+	github.com/lidofinance/terra-fcd-rest-client v0.0.0-20220512130920-2131001551bd
 	github.com/lidofinance/terra-repositories v0.0.0-20211216152128-33a198aeb9d9
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/prometheus/client_golang v1.11.0
