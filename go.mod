@@ -9,7 +9,7 @@ require (
 	github.com/lidofinance/terra-fcd-rest-client v0.0.0-20220512130920-2131001551bd
 	github.com/lidofinance/terra-repositories v0.0.0-20211216152128-33a198aeb9d9
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_golang v1.11.1
 	github.com/prometheus/procfs v0.7.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
